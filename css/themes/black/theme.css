@@ -1,0 +1,39 @@
+body, #background, #header { background: url('paper.jpg'); color: #fff; }
+a, a:link, a:visited, a:hover { color: #fff; }
+
+#navigation ul li a:link, #navigation ul li a:visited { color: #aaa; }
+#navigation ul li a:hover, #navigation ul li .link { color: #fff; }
+
+h3 a:link, h3 a:visited, h3 a:hover { color: #fff }
+
+#info { background-color: #666; color: #eee; }
+
+#content .section p { background-color: rgba(68, 68, 68, 0.5); color: #fff; }
+
+.tipsy-inner { background-color: #fff; color: #333; }
+.tipsy-arrow-n { border-bottom-color: #fff; }
+.tipsy-arrow-s { border-top-color: #fff; }
+.tipsy-arrow-e { border-left-color: #fff; }
+.tipsy-arrow-w { border-right-color: #fff; }
+
+.module, .framed { background-color: rgba(255, 255, 255, 0.1); }
+
+/*	index page	*/
+#node_info { color: #fff; }
+
+/*	about page	*/
+.quote, .author { color:#999; }
+.toggle > a, .toggle > a:visited { color: #fff; }
+.toggle > a:hover, .toggle > a.selected { color: #333; background-color: #fff; padding:.1em .4em; }
+
+/*	browse page	*/
+.module .header { background-color: rgba(255, 255, 255, .2); color: #fff; }
+.result a:link, .result a:visited {  color: #ccc; }
+.result a:hover {  color: #fff; }
+
+/*	icons	*/
+#icon_gear { background: url("icons/gear.png") no-repeat; width:20px; height:20px; }
+#icon_save { background: url("icons/save.png") no-repeat; width:20px; height:20px; border:0px; }
+#icon_theme { background: url("icons/theme.png") no-repeat; width:20px; height:28px; border:none; }
+.ui-datepicker-trigger { background: url("icons/calendar.png") no-repeat; width:20px; height:20px; border:none; }
+#icon_checkmark { background: url("icons/checkmark.png") no-repeat; width:30px; height:30px; border:none; }
