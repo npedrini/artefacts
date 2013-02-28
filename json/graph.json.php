@@ -188,118 +188,6 @@ if( isset($_SESSION['submission'])
 	unset( $_SESSION['submission'] );
 }
 
-//	get all artworks
-
-/*
-$sql  = "SELECT DISTINCT visit_data.artwork_id,artworks.* FROM visits ";
-$sql .= "RIGHT JOIN visit_data ON visits.id = visit_data.visit_id ";
-$sql .= "RIGHT JOIN artworks ON artworks.id = visit_data.artwork_id ";
-$sql .= "WHERE visits.visit_date >= '" . $date_end . "' AND visits.visit_date <= '" . $date_start . "'";
-$result = $mysqli->query( $sql );
-*/
-
-/*
-//	calculate artwork<>artwork links based on tag matches
-foreach($artworks as $item)
-{
-	if( strtolower($item->title) == 'mona' ) $mona_node = $item;
-	
-	foreach($artworks as $sibling)
-	{
-		if( $item->id != $sibling->id )
-		{
-			$common_tags = array_intersect( $item->tags, $sibling->tags );
-			
-			if( count($common_tags) > 1 )
-			{
-				$source = getNodeById( $item->id, "artwork", $nodes );
-				$target = getNodeById( $sibling->id, "artwork", $nodes );
-				
-				if( $source !=null 
-					&& $target !=null )
-				{
-					$key = $source->index.'_'.$target->index;
-					$key_rev = $target->index.'_'.$source->index;
-					
-					if( isset($a_keys[$key]) || isset($a_keys[$key_rev]) ) continue;
-					
-					//$links[] = (object)array('source'=>$source->index,'target'=>$target->index,'value'=>count($common_tags),'type'=>'aa');
-					
-					$a_keys[ $key ] = true;
-					
-					$source->value++;
-					$target->value++;
-				}
-			}
-		}
-	}
-}
-
-if( $mona_node != null )
-{
-	foreach($artworks as $item)
-	{
-		if( $item->id != $mona_node->id )
-		{
-			$source = getNodeById( $item->id, "artwork", $nodes );
-			$target = getNodeById( $mona_node->id, "artwork", $nodes );
-			
-			if( $source !=null 
-				&& $target !=null )
-			{
-				$key = $source->index.'_'.$target->index;
-				$key_rev = $target->index.'_'.$source->index;
-				
-				if( isset($a_keys[$key]) || isset($a_keys[$key_rev]) ) continue;
-				
-				//$links[] = (object)array('source'=>$source->index,'target'=>$target->index,'value'=>1,'type'=>'aa');
-				
-				$a_keys[ $key ] = true;
-				
-				//$source->value++;
-				$target->value++;
-			}
-		}
-	}
-}
-*/
-
-/*
-//	calculate dream<>dream links based on tag matches
-foreach($dreams as $item)
-{
-	foreach($dreams as $sibling)
-	{
-		if( $item->id != $sibling->id )
-		{
-			$common_tags = array_intersect( $item->tags, $sibling->tags );
-			
-			if( count($common_tags) )
-			{
-				$source = getNodeById( $item->id, "dream", $nodes );
-				$target = getNodeById( $sibling->id, "dream", $nodes );
-				
-				if( $source !=null 
-					&& $target !=null )
-				{
-					$key = $source->index.'_'.$target->index;
-					$key_rev = $target->index.'_'.$source->index;
-					
-					if( isset($d_keys[$key]) || isset($d_keys[$key_rev]) ) continue;
-					
-					$links[] = (object)array('source'=>$source->index,'target'=>$target->index,'value'=>count($common_tags),'type'=>'dd');
-				
-					$d_keys[ $key ] = true;
-					
-					$source->value++;
-					$target->value++;
-				}
-			}
-		}
-	}
-}
-*/
-
 //	calculate dream<>artwork links based on tag matches
 foreach($dreams as $dream)
 {
@@ -491,28 +379,10 @@ if( SHOW_MONA )
 	}
 }
 
-/*
-$x = WIDTH/2/WIDTH;
-$y = HEIGHT/2/HEIGHT;
-
-$mona_node->fixed = true;
-$mona_node->x = $x;
-$mona_node->y = $y;
-
-$r = WIDTH/2;
-$d = 0;
-
-for($i=0;$i<count($nodes_structured[1]);$i++)
+foreach($nodes as $node)
 {
-	$a = $d * (M_PI/180);
-	
-	$nodes_structured[1][$i]->fixed = true;
-	$nodes_structured[1][$i]->x = $x + (($r * cos($a)) / WIDTH);
-	$nodes_structured[1][$i]->y = $y + (($r * sin($a)) / HEIGHT);
-	
-	$d += 360/count($nodes_structured[1]);
+	$node->stroke = isset($node->color2) ? (hexdec(preg_replace("/#/","0x",$node->color2)) > 0x666666/2 ? true : false) : false; 
 }
-*/
 
 $data = (object)array( 'nodes'=>$nodes, 'links'=>$links, 'dream_total'=>count($dreams), 'art_total'=>count($artworks) );
 

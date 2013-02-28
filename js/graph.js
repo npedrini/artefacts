@@ -582,12 +582,12 @@ function nodeRadius(d)
 
 function nodeColor(d) { return themeId == 1 ? (d.color2 != null ? d.color2 : '#fff') : (d.color2!=null?d.color2:d.color); }
 function nodeFilter(d) { return '';return d.node_type==TYPE_DREAM?"url(#blur)":""; }
-function nodeStrokeColor(d) { return (parseInt(d.color2, 16) > 0xffffff/2) ? d.color2 : (themeId == 1?'#fff':'#000'); }
-function nodeStrokeOpacity(d) { return (parseInt(d.color2, 16) > 0xffffff/2) || d.node_type == TYPE_TAG ? .3 : 1; }
+function nodeStrokeColor(d) { return d.stroke ? d.color2 : (themeId == 1?'#fff':'#000'); }
+function nodeStrokeOpacity(d) {return d.stroke || d.node_type == TYPE_TAG ? .3 : 1; }
 function nodeStrokeWidth(d) 
 { 
 	if(d.node_type==TYPE_ARTWORK) 
-		return (parseInt(d.color2, 16) > 0xffffff/2) ? 0 : .25;
+		return d.stroke ? 0 : .25;
 	else if(d.node_type==TYPE_TAG && d.id != MONA_ID)
 		return 2;
 		
