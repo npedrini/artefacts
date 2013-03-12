@@ -245,6 +245,16 @@ function toggleTheme()
 	setTheme( themeId == 1 ? 0 : 1 ); 
 }
 
+function showLoader()
+{
+	$("body").append( "<div id='loader' class='centered'><div style='width:50px;'><img src='css/themes/<?php echo $_COOKIE['theme']==1?'black':'white'; ?>/loader.gif' /></div></div>" );
+}
+
+function hideLoader()
+{
+	$("#loader").remove();
+}
+
 function getTagDescription( tag )
 {
 	$.ajax
@@ -272,9 +282,9 @@ var inactivityTimer;
 
 <body id="vis" style="margin: 0px;">
 	
-	<div id="intro" style='position:absolute;top:50%;margin-top:-40px;left:0;width:100%;'>
+	<div id="intro" class="centered" style="width:200px;">
 	
-		<div style='width:200px;height:40px;font-family:courier,mono-space;font-size:.7em;margin-left:auto;margin-right:auto;margin-bottom:60px;color:#333;vertical-align:middle'>
+		<div>
 			<a href="javascript:show();"><span id="line1">It's <?php echo $date->format('g:ia'); ?> in Hobart.</span><br/><span id="line2">MONA is <?php echo $mona_state; ?>.</span></a>
 		</div>
 		

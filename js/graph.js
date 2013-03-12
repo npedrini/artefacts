@@ -61,8 +61,12 @@ function initGraph( date )
   	url += "&show_mona=<?php echo isset($_GET['mona'])?$_GET['mona']:'true'; ?>";
   	*/
   	
+  	showLoader();
+  	
 	d3.json(url, function(error, graph) 
 	{
+		hideLoader();
+		
 		if( force ) force.stop();
 		
 		force = d3.layout.force(.2).charge(-300).friction(.8).size([w, h]);
