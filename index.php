@@ -144,39 +144,42 @@ function show()
 			//	store list of available dates
 			availableDates = data.dates;
 			
-			//	create date format string
-			var df = DATE_FORMAT
-				.replace( /{{date}}/, 'd' )
-				.replace( /{{month}}/, 'm' )
-				.replace( /{{year}}/, 'yy' );
-			
-			//	initialize date packer
-			$("#datepicker").datepicker
-			(
-				{
-					beforeShow: function(){ $('#date').tipsy("hide"); },
-					beforeShowDay: shouldEnableDate,
-					dateFormat: df,
-					buttonImageOnly: true,
-					minDate: availableDates[ availableDates.length - 1 ],
-					maxDate: availableDates[0],
-					onSelect: onDateChange,
-					showOn: "button"
-				}
-			);
-			
-			$("#dateselect").attr("title","Set Date");
-			
-			$.extend($.datepicker,{_checkOffset:function(inst,offset,isFixed){return offset}});
-			
-			//	get init date from hash
-			var hash = window.location.hash;
-			hash = hash.substr( hash.indexOf('#')+ 1 );
-			
-			//	set initial date
-			$("#datepicker").val( availableDates.indexOf( hash ) > -1 ? hash : availableDates[0] );
-			
-			onDateChange();
+			if( availableDates.length )
+			{
+				//	create date format string
+				var df = DATE_FORMAT
+					.replace( /{{date}}/, 'd' )
+					.replace( /{{month}}/, 'm' )
+					.replace( /{{year}}/, 'yy' );
+				
+				//	initialize date packer
+				$("#datepicker").datepicker
+				(
+					{
+						beforeShow: function(){ $('#date').tipsy("hide"); },
+						beforeShowDay: shouldEnableDate,
+						dateFormat: df,
+						buttonImageOnly: true,
+						minDate: availableDates[ availableDates.length - 1 ],
+						maxDate: availableDates[0],
+						onSelect: onDateChange,
+						showOn: "button"
+					}
+				);
+				
+				$("#dateselect").attr("title","Set Date");
+				
+				$.extend($.datepicker,{_checkOffset:function(inst,offset,isFixed){return offset}});
+				
+				//	get init date from hash
+				var hash = window.location.hash;
+				hash = hash.substr( hash.indexOf('#')+ 1 );
+				
+				//	set initial date
+				$("#datepicker").val( availableDates.indexOf( hash ) > -1 ? hash : availableDates[0] );
+				
+				onDateChange();
+			}
 		}
 	);
 }
