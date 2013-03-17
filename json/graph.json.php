@@ -326,7 +326,7 @@ foreach($dreams as $dream)
 					}
 				}
 				
-				if( SHOW_MONA ) $mona_node->value++;
+				if( SHOW_MONA && isset($mona_node) ) $mona_node->value++;
 			}
 		}
 	}
@@ -334,7 +334,8 @@ foreach($dreams as $dream)
 
 $nodes_structured[1] = array();
 
-if( SHOW_MONA )
+if( SHOW_MONA 
+	&& isset($mona_node) )
 {
 	$source = getNodeById( $mona_node->id, "artwork", $nodes );
 	
