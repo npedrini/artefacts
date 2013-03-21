@@ -112,14 +112,14 @@ class Dream
 			$file_extensions = array('gif','jpg','jpeg','png');
 			
 			if ( in_array( $this->file["type"], $mime_types )
-				&& ($this->file["size"] < MAX_BYTES)
+				&& ($this->file["size"] < self::MAX_BYTES)
 				&& in_array($extension, $file_extensions) )
 			{
 				if ($this->file["error"] == 0)
 				{
-					$image = time() . "." . $extension;
+					$this->image = time() . "." . $extension;
 					
-					if ( !move_uploaded_file( $this->file["tmp_name"], getcwd()."/images/dreams/" . $image ) )
+					if ( !move_uploaded_file( $this->file["tmp_name"], getcwd()."/images/dreams/" . $this->image ) )
 					{
 						$this->status = "Oops! We had trouble moving the image. Please try again later.";
 						$valid = $disable_fields = false;
@@ -267,7 +267,7 @@ class Dream
 		$valid = true;
 		
 		//	validate required fields
-		$required = array('date','description','email');
+		$required = array('date','description');
 		
 		foreach($required as $field)
 			if( !isset($this->$field) || empty($this->$field) )
@@ -277,36 +277,6 @@ class Dream
 		{
 			$this->status = "Please complete all the fields.";
 		}
-		
-		//	validate email separately
-		if( $valid )
-		{
-			if( !isset($this->email) ) 
-			{
-				$this->status = "Oops! Please enter your email.";
-				$valid = false;
-			}
-			
-			if( !filter_var($this->email, FILTER_VALIDATE_EMAIL) )
-			{
-				$this->status = "Oops! This doesn't look like a valid email.";
-				$valid = false;
-			}
-		}
-		
-		/*
-		//	validate for at least five tags
-		if( $valid )
-		{
-			$tags = explode( ',', $this->tags );
-			
-			if( count($tags) < 5 )
-			{
-				$this->status = "Oops! Please enter at least five associations.";
-				$valid = false;
-			}
-		}
-		*/
 		
 		return $valid;
 	}
