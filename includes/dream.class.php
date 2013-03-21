@@ -9,9 +9,9 @@ class Dream
 	//	max size of file upload in bytes
 	const MAX_BYTES = 3145728;
 	
-	public $date;
 	public $age;
 	public $color;
+	public $date;
 	public $description;
 	public $email;
 	public $gender;
@@ -19,6 +19,8 @@ class Dream
 	public $tags;
 	public $title;
 	public $user_id;
+	
+	public $file;
 	
 	public $alchemyApiKey;
 	public $date_format;	//	TODO: set a default
@@ -100,27 +102,24 @@ class Dream
 		}
 		*/
 		
-		//	upload image if specified
-		$image = "";
-		
 		if( $valid 
-			&& isset($_FILES["file"])
-			&& !empty($_FILES["file"]["name"]) )
+			&& isset($this->file)
+			&& !empty($this->file["name"]) )
 		{
-			$extension = end( explode( ".", strtolower($_FILES["file"]["name"]) ) );
+			$extension = end( explode( ".", strtolower($this->file["name"]) ) );
 			
 			$mime_types = array('image/gif','image/jpeg','image/png');
 			$file_extensions = array('gif','jpg','jpeg','png');
 			
-			if ( in_array( $_FILES["file"]["type"], $mime_types )
-				&& ($_FILES["file"]["size"] < MAX_BYTES)
+			if ( in_array( $this->file["type"], $mime_types )
+				&& ($this->file["size"] < MAX_BYTES)
 				&& in_array($extension, $file_extensions) )
 			{
-				if ($_FILES["file"]["error"] == 0)
+				if ($this->file["error"] == 0)
 				{
 					$image = time() . "." . $extension;
 					
-					if ( !move_uploaded_file( $_FILES["file"]["tmp_name"], getcwd()."/images/dreams/" . $image ) )
+					if ( !move_uploaded_file( $this->file["tmp_name"], getcwd()."/images/dreams/" . $image ) )
 					{
 						$this->status = "Oops! We had trouble moving the image. Please try again later.";
 						$valid = $disable_fields = false;
@@ -128,7 +127,7 @@ class Dream
 				}
 				else
 				{
-					$this->status = "Sorry, there was an error with the image: ".$_FILES["file"]["error"];
+					$this->status = "Sorry, there was an error with the image: ".$this->file["error"];
 					$valid = $disable_fields = false;
 				}
 			}
@@ -312,12 +311,15 @@ class Dream
 		return $valid;
 	}
 	
-	function setValues( $c )
+	function setValues( $values, $file = null )
     {
-    	foreach($c as $key=>$val)
+    	foreach($values as $key=>$val)
     	{
     		$this->$key = $val;
     	}
+    	
+    	if( $file != null )
+    		$this->file = $file;
     }
 }
 
