@@ -1,12 +1,12 @@
 <?php
 include_once "includes/db.class.php";
-include_once "includes/monadream.class.php";
+include_once "includes/dream.class.php";
 include_once 'config/' . getenv('HTTP_APPLICATION_ENVIRONMENT') . "/config.php";
 
 session_start();
 
 $database = new Database();
-$dream = new MonaDream();
+$dream = new Dream();
 
 //	set up 'tour not found' text, appending tag artwork call to action
 $errorText = "<p>Oops, we had trouble locating your tour information. Please make sure you correctly typed the email address you used when recording your tour via The O. We use this only to link your dream to your tour information, and it will not be disclosed to anyone.</p>";
@@ -150,9 +150,8 @@ $(document).ready
 			}
 		);
 		
-		$('input[type=minicolors]').on( 'change', function(){ onColorChange() } );
-		
-		$('#find').bind('click', function() { validate() } );
+		//$('input[type=minicolors]').on( 'change', function(){ onColorChange() } );
+		//$('#find').bind('click', function() { validate() } );
 		
 		$('span[rel=tooltip]').tipsy( { gravity:'w', offset:5 } );
 		
@@ -165,12 +164,15 @@ $(document).ready
 		
 		onColorChange();
 		
+		/*
 		<?php if ($disable_fields) { ?>
 		enableFields(false);
 		<?php } ?>
+		*/
 	}
 );
 
+/*
 function validate()
 {
 	var date = $("#datepicker").datepicker( "getDate" );
@@ -242,8 +244,9 @@ function enableFields( enable )
 function onColorChange()
 {
 	var input = $(this), hex = $('#colorpicker1').val();
-	//$('#header > h1 > a').css('color',hex);
+	$('#header > h1 > a').css('color',hex);
 }
+*/
 
 function showStatus(status)
 {
@@ -273,6 +276,7 @@ var tagTimer;
 			
 			<input type="hidden" name="id" value="<?php echo isset($dream->id)?$dream->id:''; ?>"  />
 			
+			<!--
 			<div class="module">
 				
 				<div class='title'>Tour Information</div>
@@ -300,6 +304,7 @@ var tagTimer;
 					</div>
 				</div>				
 			</div>
+			-->
 			
 			<div class="module" id="fields">
 				
