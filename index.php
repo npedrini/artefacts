@@ -35,7 +35,6 @@ $_SESSION['introShown'] = true;
 <script type="text/javascript" src="http://canvg.googlecode.com/svn/trunk/rgbcolor.js"></script> 
 <script type="text/javascript" src="http://canvg.googlecode.com/svn/trunk/canvg.js"></script> 
 <script type="text/javascript" src="js/theme.js"></script>
-<script type="text/javascript" src="js/random-quote.js"></script>
 <script type="text/javascript" src="js/graph.js"></script>
 <script type="text/javascript">
 $(document).ready
@@ -66,18 +65,18 @@ $(document).ready
 		$('#dateselect,#gear,#theme_toggle').css('opacity',.5);
 		
 		//	hide stuff
-		$("#background,#foreground,#info,#settings,#line1,#line2").hide();
+		$("#background,#foreground,#info,#settings,intro").hide();
 		
 		//	fade intro
 		var showIntro = <?php echo $showIntro?'true':'false' ?>;
 		
 		if( showIntro )
 		{
-			$('body').css("background","none");
+			$('body').addClass('hidden');
+			
 			$('#line1').fadeIn(1000);
 			$('#line2').delay(1000).fadeIn(1000);
-			
-			showRandomQuoteStart();
+			$('#intro').show();
 		}
 		else
 		{
@@ -124,9 +123,8 @@ function save()
 **/
 function show()
 {
-	showRandomQuoteStop();
-	
 	$("#intro").remove();
+	$('body').removeClass('hidden');
 	$("#background,#foreground").fadeIn();
 	
 	//	get dates for which there is data
@@ -285,15 +283,10 @@ var inactivityTimer;
 
 <body id="vis" style="margin: 0px;">
 	
-	<div id="intro" class="centered" style="width:200px;">
+	<div id="intro" class="centered">
 	
-		<div>
+		<div style='width:200px;margin-left:auto;margin-right:auto;text-align:center'>
 			<a href="javascript:show();"><span id="line1">It's <?php echo $date->format('g:ia'); ?> in Hobart.</span><br/><span id="line2">MONA is <?php echo $mona_state; ?>.</span></a>
-		</div>
-		
-		<div style='width:400px;margin-left:auto;margin-right:auto;text-align:center'>
-			<span class="quote"></span><br/>
-			<span class="author"></span>
 		</div>
 		
 	</div>

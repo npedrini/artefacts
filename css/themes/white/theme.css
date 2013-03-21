@@ -1,4 +1,5 @@
-body, #background, #header { background: url('paper.jpg'); color: #333; }
+body.hidden { background-color: #fff; background-image: none; }
+body, #background, #header { background-image: url('paper.jpg'); color: #333; }
 a, a:link, a:visited, a:hover { color: #000; }
 
 #navigation ul li a:link, #navigation ul li a:visited { color: #aaa; }
@@ -7,6 +8,8 @@ a, a:link, a:visited, a:hover { color: #000; }
 h3 a:link, h3 a:visited, h3 a:hover { color: #333 }
 
 #info { background-color: #fff; color:#333 }
+
+#intro { color: #000; }
 
 #content .section p { background-color: rgba(255, 255, 255, 0.5); color: 333; }
 

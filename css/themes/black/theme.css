@@ -1,4 +1,6 @@
-body, #background, #header { background: url('paper.jpg'); color: #fff; }
+body.hidden { background-color: #000; background-image: none; }
+body, #background, #header { background-image: url('paper.jpg'); color: #fff; }
+
 a, a:link, a:visited, a:hover { color: #fff; }
 
 #navigation ul li a:link, #navigation ul li a:visited { color: #aaa; }
@@ -7,6 +9,8 @@ a, a:link, a:visited, a:hover { color: #fff; }
 h3 a:link, h3 a:visited, h3 a:hover { color: #fff }
 
 #info { background-color: #666; color: #eee; }
+
+#intro { color: #fff; }
 
 #content .section p { background-color: rgba(68, 68, 68, 0.5); color: #fff; }
 
