@@ -41,6 +41,7 @@ if( isset($_GET['did']) )
 		
 		$dream['tags'] = $tags;
 		
+		/*
 		//	get visited works by this user on this date
 		$sql  = "SELECT DISTINCT(artworks.id), artworks.image, artworks.title FROM `artworks` ";
 		$sql .= "LEFT JOIN `visit_data` ON visit_data.artwork_id=artworks.id ";
@@ -53,6 +54,7 @@ if( isset($_GET['did']) )
 		{
 			$visited_works[] = $artwork;
 		}
+		*/
 	}
 }
 else if( isset($_GET['aid']) )
@@ -217,8 +219,7 @@ $(document).ready
 						beforeShowDay: shouldEnableDate,
 						dateFormat: df,
 						minDate: availableDates[ availableDates.length - 1 ],
-						maxDate: availableDates[0],
-						onSelect: selectDate
+						maxDate: availableDates[0]
 					}
 				);
 				
@@ -269,22 +270,6 @@ function shouldEnableDate( date )
 	return [false, "There are no dreams for this day"];
 }
 
-/**
- * Selects a date
- * @param {Date} date
- */
-function selectDate( date )
-{
-	var date = $("#datepicker").datepicker( "getDate" );
-	
-	var dateString = dateFormat
-		.replace( /{{date}}/, date.getDate() )
-		.replace( /{{month}}/, date.getMonth() + 1 )
-		.replace( /{{year}}/, date.getFullYear() );
-	
-	//initGraph( dateString );
-}
-
 var dateFormat = "<?php echo DATE_FORMAT; ?>";
 var availableDates;
 </script>
@@ -330,36 +315,7 @@ form input[type=text], form textarea { padding: .5em; outline-width: 0; }
 		<?php
 		$nl = "\n\n\t\t\t";
 		
-		if( isset($artwork) )
-		{
-			echo $nl."<div class='module'>";
-			
-			echo $nl."\t<div class='header'>";
-			
-			$title = $artwork['title'] . (!is_null($artwork['year']) ? ", " . $artwork['year'] : "");
-			
-			if( isset($artwork['title']) ) 
-			{
-				echo $nl."\t\t<div class='title artwork_title'>" . $title . "</div>";
-				echo $nl."\t\t<div class='subtitle artwork_artist'>" . $artwork['artist'] . "</div>";
-			}
-			else
-			{
-				echo $nl."\t\t<div class='title artwork_title'>" . $title . "</div>";
-			}
-			
-			echo $nl."\t</div>";
-			
-			//style='background-color:".$artwork['color'] . "
-			
-			echo $nl."\t<div class='body'>";
-			echo $nl."\t\t<img style='display:inline-block;' src='".IMAGE_PATH.$artwork['image']."' />";
-			echo $nl."\t\t<div style='font-size:.5em;font-style:italic'>Image sourced from <a href='http://mona-vt.artpro.net.au/theo.php'>MONA</a></div>";
-			echo $nl."\t</div>";	
-			
-			echo $nl."</div>";	//	end
-		}
-		else if( isset($dream) )
+		if( isset($dream) )
 		{
 			$date = new DateTime( $dream['occur_date'], new DateTimeZone('Australia/Melbourne') );
 			
@@ -394,6 +350,7 @@ form input[type=text], form textarea { padding: .5em; outline-width: 0; }
 			
 			echo $nl."\t</div>";	//	end module
 			
+			/*
 			echo $nl."\t<div id='images' style='margin-top:20px'>";
 			
 			foreach($visited_works as $artwork)
@@ -402,8 +359,41 @@ form input[type=text], form textarea { padding: .5em; outline-width: 0; }
 			}
 			
 			echo $nl."\t</div>";	//	end images
+			*/
+			
 			echo $nl."</div>";
 		}
+		/*
+		else if( isset($artwork) )
+		{
+			echo $nl."<div class='module'>";
+			
+			echo $nl."\t<div class='header'>";
+			
+			$title = $artwork['title'] . (!is_null($artwork['year']) ? ", " . $artwork['year'] : "");
+			
+			if( isset($artwork['title']) ) 
+			{
+				echo $nl."\t\t<div class='title artwork_title'>" . $title . "</div>";
+				echo $nl."\t\t<div class='subtitle artwork_artist'>" . $artwork['artist'] . "</div>";
+			}
+			else
+			{
+				echo $nl."\t\t<div class='title artwork_title'>" . $title . "</div>";
+			}
+			
+			echo $nl."\t</div>";
+			
+			//style='background-color:".$artwork['color'] . "
+			
+			echo $nl."\t<div class='body'>";
+			echo $nl."\t\t<img style='display:inline-block;' src='".IMAGE_PATH.$artwork['image']."' />";
+			echo $nl."\t\t<div style='font-size:.5em;font-style:italic'>Image sourced from <a href='http://mona-vt.artpro.net.au/theo.php'>MONA</a></div>";
+			echo $nl."\t</div>";	
+			
+			echo $nl."</div>";	//	end
+		}
+		*/
 		else
 		{
 			$result_text = "dream".(count($dreams)==1?"":"s");
