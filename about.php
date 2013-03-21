@@ -92,23 +92,30 @@ if( isset($_POST['submit']) )
 	}
 }
 
+/*
 $sql  = "SELECT COUNT(DISTINCT(artworks.id)) AS artwork_count, ";
 $sql .= "COUNT(DISTINCT(artworks.artist)) AS artist_count, ";
 $sql .= "COUNT(DISTINCT(dreams.id)) AS dream_count, ";
 $sql .= "COUNT(DISTINCT(dreams.user_id)) AS dreamer_count ";
-//$sql .= "COUNT(DISTINCT(dreams.occur_date)) AS dream_dates ";
 $sql .= "FROM `artworks`,`dreams`";
+*/
+
+$sql = "SELECT COUNT(DISTINCT(dreams.id)) AS dream_count, ";
+$sql .= "COUNT(DISTINCT(dreams.user_id)) AS dreamer_count, ";
+$sql .= "COUNT(DISTINCT(dreams.occur_date)) AS dream_dates ";
+$sql .= "FROM `dreams`";
+
 $result = $mysqli->query($sql);
 $row = $result->fetch_assoc();
 
 $stats_temp = array
 (
-	'museum'=>1,
+	/*'museum'=>1,
 	'artworks'=>$row['artwork_count'],
-	'artists'=>$row['artist_count'],
+	'artists'=>$row['artist_count'],*/
 	'dreams'=>$row['dream_count'],
 	'dreamers'=>$row['dreamer_count'],
-	/*'nights'=>$row['dream_dates']*/
+	'nights'=>$row['dream_dates']
 );
 
 arsort($stats_temp);
