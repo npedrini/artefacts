@@ -27,14 +27,19 @@ $dream->timezone = TIME_ZONE;
 
 if( DEBUG )
 {
-	$dream->age = '33';
-	$dream->color = '#ff3300';
-	$dream->date = '19/1/2013';
-	$dream->description = 'I am in a car with my friend Mark. Mark is totally blind and so am I. The interesting thing about this is that I am driving the car. I am driving the car from somewhere to my house. I don\'t know how I seem to know where to go, but I seem to know. I told him that I am going to drive us home and I\'m doing it. I always wished that I could drive although this is the first dream I have ever had where I\'m doing it. The main senses I used in this were hearing because I could listen to him and hear what he was saying, I could hear the other traffic around me. And feeling. I could feel the upholstery around me in the car, the steering wheel. I was driving the car, that\'s all there is to that dream.';
-	$dream->email = 'go@looklisten.net';
-	$dream->gender = 'female';
-	$dream->tags = 'blind,driving,Mark,hearing,upholstery';
-	$dream->title = 'me and mark';
+	$testValues = array
+	(
+		'age' => '33',
+		'color' => '#ff3300',
+		'date' => '19/1/2013',
+		'description' => 'I am in a car with my friend Mark. Mark is totally blind and so am I. The interesting thing about this is that I am driving the car. I am driving the car from somewhere to my house. I don\'t know how I seem to know where to go, but I seem to know. I told him that I am going to drive us home and I\'m doing it. I always wished that I could drive although this is the first dream I have ever had where I\'m doing it. The main senses I used in this were hearing because I could listen to him and hear what he was saying, I could hear the other traffic around me. And feeling. I could feel the upholstery around me in the car, the steering wheel. I was driving the car, that\'s all there is to that dream.',
+		'email' => 'go@looklisten.net',
+		'gender' => 'female',
+		'tags' => 'blind,driving,Mark,hearing,upholstery',
+		'title' => 'me and mark'
+	);
+	
+	$dream->setValues( $testValues );
 }
 else
 {
@@ -52,7 +57,7 @@ if( !isset($_SESSION['submission']) )
 if( isset($_POST['submit']) )
 {
 	//	set values to what user submitted in case there are errors
-	$dream->setValues( $_POST );
+	$dream->setValues( $_POST, isset($_FILES['file'])?$_FILES['file']:null );
 	
 	//	enable all form fields in case there are errors
 	$disable_fields = false;
@@ -167,6 +172,12 @@ var tagTimer;
 				
 				<div class="body">
 				
+					<div class="row">
+						<label style="float:left" class="emphasized" for="datepicker">When did you have your dream?</label>
+						<input id="datepicker" type="text" name="date" class="date big"
+								value="<?php echo $dream->date; ?>" style='width:350px;display:inline;vertical-align: middle' />
+					</div>
+					
 					<div class="row">
 						<label class="emphasized" for="description">Describe your dream</label>
 						<textarea class="big" id="description" name="description" rows="8" placeholder=""><?php echo $dream->description; ?></textarea>
