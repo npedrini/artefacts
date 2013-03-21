@@ -82,7 +82,7 @@ class Graph
 				$dream->node_type = "dream";
 				$dream->index = count($this->nodes);
 				$dream->value = 0;
-				$dream->color2 = ($dream->ip == $_SERVER['REMOTE_ADDR']) ? self::$highlightColor : $dream->color;
+				$dream->color2 = ($dream->ip == $_SERVER['REMOTE_ADDR']) ? $this->highlightColor : $dream->color;
 				$dream->color = 0x000000;
 				$dream->tags = array();
 				
