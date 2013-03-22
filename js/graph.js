@@ -4,7 +4,7 @@
  */
 function initGraph( date )
 {
-	highlightRandomNodeStop();
+	currentDate = date;
 	
 	//	clear d3 canvas
 	d3.select("svg").remove();
@@ -22,44 +22,8 @@ function initGraph( date )
 		.attr("viewBox", "0 0 " + w + " " + h);
 	
 	var defs = vis.append("svg:defs");
-	
-	/*
-	var filter = defs
-  		.append("svg:filter")
-    	.attr("id", "blur")
-    	.attr("x", "-20%")
-    	.attr("y", "-20%")
-    	.attr("width", "140%")
-    	.attr("height", "140%")
-  		.append("svg:feGaussianBlur")
-    	.attr("stdDeviation", 2);
-    */
-  	
-  	/*
-  	var bg = defs
-  		.append("svg:pattern")
-  		.attr("id","tile-bg")
-  		.attr("width","600")
-  		.attr("height","600")
-  		.attr("patternUnits","userSpaceOnUse")
-  		.append("svg:image")
-  		.attr("xlink:href","css/images/paper_black.jpg")
-  		.attr("width","600")
-  		.attr("height","600");
-  	 
-  	vis.append("svg:rect")
-  		.attr("fill","url(#tile-bg)")
-  		.attr("width","100%")
-  		.attr("height","100%");
-  	*/
   	
   	var url = "json/graph.json.php?date="+date;
-  	
-  	/*
-  	url += "&show_tags=<?php echo isset($_GET['tags'])?$_GET['tags']:'true'; ?>";
-  	url += "&show_artists=<?php echo isset($_GET['artists'])?$_GET['artists']:'false'; ?>";
-  	url += "&show_mona=<?php echo isset($_GET['mona'])?$_GET['mona']:'true'; ?>";
-  	*/
   	
   	showLoader();
   	
@@ -137,6 +101,8 @@ function initGraph( date )
 		root.x = w/2;
 		root.y = h/2;
 		root.fixed = true;
+		
+		rootNode = root;
 		
 		force
 			.nodes(graph.nodes)
@@ -344,7 +310,17 @@ function zoom(d, i)
 	{
 		node_info += "<div id='node_info' class='module' style='position:absolute;z-index:1000;width:600px'>";
 		
+		var query = [];
+		
+		if( node.city != null ) query.push( node.city );
+		if( node.state != null ) query.push( node.state );
+		if( node.country != null ) query.push( node.country );
+		
+		var map_url = "http://maps.google.com/maps?q=" + query.join(', ');
+		
 		node_info += "<div class='body'>";
+		node_info += "<div>" + node.title + "</div>";
+		node_info += "<div style='margin-bottom:20px;font-size:x-small'>Dreamt in <a href='" + map_url + "'>" + node.city + "</a> on " + currentDate + "</div>";
 		node_info += "<div>" + stripslashes(node.description) + "</div>";
 		node_info += "</div>";
 		
@@ -554,6 +530,8 @@ function onNodeOut(d)
 
 function onNodeClick(d)
 {
+	if( d == rootNode ) return;
+	
 	dragging = false;
 	
 	var node = d3.select(this);
@@ -733,12 +711,13 @@ var TYPE_TAG = 'tag';
 var LETTERS = [ "a","b","c","d","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"];
 
 var running=false,zooming=false,zoomed=false,dragging=false;	//	state variables
-var node,hoverNode,highlightedNode,highlightRandomNode;			//	state-based node references
+var node,rootNode,hoverNode,highlightedNode,highlightRandomNode;			//	state-based node references
 var w,h,r,x,y,radius,vis,force,forceAlpha,fishEye;				//	vis properties
 var nodes,totalDreams,totalArtworks;
 var taggedArtworkIds = [];
 var thumbnails = [];
 var thumbNodes = [];
+var currentDate;
 
 var LINK_OPACITY = .2;
 var LINK_OPACITY_OVER = .6;
