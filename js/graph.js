@@ -593,7 +593,7 @@ function nodeTitle(d,expanded)
 	else if( d.node_type==TYPE_TAG ) 
 		return d.title;
 	else if( d.node_type==TYPE_DREAM )
-		return d.title ? d.title : d.description.substr( 0, d.description.indexOf('.')+1 );
+		return d.title ? d.title : ( d.description != null ? d.description.substr( 0, d.description.indexOf('.')+1 ) : '' );
 	
 	return d.description.substr( 0, d.description.indexOf('.')+1 );
 }
