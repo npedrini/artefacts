@@ -99,7 +99,7 @@ if( isset($_POST['submit']) )
 <head>
 <title>Artefacts of the Collective Unconscious</title>
 <link href='http://fonts.googleapis.com/css?family=Cedarville+Cursive|Open+Sans' rel='stylesheet' type='text/css'>
-<link rel="stylesheet" type="text/css" href="css/themes/<?php echo $_COOKIE['theme']==1?'black':'white'; ?>/theme.css">
+<link rel="stylesheet" type="text/css" href="css/themes/<?php echo THEME; ?>/theme.css">
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/aristo/Aristo.css">
 <link rel="stylesheet" href="css/jquery.miniColors.css">

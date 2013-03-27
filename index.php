@@ -1,6 +1,5 @@
 <?php 
 include 'config/' . getenv('HTTP_APPLICATION_ENVIRONMENT') . "/config.php";
-
 session_start();
 
 $date = new DateTime( 'now', new DateTimeZone('Australia/Melbourne') );
@@ -18,10 +17,10 @@ $_SESSION['introShown'] = true;
 <html>
 <meta charset="utf-8">
 <head>
-<title>Artefacts of the Collective Unconscious</title>
+<title>Artefacts of the Collective Uncoscious</title>
 <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
 <link href='http://fonts.googleapis.com/css?family=Cedarville+Cursive|Open+Sans' rel='stylesheet' type='text/css'>
-<link id="theme" rel="stylesheet" type="text/css" href="css/themes/<?php echo $_COOKIE['theme']==1?'black':'white'; ?>/theme.css">
+<link id="theme" rel="stylesheet" type="text/css" href="css/themes/<?php echo THEME; ?>/theme.css">
 <link rel="stylesheet" href="css/aristo/Aristo.css">
 <link rel="stylesheet" href="css/tipsy.css" type="text/css">
 <link rel="stylesheet" href="css/style.css">
@@ -248,7 +247,7 @@ function toggleTheme()
 
 function showLoader()
 {
-	$("body").append( "<div id='loader' class='centered'><div style='width:50px;'><img src='css/themes/<?php echo $_COOKIE['theme']==1?'black':'white'; ?>/loader.gif' /></div></div>" );
+	$("body").append( "<div id='loader' class='centered'><div style='width:50px;'><img src='css/themes/<?php echo THEME; ?>/loader.gif' /></div></div>" );
 }
 
 function hideLoader()

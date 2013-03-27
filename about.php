@@ -128,7 +128,7 @@ foreach($stats_temp as $label=>$value) $stats[] = $value . ' ' . $label;
 <head>
 <title>Artefacts of the Collective Unconscious</title>
 <link href='http://fonts.googleapis.com/css?family=Cedarville+Cursive|Open+Sans|Roboto+Condensed' rel='stylesheet' type='text/css'>
-<link rel="stylesheet" type="text/css" href="css/themes/<?php echo $_COOKIE['theme']==1?'black':'white'; ?>/theme.css">
+<link rel="stylesheet" type="text/css" href="css/themes/<?php echo THEME; ?>/theme.css">
 <link rel="stylesheet" href="css/style.css">
 <script type="text/javascript" src="js/lib/jquery-1.9.1.js"></script>
 <script type="text/javascript" src="js/lib/jquery.cookie.js"></script>

@@ -177,14 +177,13 @@ $isMain = !( isset($dream) || isset($artwork) );
 <title>Artefacts of the Collective Unconscious</title>
 <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
 <link href='http://fonts.googleapis.com/css?family=Cedarville+Cursive|Open+Sans|Roboto+Condensed' rel='stylesheet' type='text/css'>
-<link rel="stylesheet" type="text/css" href="css/themes/<?php echo $_COOKIE['theme']==1?'black':'white'; ?>/theme.css">
+<link rel="stylesheet" type="text/css" href="css/themes/<?php echo THEME; ?>/theme.css">
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/aristo/Aristo.css">
 <link rel="stylesheet" href="css/tipsy.css" type="text/css">
 <script type="text/javascript" src="js/lib/jquery-1.9.1.js"></script>
 <script type="text/javascript" src="js/lib/jquery-ui-1.10.1.custom.min.js"></script>
 <script type="text/javascript" src="js/lib/jquery.tipsy.js"></script>
-<script type="text/javascript" src="js/lib/jquery.cookie.js"></script>
 <script type="text/javascript" src="js/random-quote.js"></script>
 <script type="text/javascript">
 $(document).ready
