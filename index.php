@@ -12,6 +12,23 @@ else $mona_state = "asleep";
 
 $showIntro = isset($_SESSION['introShown']) ? false : true;
 $_SESSION['introShown'] = true;
+
+if( $showIntro )
+{
+	$get_location = curl_init();
+	
+	curl_setopt($get_location, CURLOPT_URL, "http://freegeoip.net/json/");
+	curl_setopt($get_location, CURLOPT_RETURNTRANSFER, 1);
+	
+	$location = curl_exec($get_location);
+	$location = json_decode($location);
+	
+	$city = $location->city;
+	
+// 	echo "<pre>";
+// 	print_r($location);
+// 	echo "</pre>";
+}
 ?>
 <!DOCTYPE HTML>
 <html>
@@ -219,9 +236,9 @@ function updateInfo()
 {
 	var date = $("#datepicker").datepicker( "getDate" );
 	
-	if( totalDreams == null || totalArtworks  == null || date  == null ) return;
+	if( totalDreams == null || date  == null ) return;
 	
-	var text = 'Showing ' + totalDreams + ' dreams and ' + totalArtworks + ' artworks from tours on ' + date.getDate() + ' ' + MONTHS[date.getMonth()] + ' ' + date.getFullYear();
+	var text = 'Showing ' + totalDreams + ' dreams for ' + date.getDate() + ' ' + MONTHS[date.getMonth()] + ' ' + date.getFullYear();
 	$('#info').html( text );
 }
 
@@ -285,7 +302,7 @@ var inactivityTimer;
 	<div id="intro" class="centered">
 	
 		<div style='width:200px;margin-left:auto;margin-right:auto;text-align:center'>
-			<a href="javascript:show();"><span id="line1">It's <?php echo $date->format('g:ia'); ?> in Hobart.</span><br/><span id="line2">MONA is <?php echo $mona_state; ?>.</span></a>
+			<a href="javascript:show();"><span id="line1">It's <?php echo $date->format('g:ia'); ?> in <?php echo $city; ?>.</span><br/><span id="line2">MONA is <?php echo $mona_state; ?>.</span></a>
 		</div>
 		
 	</div>
