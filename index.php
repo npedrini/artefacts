@@ -11,6 +11,7 @@ else if( $hour >= 6 ) $mona_state = "rising";
 else $mona_state = "asleep";
 
 $showIntro = isset($_SESSION['introShown']) ? false : true;
+
 $_SESSION['introShown'] = true;
 
 if( $showIntro )
@@ -48,8 +49,8 @@ if( $showIntro )
 <script type="text/javascript" src="js/lib/d3/d3.fisheye.js"></script>
 <script type="text/javascript" src="js/lib/jquery.tipsy.js"></script>
 <script type="text/javascript" src="js/lib/jquery.cookie.js"></script>
-<script type="text/javascript" src="http://canvg.googlecode.com/svn/trunk/rgbcolor.js"></script> 
-<script type="text/javascript" src="http://canvg.googlecode.com/svn/trunk/canvg.js"></script> 
+<script type="text/javascript" src="js/lib/canvg/rgbcolor.js"></script> 
+<script type="text/javascript" src="js/lib/canvg/canvg.js"></script> 
 <script type="text/javascript" src="js/theme.js"></script>
 <script type="text/javascript" src="js/graph.js"></script>
 <script type="text/javascript">
