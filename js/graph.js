@@ -302,7 +302,7 @@ function zoom(d, i)
 		
 		node_info += "<div class='body'>";
 		node_info += "<div>" + title + "</div>";
-		node_info += node != rootNode ? "<div style='margin-bottom:20px;font-size:x-small'>Dreamt in <a href='" + map_url + "'>" + node.city + "</a> on " + currentDate + "</div>" : "";
+		node_info += node != rootNode ? "<div style='margin-bottom:20px;font-size:x-small'>Dreamt in <a href='" + map_url + "'>" + node.city + "</a> at " + node.age + " on " + currentDate + "</div>" : "";
 		node_info += "<div>" + stripslashes(description) + "</div>";
 		node_info += "</div>";
 		
@@ -312,6 +312,9 @@ function zoom(d, i)
 			
 			for(var i=0;i<node.tags.length;i++)
 			{
+				tags.push( node.tags[i] );
+				
+				/*
 				for(var j=0;j<nodes.length;j++)
 				{
 					if(	nodes[j].node_type==TYPE_TAG
@@ -321,6 +324,7 @@ function zoom(d, i)
 						break;
 					}
 				}
+				*/
 			}
 						
 			node_info += "<div class='footer'>associations: " + tags.join(', ') + "</div>";
