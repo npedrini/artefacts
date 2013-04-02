@@ -23,8 +23,8 @@ class Dream
 	public $file;
 	
 	public $alchemyApiKey;
-	public $date_format;	//	TODO: set a default
-	public $time_zone;
+	public $dateFormat;	//	TODO: set a default
+	public $timezone;
 	public $status;
 	
 	public $logger;
@@ -117,12 +117,25 @@ class Dream
 			{
 				if ($this->file["error"] == 0)
 				{
-					$this->image = time() . "." . $extension;
+					$image_name = time();
+					
+					$this->image = $image_name . "." . $extension;
 					
 					if ( !move_uploaded_file( $this->file["tmp_name"], getcwd()."/images/dreams/" . $this->image ) )
 					{
 						$this->status = "Oops! We had trouble moving the image. Please try again later.";
 						$valid = $disable_fields = false;
+					}
+					else
+					{
+						$size = getimagesize( $this->file["tmp_name"] );
+						
+						$w = 200;
+						$h = $size[1] * ($w/$size[0]);
+						
+						$thumb = $this->image . '_sm.' . $extension;
+						
+						exec("convert -size {$size[0]}x{$size[1]} {$this->file["tmp_name"]} -thumbnail {$w}x{$h} $thumb");
 					}
 				}
 				else

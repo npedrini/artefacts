@@ -24,6 +24,8 @@ h3 a:link, h3 a:visited, h3 a:hover { color: #fff }
 
 /*	index page	*/
 #node_info { color: #fff; }
+a.dream_link:link, a.dream_link:visited { color: #fff; background-color: none; }
+a.dream_link:hover { color: #000; background-color: #fff; }
 
 /*	about page	*/
 .quote, .author { color:#999; }

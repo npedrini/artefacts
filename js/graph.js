@@ -14,15 +14,10 @@ function initGraph( date )
 	
 	vis = d3.select("#visualization")
 		.append("svg:svg")
-		/*.attr("version","1.1")
-		.attr("xmlns","http://www.w3.org/2000/svg")
-		.attr("xlink","http://www.w3.org/1999/xlink")*/
 		.attr("width", "100%")
 		.attr("height", "100%")
 		.attr("viewBox", "0 0 " + w + " " + h);
 	
-	var defs = vis.append("svg:defs");
-  	
   	var url = "json/graph.json.php?date="+date;
   	
   	showLoader();
@@ -135,7 +130,7 @@ function initGraph( date )
 			.attr("title", function(d) { return nodeTitle(d,true); } )
 			.style("cursor","pointer")
 			.style("fill",function(d){ return nodeColor(d); })
-			.style("fill-opacity",function(d){ return nodeFillOpacity(d) })
+			.style("fill-opacity",function(d){ return nodeFillOpacity(d); })
 			.style("stroke", function(d){ return nodeStrokeColor(d); })
 			.style("stroke-opacity", function(d){ return nodeStrokeOpacity(d); })
 			.style("stroke-dasharray", function(d) { return nodeDashArray(d); })
@@ -145,13 +140,6 @@ function initGraph( date )
 			.on("dragstart", onNodeDragStart)
 			.on("dragend", onNodeDragEnd)
 			.call(force.drag);
-		
-		/*
-		if( !isMobile() )
-		{
-			fisheye = d3.fisheye.circular().radius(150).distortion(1.35);
-      	}
-      	*/
       	
 		nodes = graph.nodes;
 		
@@ -178,37 +166,6 @@ function initGraph( date )
 			}
 		);
 		
-		/*
-		vis.on
-		(
-			"mousemove", 
-			function(e)
-			{
-				if( zooming || zoomed || running ) return;
-				
-				if( fisheye ) fisheye.focus( d3.mouse(this) );
-				
-				node.each(function(d) { d.fisheye = fisheye(d); })
-					.attr("cx", function(d) { return d.fisheye.x; })
-				  	.attr("cy", function(d) { return d.fisheye.y; })
-				  	.attr("r", function(d) { return d.fisheye.z * nodeRadius(d); });
-				
-				link.attr("x1", function(d) { return d.source.fisheye.x; })
-				 	.attr("y1", function(d) { return d.source.fisheye.y; })
-				  	.attr("x2", function(d) { return d.target.fisheye.x; })
-				  	.attr("y2", function(d) { return d.target.fisheye.y; });
-				
-				node.each
-				(
-					function(d) 
-					{
-						positionNodeTip(d);
-					}
-				);
-			}
-		);
-    	*/
-    	
 		totalDreams = graph.dream_total;
 		totalArtworks = graph.art_total;
 		
@@ -216,8 +173,6 @@ function initGraph( date )
 		$('circle.node').tipsy( { delayIn: 0, delayOut: 0, fade: false, gravity: 'sw', hoverlock:true, html: true, offset: 5, opacity: 1 } );
 		
 		updateInfo();
-		
-		//onActivity();
 	});
 }
 
@@ -288,7 +243,7 @@ function zoom(d, i)
 		.attr("cx", function(d) { return x(d.x); })
 		.attr("cy", function(d) { return y(d.y); })
 		.attr("r", function(d) { return k * nodeRadius(d); })
-		.style("fill-opacity",function(d){ return nodeFillOpacity(d); })
+		.style("fill-opacity",function(d){ return nodeFillOpacity(d); });
 	  
 	t.selectAll("line")
 		.attr("x1", function(d) { return x(d.source.x); })
@@ -310,18 +265,45 @@ function zoom(d, i)
 	{
 		node_info += "<div id='node_info' class='module' style='position:absolute;z-index:1000;width:600px'>";
 		
-		var query = [];
+		var title = node.title;
+		var description = node.description;
 		
-		if( node.city != null ) query.push( node.city );
-		if( node.state != null ) query.push( node.state );
-		if( node.country != null ) query.push( node.country );
+		var qs = [];
 		
-		var map_url = "http://maps.google.com/maps?q=" + query.join(', ');
+		if( node.city != null ) qs.push( node.city );
+		if( node.state != null ) qs.push( node.state );
+		if( node.country != null ) qs.push( node.country );
+		
+		var map_url = "http://maps.google.com/maps?q=" + qs.join(', ');
+		
+		if( node == rootNode )
+		{
+			var paragraphs = [];
+			
+			for(var i=0,uid=0;i<description.length;i++)
+			{
+				var sentences = [];
+				
+				for(var j=0;j<description[i].length;j++)
+				{
+					var index = description[i][j].index;
+					var id = 'line_' + uid;
+					
+					sentences.push( "<a id='"+id+"' class='dream_link' title='" + nodes[index].title + "' href='javascript:$(\"#"+id+"\").tipsy(\"hide\");showNodeByIndex("+index+")'>" + description[i][j].sentence + "</a>" );
+					
+					uid++;
+				}
+				
+				paragraphs.push( sentences.join(". ") );
+			}
+			
+			description = "<p>" + paragraphs.join( "</p><p>" ) + "</p>";
+		}
 		
 		node_info += "<div class='body'>";
-		node_info += "<div>" + node.title + "</div>";
-		node_info += "<div style='margin-bottom:20px;font-size:x-small'>Dreamt in <a href='" + map_url + "'>" + node.city + "</a> on " + currentDate + "</div>";
-		node_info += "<div>" + stripslashes(node.description) + "</div>";
+		node_info += "<div>" + title + "</div>";
+		node_info += node != rootNode ? "<div style='margin-bottom:20px;font-size:x-small'>Dreamt in <a href='" + map_url + "'>" + node.city + "</a> on " + currentDate + "</div>" : "";
+		node_info += "<div>" + stripslashes(description) + "</div>";
 		node_info += "</div>";
 		
 		if( node.tags.length ) 
@@ -437,6 +419,7 @@ function zoom(d, i)
 		
 	$('body').append( node_info );
 	$('#node_info').hide();
+	$('a[title]').tipsy( { gravity: 'e', offset: 10, opacity: 1 } );
 	
 	if( d3.event ) d3.event.stopPropagation();
 }
@@ -453,13 +436,13 @@ function zoomOut()
 		.attr("cx", function(d) { return d.x; })
 		.attr("cy", function(d) { return d.y; })
 		.attr("r", function(d) { return nodeRadius(d); })
-		.style("fill-opacity",function(d){ return nodeFillOpacity(d); })
+		.style("fill-opacity",function(d){ return nodeFillOpacity(d); });
 	
 	t.selectAll("line")
 		.attr("x1", function(d) { return d.source.x; })
 		.attr("y1", function(d) { return d.source.y; })
 		.attr("x2", function(d) { return d.target.x; })
-		.attr("y2", function(d) { return d.target.y; })
+		.attr("y2", function(d) { return d.target.y; });
 	
 	if( d3.event ) d3.event.stopPropagation();
 }
@@ -530,8 +513,6 @@ function onNodeOut(d)
 
 function onNodeClick(d)
 {
-	if( d == rootNode ) return;
-	
 	dragging = false;
 	
 	var node = d3.select(this);
@@ -585,7 +566,7 @@ function nodeTitle(d,expanded)
 	else if( d.node_type==TYPE_ARTWORK )
 	{
 		var thumb = d.image.replace(/_lg/,'_sm');
-		var title = '<div style="margin-bottom:5px">' + d.title + '</div>'
+		var title = '<div style="margin-bottom:5px">' + d.title + '</div>';
 		title += expanded?'<img onerror="$(this).hide();" src="images/artworks/' + thumb + '"/>':'';
 		
 		return title;
@@ -600,7 +581,7 @@ function nodeTitle(d,expanded)
 
 function nodeFillOpacity(d)
 {
-	if( d.id == MONA_ID ) return NODE_OPACITY_ALT;
+	if( d == rootNode ) return NODE_OPACITY_ALT;
 	if( d.node_type==TYPE_ARTIST || d.node_type==TYPE_TAG ) return 0;
 	
 	return NODE_OPACITY;
@@ -612,7 +593,7 @@ function linkDistance(link,index) { return nodeRadius(link.source) + nodeRadius(
 function linkOpacity(d) { return LINK_OPACITY; }
 function linkColor(d) { return themeId == 1 ? '#fff':'#000'; }
 function linkDashArray(d) { return d.type == 'museum_artwork' || d.type == 'museum_artist' ? "2,4" : ""; }
-function linkOpacityOver(d) { return d.source === hoverNode || d.target === hoverNode ? LINK_OPACITY_OVER : LINK_OPACITY; }
+function linkOpacityOver(d) { return (d.source === hoverNode || d.target === hoverNode && !(d.source === rootNode || d.target === rootNode)) ? LINK_OPACITY_OVER : LINK_OPACITY; }
 
 function layoutStart() { running = true; }
 function layoutComplete() { running = false; }
@@ -703,24 +684,22 @@ function stripslashes (str)
 	);
 }
 
-var TYPE_ARTWORK = 'artwork';
-var TYPE_ARTIST = 'artist';
-var TYPE_DREAM = 'dream';
-var TYPE_TAG = 'tag';
+const LETTERS = [ "a","b","c","d","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"];
+const LINK_OPACITY = 0;
+const LINK_OPACITY_OVER = .4;
+const NODE_OPACITY = 1;
+const NODE_OPACITY_ALT = .3;
+const MONA_ID = 962;
+const TYPE_ARTWORK = 'artwork';
+const TYPE_ARTIST = 'artist';
+const TYPE_DREAM = 'dream';
+const TYPE_TAG = 'tag';
 
-var LETTERS = [ "a","b","c","d","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"];
-
-var running=false,zooming=false,zoomed=false,dragging=false;	//	state variables
-var node,rootNode,hoverNode,highlightedNode,highlightRandomNode;			//	state-based node references
-var w,h,r,x,y,radius,vis,force,forceAlpha,fishEye;				//	vis properties
+var running=false,zooming=false,zoomed=false,dragging=false;		//	state variables
+var node,rootNode,hoverNode,highlightedNode,highlightRandomNode;	//	state-based node references
+var w,h,r,x,y,radius,vis,force,forceAlpha,fishEye;					//	vis properties
 var nodes,totalDreams,totalArtworks;
 var taggedArtworkIds = [];
 var thumbnails = [];
 var thumbNodes = [];
 var currentDate;
-
-var LINK_OPACITY = .2;
-var LINK_OPACITY_OVER = .6;
-var NODE_OPACITY = 1;
-var NODE_OPACITY_ALT = .3;
-var MONA_ID = 962;

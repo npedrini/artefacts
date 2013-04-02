@@ -14,8 +14,9 @@ if( !isset( $_GET['date'] ) ) die( );
 $date = DateTime::createFromFormat( $date_format, $_GET['date'], new DateTimeZone(TIME_ZONE) );
 
 $graph = new Graph();
-$graph->date_from = $date->format('Y-m-d');
-$graph->date_to = $date->format('Y-m-d');
+$graph->dateFrom = $date->format('Y-m-d');
+$graph->dateTo = $date->format('Y-m-d');
+$graph->minTagValue = 2;
 $graph->build();
 
 echo $graph->render();

@@ -11,9 +11,12 @@ class Graph
 	const SHOW_ROOT = true;
 	const SHOW_TAGS = true;
 	
-	public $date_from;
-	public $date_to;
+	const TYPE_DREAM = "dream";
+	
+	public $dateFrom;
+	public $dateTo;
 	public $highlightColor = '#CC3300';
+	public $minTagValue;
 	
 	private $dreams;
 	private $tags;
@@ -39,6 +42,7 @@ class Graph
 		$this->dreams = array();
 		$this->keys = array();
 		$this->indexes = array( "tags"=>array() );
+		$this->minTagValue = 1;
 		$this->nodes = array();
 		$this->links = array();
 		$this->tags = array();
@@ -48,22 +52,14 @@ class Graph
     function build()
     {
     	$data = array();
+		
+    	$root_node = $this->getRootNode();
+    	$this->nodes[] = $root_node;
     	
-    	$root_node = (object)array();
-		$root_node->color2 = '#000000';
-		$root_node->color = '#000000';
-		$root_node->node_type = "dream";
-		$root_node->index = count($this->nodes);
-		$root_node->tags = array();
-		$root_node->title = $this->date_from;
-		$root_node->value = 0;
-		
-		$this->nodes[] = $root_node;
-		
 		//	STEP 2: GET ALL DREAMS FOR SPECIFIED DATE RANGE
 		$sql = "SELECT dreams.*, users.ip FROM `dreams` ";
 		$sql .= "LEFT JOIN `users` on dreams.user_id=users.id ";
-		$sql .= "WHERE occur_date >= '" . $this->date_to . "' AND occur_date <= '" . $this->date_from . "'";
+		$sql .= "WHERE occur_date >= '" . $this->dateTo . "' AND occur_date <= '" . $this->dateFrom . "'";
 		
 		$result = $this->db->query( $sql );
 		
@@ -79,7 +75,7 @@ class Graph
 				
 				$result_tags = $this->db->query( $sql );
 				
-				$dream->node_type = "dream";
+				$dream->node_type = self::TYPE_DREAM;
 				$dream->index = count($this->nodes);
 				$dream->value = 0;
 				$dream->color2 = ($dream->ip == $_SERVER['REMOTE_ADDR']) ? $this->highlightColor : $dream->color;
@@ -95,7 +91,24 @@ class Graph
 					{
 						$dream->tags[] = $t['tag'];
 						
-						$this->showTag( (object)$t, $dream );
+						if( self::SHOW_TAGS )
+						{
+							$tag = (object)$t;
+							
+							if( isset($this->indexes['tags'][$tag->id]) )
+							{
+								$tag_node = $this->indexes['tags'][$tag->id];
+							}
+							else
+							{
+								$this->indexes['tags'][$tag->id] = $this->tags[] = $tag_node = (object)array('color'=>'#000000','id'=>$tag->id,'index'=>count($this->nodes),'node_type'=>'tag','tags'=>array(),'title'=>$tag->tag,'value'=>0);
+								$this->indexes['tags_by_tag'][$tag->tag] = $tag_node;
+							}
+						}	
+						
+						$tag_node->value++;
+						
+						//$this->showTag( (object)$t, $dream );
 					}
 				}
 				
@@ -119,13 +132,80 @@ class Graph
 					$root_node->value++;
 			}
 		}
+		
+		if( self::SHOW_TAGS )
+		{
+			foreach($this->dreams as $dream)
+			{
+				foreach($dream->tags as $tag)
+				{
+					$tag = $this->indexes['tags_by_tag'][$tag];
+					
+					if( $tag->value >= $this->minTagValue )
+					{
+						if( !array_search($tag,$this->nodes) ) 
+						{
+							$this->nodes[] = $tag;
+						}
+						
+						$this->showTag( $tag, $dream );
+					}
+				}
+			}
+		}
+    }
+    
+    function getRootNode()
+    {
+    	$root_node = (object)array();
+    	$root_node->color2 = '#000000';
+    	$root_node->color = '#000000';
+    	$root_node->node_type = self::TYPE_DREAM;
+    	$root_node->index = count($this->nodes);
+    	$root_node->tags = array();
+    	$root_node->title = 'A dream of the collective unconscious';
+    	$root_node->value = 0;
+    	
+    	return $root_node;
     }
     
     function render()
     {
-    	foreach($this->nodes as $node)
+    	$paragraphs = array();
+		$dreams_by_value = array();
+		
+		foreach($this->dreams as $dream)
 		{
-			$node->stroke = isset($node->color2) ? (hexdec(preg_replace("/#/","0x",$node->color2)) > 0x666666/2 ? true : false) : false; 
+			if( $dream->node_type == self::TYPE_DREAM )
+			{
+				$index = array_search( $dream, $this->dreams );
+				$dreams_by_value[ $index ] = $dream->value;
+			}
+		}
+		
+		asort( $dreams_by_value );
+		
+		foreach($dreams_by_value as $index=>$value)
+		{
+			$dream = $this->dreams[$index];
+			$sentences = explode(".",$dream->description);
+			
+			for($i=0,$j=0;$i<count($sentences);$i++)
+			{
+				if( $sentences[$i] == null ) continue;
+				if( !isset($paragraphs[$j]) ) $paragraphs[$j] = array();
+				
+				$paragraphs[$j][] = array( "index"=>$dream->index, "sentence"=>$sentences[$i] );
+				
+				$j++;
+			}
+		}
+		
+		$this->nodes[0]->description = $paragraphs;
+		
+		foreach($this->nodes as $node)
+		{
+			$node->stroke = isset($node->color2) ? (hexdec(preg_replace("/#/","0x",$node->color2)) > 0x666666/2 ? true : false) : false;
 		}
 		
 		$data = (object)array( 'nodes'=>$this->nodes, 'links'=>$this->links, 'dream_total'=>count($this->dreams), 'art_total'=>0 );
@@ -141,13 +221,20 @@ class Graph
     
     function showTag( $tag, $node )
 	{
+		/*
 		if( self::SHOW_TAGS == false ) return;
 		
 		if( isset($this->indexes['tags'][$tag->id]) )
 			$tag_node = $this->indexes['tags'][$tag->id];
 		else
 			$this->indexes['tags'][$tag->id] = $this->tags[] = $this->nodes[] = $tag_node = (object)array('color'=>'#000000','id'=>$tag->id,'index'=>count($this->nodes),'node_type'=>'tag','tags'=>array(),'title'=>$tag->tag,'value'=>0);
-	
+		*/
+		
+		if( !isset($this->indexes['tags'][$tag->id]) ) return;
+		
+		$tag_node = $this->indexes['tags'][$tag->id];
+		$tag_node->index = array_search($tag_node,$this->nodes);
+		
 		$source = $node;
 		$target = $tag_node;
 		
@@ -156,9 +243,9 @@ class Graph
 		{
 			$key = $source->index.'_'.$target->index;
 			
-			if( !isset($keys[$key]) ) 
+			if( !isset($this->keys[$key]) ) 
 			{
-				$this->links[] = (object)array('source'=>$source->index,'target'=>$target->index,'value'=>0,'type'=>'tag');
+				$this->links[] = (object)array('source'=>$source->index,'target'=>$target->index,'value'=>1,'type'=>'tag');
 				$this->keys[$key] = 1;
 				
 				$tag_node->value++;

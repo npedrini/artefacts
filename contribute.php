@@ -22,7 +22,7 @@ $date = new DateTime( 'now', new DateTimeZone( TIME_ZONE ) );
 $date->sub( new DateInterval("P01D") );
 
 $dream->alchemyApiKey = ALCHEMY_API_KEY;
-$dream->date_format = $date_format;
+$dream->dateFormat = $date_format;
 $dream->timezone = TIME_ZONE;
 
 if( DEBUG )
