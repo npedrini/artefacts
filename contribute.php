@@ -23,6 +23,7 @@ $date->sub( new DateInterval("P01D") );
 
 $dream->alchemyApiKey = ALCHEMY_API_KEY;
 $dream->dateFormat = $date_format;
+$dream->origin = $_SESSION['origin'];
 $dream->timezone = TIME_ZONE;
 
 if( DEBUG )

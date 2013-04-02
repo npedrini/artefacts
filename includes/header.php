@@ -1,3 +1,9 @@
+<?php 
+if( isset($_GET['origin']) )
+{
+	$_SESSION['origin'] = $_GET['origin'];
+}
+?>
 <script type="text/javascript">
 $(document).ready
 (

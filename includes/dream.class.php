@@ -16,6 +16,7 @@ class Dream
 	public $email;
 	public $gender;
 	public $image;
+	public $origin;
 	public $tags;
 	public $title;
 	public $user_id;
@@ -159,7 +160,16 @@ class Dream
 			if( !is_null($id) 
 				&& !empty($id) )
 			{
-				$sql  = "UPDATE `dreams` SET user_id='".$this->user_id."',title='".$this->db->real_escape_string($this->title)."',description='".$this->db->real_escape_string($this->description)."',color='".$this->color."',image='".$this->db->real_escape_string($this->image)."',occur_date='".$this->date->format('Y-m-d')."',age='".$this->db->real_escape_string($this->age)."',gender='".$this->db->real_escape_string($this->gender)."' WHERE id ='".$id."'";
+				$sql  = "UPDATE `dreams` SET user_id='".$this->user_id."',";
+				$sql .= "age='".$this->db->real_escape_string($this->age)."',";
+				$sql .= "color='".$this->color."',";
+				$sql .= "description='".$this->db->real_escape_string($this->description)."',";
+				$sql .= "gender='".$this->db->real_escape_string($this->gender)."',";
+				$sql .= "image='".$this->db->real_escape_string($this->image)."',";
+				$sql .= "occur_date='".$this->date->format('Y-m-d')."',";
+				$sql .= "origin='".$this->db->real_escape_string($this->origin)."',";
+				$sql .= "title='".$this->db->real_escape_string($this->title)."' ";
+				$sql .= "WHERE id ='".$id."'";
 				
 				$result = $this->db->query( $sql );
 				
@@ -177,9 +187,10 @@ class Dream
 				$color = $this->db->real_escape_string($this->color);
 				$gender = $this->db->real_escape_string($this->gender);
 				$image = $this->db->real_escape_string($this->image);
+				$origin = $this->db->real_escape_string($this->origin);
 				$title = $this->db->real_escape_string($this->title);
 				
-				$date = DateTime::createFromFormat( $this->date_format, $this->date, new DateTimeZone($this->timezone) ); 
+				$date = DateTime::createFromFormat( $this->dateFormat, $this->date, new DateTimeZone($this->timezone) ); 
 				
 				$get_location = curl_init(); 
 				curl_setopt($get_location, CURLOPT_URL, "http://freegeoip.net/json/");
@@ -188,11 +199,8 @@ class Dream
 				$location = curl_exec($get_location);
 				$location = json_decode($location);
 				
-				$fields  = "user_id,title,description,color,image,occur_date,age,gender,";
-				$fields .= "city,region,country,latitude,longitude";
-				
-				$values  = "'".$this->user_id."','".$title."','".$description."','".$color."','".$image."','".$date->format('Y-m-d')."','".$age."','".$gender."',";
-				$values .= "'".$location->city."','".$location->region_name."','".$location->country_name."','".$location->latitude."','".$location->longitude."'";
+				$fields  = "age,city,color,country,description,gender,image,latitude,longitude,occur_date,origin,region,title,user_id";
+				$values  = "'".$age."','".$location->city."','".$color."','".$location->country_name."','".$description."','".$gender."','".$image."','".$location->latitude."','".$location->longitude."','".$date->format('Y-m-d')."','".$origin."','".$location->region_name."','".$title."','".$this->user_id."'";
 				
 				//	add dream
 				$sql  = "INSERT INTO `dreams` (".$fields.") VALUES (".$values.")";
