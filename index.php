@@ -124,7 +124,10 @@ function save()
 {
 	var svg = new XMLSerializer().serializeToString( $('svg')[0] ).replace("href","xlink:href")
 	
-	console.log( svg );
+	$('canvas').attr('width',$('#visualization').width());
+	$('canvas').attr('height',$('#visualization').height());
+
+	console.log( $('#visualization').width(), $('#visualization').height() );
 	
 	canvg('canvas',svg);
 
@@ -133,6 +136,9 @@ function save()
 				
 	$('#save_form #data').val( data );
 	$('#save_form').submit();
+
+	$('canvas').attr('width',0);
+	$('canvas').attr('height',0);
 }
 
 /**
@@ -339,7 +345,7 @@ var inactivityTimer;
 		
 	</div>
 	
-	<canvas id="canvas" width="600px" height="600px"></canvas>	
+	<canvas id="canvas" width="0px" height="0px"></canvas>	
 	
 </body>
 
