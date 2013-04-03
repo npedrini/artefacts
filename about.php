@@ -205,74 +205,96 @@ var cid;
 			
 			<div id='question-about' class='section'>
 				
-				<p>Artefacts of the collective unconscious is an ongoing digital collection of dreams recorded by visitors to the <a href='http://www.mona.net.au/' target='_blank'>Museum of Old and New Art</a> (MONA), located in Hobart, Tasmania. The purpose of the collection is to enable study and exploration of connections between art and dreams.</p>
+				<div style="font-size:.7em">
+				
+					<b>Artefact / Artifact</b>, <i>n</i>
+					
+					<ul>
+						<li>anything created by humans which gives information about the culture of its creator and users</li>
+						<li>a product of individuals or groups (social beings) or of their social behavior</li>
+						<li>an object in a digital environment</li>
+					</ul>
+					
+					<br/>
+					
+					<b>Collective unconscious</b>, <i>n</i>
+					
+					<ul>
+						<li>A part of the unconscious mind, expressed in humanity and all life forms with nervous systems, which describes how the structure of the psyche autonomously organizes experience.</li>
+					</ul>
+					
+				</div>
+				
+				<p><b>Artefacts of the Collective Unconscious</b> is an ongoing digital collection of data about dreams, to which anyone is free to browse or contribute. The collection is founded on the principles of <u>social dreaming</u>: the idea that dreams can tell us not just about the individual dreamer, but about our collective experience of the world: that by sharing dreams create a pictures and patterns that can illuminate concerns and hopes about about our future together.</p>
 
-<p>Museum visitors are invited to donate their dreams and information about their tour via an online form sent on the day after their museum visit. Visitor dreams are catalogued each day, correlating dream data with information about the artworks visitors responded to using 'The O', an indoor location system developed by <a href='http://artprocessors.net' target='_blank'>Art Processors</a>.</p>
+				<p>As well as collecting and collating dream data, we represent the data in visual form using what we have called an 'oneirogram'. This is a force diagram which uses the <a href="http://www.alchemyapi.com" target="_blank">AlchemyAPI</a> natural language processor to analyse themes and concepts in the dream text.</p>
 
-<p>Visitors are asked to include a colour to describe their dream, and five 'associations'. The associations are not intended as descriptors, but words which spontaneously come to mind when thinking about their dream. This material is used to identify connections between dreams and artworks, and to visualise these using in the form of what we have called an 'oneirogram'.</p>
+				<p>In future, we aim to allow integration of dream data with other applications and platforms which are used to record and store dreams.</p>
 
-<p>Curators: <a href='http://www.createassociate.com.au/' target='_blank'>David Patman</a> and <a href='http://www.looklisten.net/' target='_blank'>Noah Pedrini</a></p>
+				<!--
+				<p>Curators: <a href='http://www.createassociate.com.au/' target='_blank'>David Patman</a> and <a href='http://www.looklisten.net/' target='_blank'>Noah Pedrini</a></p>
+				-->
 				
 			</div>
 			
 			<div id='question-faq' class='section'>
 				
 				<div>
-					<div class='question'>My dream isn't about the museum or its artworks &ndash; does it count?</div>
+					<div class='question'>Why are you doing this?</div>
 					<div class='answer'>
-						<p>Dreams come from the unconscious mind and work differently to the way our thought processes do when we're awake. Like art, dreams are symbolic and we often need to let go of what we think is logical and rational to understand what they could mean. So, although MONA wasn't in your dream, this doesn't mean that your MONA experience isn't relevant to what you dreamt. We think that by looking at lots of visitor dreams we'll start to see patterns and connections that will help us get insight into what the dreams mean overall.</p>
+						<p>We're interested in the social aspect of dreams - what they can tell us about experiences we have in common, rather than just our personal history.</p>
 					</div>
 				</div>
 				
 				<div>
 					<div class='question'>Isn't my dream just about me?</div>
-					<div class='answer'><p>Part of your dream is likely to be about your personal experience that is unique to you, and only you will be able to understand that part. However, part of your dream will also be about the experiences that you share with other people: e.g. your family, your friends, colleagues &ndash; and also other MONA visitors! We hope that by looking at lots of dreams from MONA visitors that we'll be able to see common themes and patterns emerge. This won't tell us about you personally, but it could tell us about how the MONA experience affects people more generally.</p>
+					<div class='answer'><p>Part of your dream is likely to be about your personal experience that is unique to you, and only you will be able to understand that part. However, part of your dream will also be about the experiences that you share with other people: e.g. your family, your friends, colleagues. We hope that by looking at lots of dreams that we'll be able to see common themes and patterns emerge.</p>
 					</div>
-				</div>
-				
-				<div>
-					<div class='question'>What is an association and how do I add them to my dream?</div>
-					<div class='answer'><p>By 'associations' are words or short phrases that spontaneously come to mind in response to the memory of a dream or any other kind of phenomenon that we experience when awake. It's a bit like 'brainstorming', where you can let your mind wander without having to think whether or not it makes sense, or whether it's related to what the dream seems to be about. So don't feel like your associations need to describe or classify your dream &ndash; let your imagination roam free. It's surprising what can come up!</p></div>
 				</div>
 				
 				<div>
 					<div class='question'>What's an 'oneirogram'?</div>
-					<div class='answer'>
-						<p>We invented what we call an oneirogram as a way to visualise connections between a collection of dreams and artefacts from waking life of which the dreamers have a shared experience or knowledge. It relies on dreamers making 'associations' to their dreams and to the artefacts (in this case MONA artworks), which we then represent graphically using JavaScript and HTML5 coding. Each day the oneirogram changes to integrate what visitors dreamt about on the previous night. You could think of it as visualising MONA's dream for that day.</p>
-					</div>
+					<div class='answer'><p>We invented what we call an oneirogram as a way to visualise connections between dreams using the <a href="http://www.alchemyapi.com" target="_blank">AlchemyAPI</a> natural language processor. The oneirogram can show dreams for specific dates, locations, tags and other data selected by the user.</p></div>
 				</div>
 				
 				<div>
 					<div class='question'>How are connections made?</div>
 					<div class='answer'>
-						<p>The oneirogram uses associations to make connections between dreams and artworks. If a dream and an artwork (or another dream) have the same association, a line (or 'edge') is drawn between them. The more connections a dream or artwork has, the larger its node shown. This way you can see which dreams and artworks seem to be the most significant on a given day, and groups of dreams and artworks that seem to represent something in common.</p>
-					</div>
-				</div>
-				
-				<div>
-					<div class='question'>Why won't my tour data show up?</div>
-					<div class='answer'>
-						<p>Our site uses the data you recorded and saved on 'The O' while on your tour of MONA. To save your tour you needed to type in an email address. You need to enter exactly the same email address for your tour to show up in the oneirogram.</p>
+						<p>We aggregate the text of all dreams for the selected parameters (date, location, tags) and determine thematic tags for the 'combined dream'. The combined dream tags are then compared with tags for the individual dreams. If a dream shares a tag with another dream, a line (or 'edge') is drawn between them. The more connections a dream or tag has, the larger its node is shown.</p>
 					</div>
 				</div>
 				
 				<div>
 					<div class='question'>How will you use my dreams and my personal information?</div>
 					<div class='answer'>
-						<p>We will store your dream and tour information in our digital collection, with your email address removed. We only ask for this initially so we can correlate your tour information with your dream and don't use it for any other purpose. Anyone will be able to see the text of the dream you record, so you may wish to disguise any details that you think could identify you.</p>
+						<p>We will store your dream data in our digital collection, but no personal information. However, anyone will be able to see the text of the dream you record, so you may wish to disguise any details that you think could identify you or others.</p>
+					</div>
+				</div>
+				
+				<div>
+					<div class='question'>Can I use your site to keep a personal dream journal?</div>
+					<div class='answer'>
+						<p>Yes! If you tag each of your dreams with a unique identifier, you can search for and visualise just your dreams.</p>
+					</div>
+				</div>
+				
+				<div>
+					<div class='question'>Can I edit my dreams once they have been recorded?</div>
+					<div class='answer'>
+						<p>At this point, no. We would need to create a personal account to enable you to do this. We may consider doing this in a future release. Please contact us at <a href="mailto:dreams@artefactsofthecollectiveunconscious.net">dreams@artefactsofthecollectiveunconscious.net</a> if you need a dream removed, e.g. if you have inadvertently recorded identifying information about yourself or someone else.</p>
 					</div>
 				</div>
 				
 				<div>
 					<div class='question'>How did you do it?</div>
 					<div class='answer'>
-						<p>Instead of traditional signage, The Museum of Old and New Art uses an innovative mobile app developed by <a href="http://artprocessors.net/" target="_blank">Art Processors</a> to facilitate interactive tours. When a user submits a dream on Artefacts, we load and parse the corresponding tour data collected via this system and migrate it to a MySQL database. This allows us to create a JSON file representing node-link relationships between artworks viewed for a given day, the dreams that were dreamt that night, and the associations that bind them. This data file is then used to drive the visualization.</p><p>The visualization itself is a <a href="http://en.wikipedia.org/wiki/Force-directed_graph_drawing" target="_blank">force-directed layout</a> built using the <a href="http://d3js.org/" target="_blank">D3js</a> javascript library, and the image export feature leverages the <a href="http://code.google.com/p/canvg/" target="_blank">canvg</a> library. A few of the other javascript libraries we use include <a href="http://jquery.com/" target="_blank">jQuery</a>, <a href="http://jqueryui.com/" target="_blank">jQuery UI</a>, and <a href="http://onehackoranother.com/projects/jquery/tipsy/" target="_blank">tipsy</a>.</p><p>A big thank you to thank the development communities who made and contributed to all of these great open-source projects, the designers over at <a href="http://thenounproject.com/" target="_blank">The Noun Project</a> for letting us use a few of their icons, and of course, <a href='http://www.mona.net.au/' target='_blank'>MONA</a>.</p>
+						<p>When a user submits a dream on Artefacts, we load and parse the corresponding tour data collected via this system and migrate it to a MySQL database. This allows us to create a JSON file representing node-link relationships between artworks viewed for a given day, the dreams that were dreamt that night, and the associations that bind them. This data file is then used to drive the visualization.</p><p>The visualization itself is a <a href="http://en.wikipedia.org/wiki/Force-directed_graph_drawing" target="_blank">force-directed layout</a> built using the <a href="http://d3js.org/" target="_blank">D3js</a> javascript library, and the image export feature leverages the <a href="http://code.google.com/p/canvg/" target="_blank">canvg</a> library. A few of the other javascript libraries we use include <a href="http://jquery.com/" target="_blank">jQuery</a>, <a href="http://jqueryui.com/" target="_blank">jQuery UI</a>, and <a href="http://onehackoranother.com/projects/jquery/tipsy/" target="_blank">tipsy</a>.</p><p>A big thank you to thank the development communities who made and contributed to all of these great open-source projects, the designers over at <a href="http://thenounproject.com/" target="_blank">The Noun Project</a> for letting us use a few of their icons, and of course, <a href='http://www.mona.net.au/' target='_blank'>MONA</a>.</p>
 					</div>
 				</div>
 				
 				<div>
 					<div class='question'>Did you know that 'artefact' is spelled wrong?</div>
-					<div class='answer'><p>Are you American?</p></div>
+					<div class='answer'><p>Yes!</p></div>
 				</div>
 			
 			</div>
