@@ -547,7 +547,7 @@ function nodeRadius(d)
 	return Math.max( 5, Math.min( 100, d.value * 5 ) );
 }
 
-function nodeColor(d) { return themeId == 1 ? (d.color2 != null ? d.color2 : '#fff') : (d.color2!=null?d.color2:d.color); }
+function nodeColor(d) { return themeId == 1 ? (d.color2 != null ? d.color2 : '#fff') : d.color; }
 function nodeFilter(d) { return '';return d.node_type==TYPE_DREAM?"url(#blur)":""; }
 function nodeStrokeColor(d) { return d.stroke ? d.color2 : (themeId == 1?'#fff':'#000'); }
 function nodeStrokeOpacity(d) {return d.stroke || d.node_type == TYPE_TAG ? .3 : 1; }
