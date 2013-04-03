@@ -6,6 +6,8 @@ h1 { font-size: .8em; font-weight: normal; padding: 0; margin: 0; }
 h2 { font-size: .8em; }
 h3 { font-size: .8em; font-weight: bold; display: inline-block; margin-bottom:5px; }
 
+ul { margin-top: 0px; margin-bottom: 0px; -webkit-margin-before: 0px; -webkit-margin-after: 0px; }
+
 form input[type=text], form textarea { border: 0; outline-width: 0; color: #cc3300; background-color: #F6F5EF; }
 form select { height: 30px; }
 form input[type=text].big, form textarea.big { padding: 1em; width: 400px; }

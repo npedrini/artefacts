@@ -11,7 +11,7 @@ h3 a:link, h3 a:visited, h3 a:hover { color: #333 }
 
 #intro { color: #000; }
 
-#content .section p { background-color: rgba(255, 255, 255, 0.5); color: 333; }
+#content .section p { background-color: rgba(255, 255, 255, 0.5); color: #333; }
 
 .tipsy-inner { background-color: #000; color: #fff; }
 .tipsy-arrow-n { border-bottom-color: #000; }
