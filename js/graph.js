@@ -173,6 +173,7 @@ function initGraph( date )
 		$('circle.node').tipsy( { delayIn: 0, delayOut: 0, fade: false, gravity: 'sw', hoverlock:true, html: true, offset: 5, opacity: 1 } );
 		
 		updateInfo();
+		setThemeVis();
 	});
 }
 
@@ -474,7 +475,7 @@ function onZoomOut()
 	if( node != undefined ) 
 	{
 		vis.select('[id=node_'+node.index+']').style("fill", nodeColor(node) );
-		vis.select('[id=node_'+node.index+']').style("stroke", nodeColor(node) );
+		vis.select('[id=node_'+node.index+']').style("stroke", nodeStrokeColor(node) );
 	}
 	
 	force.alpha( .3 );
@@ -550,11 +551,11 @@ function nodeRadius(d)
 function nodeColor(d) { return themeId == 1 ? (d.color2 != null ? d.color2 : '#fff') : d.color; }
 function nodeFilter(d) { return '';return d.node_type==TYPE_DREAM?"url(#blur)":""; }
 function nodeStrokeColor(d) { return d.stroke ? (themeId == 1?'#fff':'#000') : d.color2; }
-function nodeStrokeOpacity(d) {return d.stroke || d.node_type == TYPE_TAG ? .3 : 1; }
+function nodeStrokeOpacity(d) { return d.stroke ? .3 : 1; }
 function nodeStrokeWidth(d) 
 { 
 	if(d.node_type==TYPE_DREAM || d.node_type==TYPE_ARTWORK) 
-		return d.stroke ? .25 : 0;
+		return d.stroke ? .5 : 0;
 	else if(d.node_type==TYPE_TAG)
 		return 2;
 		

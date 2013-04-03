@@ -28,5 +28,4 @@ function setThemeVis()
 	vis.selectAll("line.link").style("stroke",function(d){ return linkColor(d); });
 }
 
-var vis;
 var themeId;

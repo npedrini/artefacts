@@ -127,8 +127,6 @@ function save()
 	$('canvas').attr('width',$('#visualization').width());
 	$('canvas').attr('height',$('#visualization').height());
 
-	console.log( $('#visualization').width(), $('#visualization').height() );
-	
 	canvg('canvas',svg);
 
 	var canvas = document.getElementById( "canvas" );

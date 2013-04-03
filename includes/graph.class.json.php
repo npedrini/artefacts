@@ -12,6 +12,7 @@ class Graph
 	const SHOW_TAGS = true;
 	
 	const TYPE_DREAM = "dream";
+	const TYPE_TAG = "tag";
 	
 	public $dateFrom;
 	public $dateTo;
@@ -205,7 +206,10 @@ class Graph
 		
 		foreach($this->nodes as $node)
 		{
-			$node->stroke = isset($node->color2) ? (hexdec(preg_replace("/#/","0x",$node->color2)) < 0x666666 ? true : false) : false;
+			if( $node->node_type == self::TYPE_TAG )
+				$node->stroke = true;
+			else
+				$node->stroke = isset($node->color2) ? (hexdec(preg_replace("/#/","0x",$node->color2)) < 0x666666 ? true : false) : false;
 		}
 		
 		$data = (object)array( 'nodes'=>$this->nodes, 'links'=>$this->links, 'dream_total'=>count($this->dreams), 'art_total'=>0 );
