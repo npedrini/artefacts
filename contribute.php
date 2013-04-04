@@ -3,6 +3,12 @@ include_once "includes/db.class.php";
 include_once "includes/dream.class.php";
 include_once 'config/' . getenv('HTTP_APPLICATION_ENVIRONMENT') . "/config.php";
 
+/*
+echo "<pre>";
+print_r($_POST);
+echo "</pre>";
+*/
+
 session_start();
 
 $database = new Database();
@@ -36,6 +42,7 @@ if( DEBUG )
 		'description' => 'I am in a car with my friend Mark. Mark is totally blind and so am I. The interesting thing about this is that I am driving the car. I am driving the car from somewhere to my house. I don\'t know how I seem to know where to go, but I seem to know. I told him that I am going to drive us home and I\'m doing it. I always wished that I could drive although this is the first dream I have ever had where I\'m doing it. The main senses I used in this were hearing because I could listen to him and hear what he was saying, I could hear the other traffic around me. And feeling. I could feel the upholstery around me in the car, the steering wheel. I was driving the car, that\'s all there is to that dream.',
 		'email' => 'go@looklisten.net',
 		'gender' => 'female',
+		'feelings' => array('6','5'),
 		'tags' => 'blind,driving,Mark,hearing,upholstery',
 		'title' => 'me and mark'
 	);
@@ -210,6 +217,37 @@ var tagTimer;
 							id="file" type="file" name="file" class="big"
 							rel="tooltip" title=".jpg, .png or .gif under <?php echo ($dream->max_bytes/1024/1024); ?>MB" style="width:200px" />
 					</div>
+					
+					<?php 
+					
+					$sql = "SELECT * FROM feelings ORDER BY feeling";
+					$result = $database->query( $sql );
+					
+					if( $database->affected_rows > 0 ) {
+
+					?>
+					<div class="row">
+						<label for="file">What you felt in your dream</label>
+						
+						<div>
+							<div class="column">
+							<?php 
+							$n = $database->affected_rows;
+							$i=0;
+							
+							while( $feeling = $result->fetch_assoc() )
+							{
+								echo "<label><input ".(in_array($feeling['id'],$dream->feelings)?'checked':'')." type='checkbox' name='feelings[]' value='".$feeling['id']."' />".$feeling['feeling']."</label><br/>";
+								
+								if( $i==floor($n/2) ) echo "</div><div class='column'>";
+								
+								$i++;
+							}
+							?>
+							</div>
+						</div>
+					</div>
+					<?php } ?>
 					
 					<div class="row">
 						<div style="vertical-align:top">

@@ -14,6 +14,7 @@ class Dream
 	public $date;
 	public $description;
 	public $email;
+	public $feelings;
 	public $gender;
 	public $image;
 	public $origin;
@@ -45,6 +46,7 @@ class Dream
     	$this->description = "";
     	$this->email = "";
     	$this->gender = "female";
+    	$this->feelings = array();
     	$this->tags = "";
     	$this->title = "";
     	
@@ -224,8 +226,6 @@ class Dream
 				//	dream was added 
 				//	restore form to default state by resetting values
 				$this->status = "Dream added!";
-				
-				$this->init();
 			}
 			
 			if( $valid ) $this->logger->log( "dream added..." );
@@ -279,6 +279,20 @@ class Dream
 				}
 			}
 		}
+		
+		if( $valid )
+		{
+			foreach($this->feelings as $feeling_id)
+			{
+				if( $feeling_id )
+				{
+					$sql = "INSERT INTO `dream_feelings` (dream_id,feeling_id) VALUES ('".$dream_id."','".$feeling_id."')";					
+					$result = $this->db->query( $sql );
+				}
+			}
+		}
+		
+		if( $valid ) $this->init();
 		
 		return $valid;
 	}
