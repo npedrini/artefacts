@@ -1,5 +1,6 @@
 <?php
 include 'config/' . getenv('HTTP_APPLICATION_ENVIRONMENT') . "/config.php";
+include 'includes/session.php';
 include 'includes/recaptcha/recaptchalib.php';
 
 $publickey = "6LdEQd0SAAAAAHivyVeW7KROMA2upIL6Npbxr99D";
@@ -376,11 +377,13 @@ var cid;
 			
 		</div>
 		
+		<!--
 		<div id="footer" style="width:200px;text-align:left">
 			<div><a href="http://www.momahobart.net.au/" target="_blank"><img src='images/mona.png'/></a></div>
 			<div style='font-size:.6em;'>Establishment of the collection was sponsored by the <a href="http://www.momahobart.net.au/" target="_blank">MONA Market</a></div>
 		</div>
-	
+		-->
+		
 	</div>
 	
 </body>

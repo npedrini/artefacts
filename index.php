@@ -1,8 +1,8 @@
 <?php 
 include 'config/' . getenv('HTTP_APPLICATION_ENVIRONMENT') . "/config.php";
-session_start();
+include 'includes/session.php';
 
-$date = new DateTime( 'now', new DateTimeZone('Australia/Melbourne') );
+$date = new DateTime( 'now', new DateTimeZone(TIME_ZONE) );
 $hour = $date->format("G");
 
 if( $hour >= 18 ) $mona_state = "unwinding";
@@ -11,6 +11,7 @@ else if( $hour >= 6 ) $mona_state = "rising";
 else $mona_state = "asleep";
 
 $showIntro = isset($_SESSION['introShown']) ? false : true;
+$showIntro = true;
 
 $_SESSION['introShown'] = true;
 
@@ -25,10 +26,6 @@ if( $showIntro )
 	$location = json_decode($location);
 	
 	$city = $location->city;
-	
-// 	echo "<pre>";
-// 	print_r($location);
-// 	echo "</pre>";
 }
 ?>
 <!DOCTYPE HTML>
@@ -306,8 +303,12 @@ var inactivityTimer;
 	
 	<div id="intro" class="centered">
 	
-		<div style='width:200px;margin-left:auto;margin-right:auto;text-align:center'>
+		<div style='width:300px;margin-left:auto;margin-right:auto;text-align:center'>
+			<?php if( isset($_SESSION['origin']) && $_SESSION['origin']=='mona' ) { ?>
+			<span id="line1" class="emphasized"><a href="javascript:show();">Artefacts of the Collective Unconscious</a></span><br/><span id="line2">A repository of MONA visitor dreams, sponsored by MONA Market.</span><div style="margin-top:50px"><img src='images/mona.png'/></div>
+			<?php } else { ?>
 			<a href="javascript:show();"><span id="line1">It's <?php echo $date->format('g:ia'); ?> in <?php echo $city; ?>.</span><br/><span id="line2">MONA is <?php echo $mona_state; ?>.</span></a>
+			<?php } ?>
 		</div>
 		
 	</div>

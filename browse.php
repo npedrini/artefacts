@@ -1,14 +1,11 @@
 <?php
-session_start();
-
 include 'config/' . getenv('HTTP_APPLICATION_ENVIRONMENT') . "/config.php";
+include 'includes/session.php';
 
 $date_format = DATE_FORMAT;
 $date_format = preg_replace( '/{{date}}/', 'j', $date_format );
 $date_format = preg_replace( '/{{month}}/', 'n', $date_format );
 $date_format = preg_replace( '/{{year}}/', 'Y', $date_format );
-
-//$date = new DateTime( 'now', new DateTimeZone('Australia/Melbourne') );
 
 $values = array('date'=>'', 'search'=>'');
 

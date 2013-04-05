@@ -188,7 +188,7 @@ var tagTimer;
 					
 					<div class="row">
 						<label class="emphasized" for="description">Describe your dream</label>
-						<textarea class="big" id="description" name="description" rows="8" placeholder=""><?php echo $dream->description; ?></textarea>
+						<textarea class="big" id="description" name="description" rows="8" placeholder=""><?php echo stripslashes($dream->description); ?></textarea>
 					</div>
 					
 					<div class="row">
@@ -267,6 +267,12 @@ var tagTimer;
 								value="<?php echo $dream->age; ?>" 
 								rel="tooltip" title="" style="width:100px" />
 						</div>
+					</div>
+					
+					<div class="row">
+						<label for="gender">Email</label>
+						<input id="email" type="text" name="email" class="date big"
+								value="<?php echo $dream->email; ?>" style='width:350px;display:inline;vertical-align: middle' />
 					</div>
 					
 					<div class="row">
