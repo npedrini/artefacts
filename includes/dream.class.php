@@ -62,14 +62,14 @@ class Dream
 		
 		//	validation
 		$valid = $this->validate();
-		
+
 		//	get a user_id, either by adding new user or fetching id of existing
 		if( $valid )
 		{
 			//	add user if doesn't exist in `users` table and get id
 			$sql = "SELECT id FROM `users` WHERE email='".$this->email."'";
 			$result = $this->db->query( $sql );
-			
+
 			if( $this->db->affected_rows > 0 )
 			{
 				$user = $result->fetch_assoc();
@@ -83,8 +83,11 @@ class Dream
 				$result = $this->db->query( $sql );
 				
 				$this->user_id = $this->db->insert_id;
-				
-				$this->logger->log( "user added..." );
+
+				if( $result )
+					$this->logger->log( "user added..." );
+				else
+					$this->logger->log( "problem adding user..." );
 			}
 			
 			if( !$this->user_id ) $valid = false;
@@ -159,6 +162,27 @@ class Dream
 		{
 			$id = isset($this->id) ? $this->db->real_escape_string($this->id):null;
 			
+			$age = $this->db->real_escape_string($this->age);
+			$color = $this->db->real_escape_string($this->color);
+			$description = $this->db->real_escape_string($this->description);
+			$email = $this->db->real_escape_string($this->email);
+			$gender = $this->db->real_escape_string($this->gender);
+			$image = $this->db->real_escape_string($this->image);
+			$origin = $this->db->real_escape_string($this->origin);
+			$title = $this->db->real_escape_string($this->title);
+				
+			$date = DateTime::createFromFormat( $this->dateFormat, $this->date, new DateTimeZone($this->timezone) ); 
+				
+			$get_location = curl_init(); 
+			curl_setopt($get_location, CURLOPT_URL, "http://freegeoip.net/json/");
+			curl_setopt($get_location, CURLOPT_RETURNTRANSFER, 1);
+				
+			$location = curl_exec($get_location);
+			$location = json_decode($location);
+			
+			$fields  = array( "age", "city", "color", "country", "description", "gender", "image", "latitude", "longitude", "occur_date", "origin", "region", "title", "user_id" );
+			$values  = array( $age, $location->city, $color, $location->country_name, $description, $gender, $image, $location->latitude, $location->longitude, $date->format('Y-m-d'), $origin, $location->region_name, $title, $this->user_id );
+
 			if( !is_null($id) 
 				&& !empty($id) )
 			{
@@ -181,54 +205,41 @@ class Dream
 					$this->logger->log( "Error updating dream" );
 			}
 			
-			$description = $this->db->real_escape_string($this->description);
-			
 			if( !isset($dream_id) )
 			{
-				$age = $this->db->real_escape_string($this->age);
-				$color = $this->db->real_escape_string($this->color);
-				$gender = $this->db->real_escape_string($this->gender);
-				$image = $this->db->real_escape_string($this->image);
-				$origin = $this->db->real_escape_string($this->origin);
-				$title = $this->db->real_escape_string($this->title);
-				
-				$date = DateTime::createFromFormat( $this->dateFormat, $this->date, new DateTimeZone($this->timezone) ); 
-				
-				$get_location = curl_init(); 
-				curl_setopt($get_location, CURLOPT_URL, "http://freegeoip.net/json/");
-				curl_setopt($get_location, CURLOPT_RETURNTRANSFER, 1);
-				
-				$location = curl_exec($get_location);
-				$location = json_decode($location);
-				
-				$fields  = "age,city,color,country,description,gender,image,latitude,longitude,occur_date,origin,region,title,user_id";
-				$values  = "'".$age."','".$location->city."','".$color."','".$location->country_name."','".$description."','".$gender."','".$image."','".$location->latitude."','".$location->longitude."','".$date->format('Y-m-d')."','".$origin."','".$location->region_name."','".$title."','".$this->user_id."'";
-				
-				//	add dream
-				$sql  = "INSERT INTO `dreams` (".$fields.") VALUES (".$values.")";
-				
+				$where = array();
+
+				for($i=0;$i<count($fields);$i++) $where[] = $fields[$i]."='".$values[$i]."'";
+
+				$sql = "SELECT id FROM `dreams` WHERE ".implode(" AND ",$where);
 				$result = $this->db->query( $sql );
-				$dream_id = $this->db->insert_id;
+
+				if( $this->db->affected_rows == 0 )
+				{
+					//	add dream
+					$sql  = "INSERT INTO `dreams` (".implode(",",$fields).") VALUES ('".implode("','",$values)."')";
+
+					$result = $this->db->query( $sql );
+					$dream_id = $this->id = $this->db->insert_id;
+
+					if( !$result || !$this->id )
+					{
+						$this->status = "There was a problem submitting the dream.";
 				
-				if( !$result ) $this->logger->log( "Error updating dream" );
+						$valid = false;
+					}
+					else
+					{
+						//	dream was added 
+						$this->status = "Dream added!";
+					}
+				}
+				else
+				{
+					$valid = false;
+					$this->status = "Ooops! It looks like this dream already exists.";
+				}	
 			}
-			
-			$this->id = $dream_id;
-			
-			if( !$result || !$this->id )
-			{
-				$this->status = "There was a problem submitting the dream.";
-				
-				$valid = false;
-			}
-			else
-			{
-				//	dream was added 
-				//	restore form to default state by resetting values
-				$this->status = "Dream added!";
-			}
-			
-			if( $valid ) $this->logger->log( "dream added..." );
 		}
 		
 		//	add dream tags
@@ -302,15 +313,22 @@ class Dream
 		$valid = true;
 		
 		//	validate required fields
-		$required = array('date','description');
+		$required = array('date','description','email');
 		
 		foreach($required as $field)
 			if( !isset($this->$field) || empty($this->$field) )
 				$valid = false;
-		
-		if( $valid )
+
+		if( !$valid )
 		{
 			$this->status = "Please complete all the fields.";
+		}
+		
+		//  validate email separately
+		else if( !filter_var($this->email, FILTER_VALIDATE_EMAIL) )
+		{
+			$this->status = "Oops! This doesn't look like a valid email.";
+			$valid = false;
 		}
 		
 		return $valid;
