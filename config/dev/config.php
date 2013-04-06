@@ -12,4 +12,6 @@ define("DB_PASS","Adm1nHats1lu!");
 define('DB_NAME','artefacts');
 
 ini_set('error_reporting', 1);
+
+DEFINE('TEST','X');
 ?>
