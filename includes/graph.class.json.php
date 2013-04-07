@@ -1,6 +1,8 @@
 <?php
 include_once "db.class.php";
 include_once "logger.class.php";
+include_once "includes/alchemy/module/AlchemyAPI.php";
+include_once "includes/alchemy/module/AlchemyAPIParams.php";
 
 class Graph
 {
@@ -14,6 +16,7 @@ class Graph
 	const TYPE_DREAM = "dream";
 	const TYPE_TAG = "tag";
 	
+	public $alchemyApiKey;
 	public $dateFrom;
 	public $dateTo;
 	public $highlightColor = '#CC3300';
@@ -50,6 +53,9 @@ class Graph
     	$this->logger = new Logger();
     }
     
+    /**
+     * Populates class with graph data
+     */
     function build()
     {
     	$data = array();
@@ -57,10 +63,10 @@ class Graph
     	$root_node = $this->getRootNode();
     	$this->nodes[] = $root_node;
     	
-		//	STEP 2: GET ALL DREAMS FOR SPECIFIED DATE RANGE
+		//	GET ALL DREAMS FOR SPECIFIED DATE RANGE
 		$sql = "SELECT dreams.*, users.ip FROM `dreams` ";
 		$sql .= "LEFT JOIN `users` on dreams.user_id=users.id ";
-		$sql .= "WHERE occur_date >= '" . $this->dateTo . "' AND occur_date <= '" . $this->dateFrom . "'";
+		$sql .= "WHERE occur_date >= '" . $this->dateFrom . "' AND occur_date <= '" . $this->dateTo . "' ";
 		
 		$result = $this->db->query( $sql );
 		
@@ -108,8 +114,6 @@ class Graph
 						}	
 						
 						$tag_node->value++;
-						
-						//$this->showTag( (object)$t, $dream );
 					}
 				}
 				
@@ -172,6 +176,8 @@ class Graph
     
     function render()
     {
+    	//$text = "";
+    	
     	$paragraphs = array();
 		$dreams_by_value = array();
 		
@@ -201,6 +207,61 @@ class Graph
 				$j++;
 			}
 		}
+		
+		/*
+		if( self::SHOW_TAGS )
+		{
+			$sentences = array();
+			
+			foreach($paragraphs as $p)
+				foreach($p as $sentence)
+				$sentences[] = $sentence['sentence'];
+			
+			$text = implode(". ", $sentences);
+			
+			$alchemy = new AlchemyAPI();
+			$alchemy->setAPIKey( $this->alchemyApiKey );
+			
+			$params = new AlchemyAPI_KeywordParams();
+			$params->setMaxRetrieve( 20 );
+			$params->setKeywordExtractMode( 'strict' );
+				
+			$result = json_decode( $alchemy->TextGetRankedKeywords( $text, AlchemyAPI::JSON_OUTPUT_MODE, $params ) );
+			
+			if( $result->status == "OK" )
+			{
+				$root_node = $this->nodes[0];
+				
+				foreach($result->keywords as $key=>$val)
+				{
+					$tag = $val->text;
+					$tag = preg_replace( "/\./", "", $tag );
+					
+					if( isset($this->indexes['tags_by_tag'][$tag]) )
+					{
+						$tag_node = $this->indexes['tags_by_tag'][$tag];
+					}
+					else
+					{
+						$this->tags[] = $tag_node = (object)array('color'=>'#000000','id'=>-1,'index'=>count($this->nodes),'node_type'=>'atag','tags'=>array(),'title'=>$tag,'value'=>0);
+						$this->indexes['tags_by_tag'][$tag] = $tag_node;
+					}
+					
+					$tag_node->value++;
+					
+					if( $tag_node->value >= $this->minTagValue )
+					{
+						if( !array_search($tag_node,$this->nodes) )
+						{
+							$this->nodes[] = $tag_node;
+						}
+					
+						//$this->showTag( $tag_node, $root_node );
+					}
+				}
+			}
+		}
+		*/
 		
 		$this->nodes[0]->description = $paragraphs;
 		

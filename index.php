@@ -11,7 +11,6 @@ else if( $hour >= 6 ) $mona_state = "rising";
 else $mona_state = "asleep";
 
 $showIntro = isset($_SESSION['introShown']) ? false : true;
-$showIntro = true;
 
 $_SESSION['introShown'] = true;
 
@@ -43,12 +42,10 @@ if( $showIntro )
 <script type="text/javascript" src="js/lib/jquery-1.9.1.js"></script>
 <script type="text/javascript" src="js/lib/jquery-ui-1.10.1.custom.min.js"></script>
 <script type="text/javascript" src="js/lib/d3/d3.min.js"></script>
-<script type="text/javascript" src="js/lib/d3/d3.fisheye.js"></script>
 <script type="text/javascript" src="js/lib/jquery.tipsy.js"></script>
 <script type="text/javascript" src="js/lib/jquery.cookie.js"></script>
 <script type="text/javascript" src="js/lib/canvg/rgbcolor.js"></script> 
 <script type="text/javascript" src="js/lib/canvg/canvg.js"></script> 
-<script type="text/javascript" src="js/theme.js"></script>
 <script type="text/javascript" src="js/graph.js"></script>
 <script type="text/javascript">
 $(document).ready
@@ -62,24 +59,25 @@ $(document).ready
 		$('#header h1').on("mouseenter",function(e){ $('#info').fadeIn(); });
 		$('#header h1').on("mouseleave",function(e){ $('#info').hide(); });
 		
-		$('#dateselect').on("mouseover",function(e){ $(e.currentTarget).tipsy("show"); });
-		$('#dateselect').on("mouseout", function(e){ $(e.currentTarget).tipsy("hide"); });
+		$('#search').on("mouseover",function(e){ $(e.currentTarget).tipsy("show"); });
+		$('#search').on("mouseout", function(e){ $(e.currentTarget).tipsy("hide"); });
+		$('#icon_search').on("click", function(e){ $(e.currentTarget).parent().tipsy("hide"); });
 		
-		$('#footer').on("mouseenter",function(e){ $('#dateselect,#gear,#theme_toggle').css('opacity',1);$("#settings").show(); });
-		$('#settings').on("mouseleave", function(e){ $('#dateselect,#gear,#theme_toggle').css('opacity',.5);$("#settings").hide(); });
+		$('#footer').on("mouseenter",function(e){ $('#search,#gear,#theme_toggle').css('opacity',1);$("#settings").show(); });
+		$('#settings').on("mouseleave", function(e){ $('#search,#gear,#theme_toggle').css('opacity',.5);$("#settings").hide(); });
 		
 		//	pointer cursor
-		$('#header h1,#footer,#dateselect').css('cursor', 'pointer');
+		$('#header h1,#footer,#search').css('cursor', 'pointer');
 		
 		//	tooltips
-		$('#dateselect').tipsy( { gravity: 'e', offset: 10, opacity: 1, trigger: "manual" } );
+		$('#search').tipsy( { gravity: 'e', offset: 10, opacity: 1, trigger: "manual" } );
 		$('#theme_toggle,#save').tipsy( { gravity: 'e', offset: 10, opacity: 1 } );
 		
 		//	init opacity
-		$('#dateselect,#gear,#theme_toggle').css('opacity',.5);
+		$('#search,#gear,#theme_toggle').css('opacity',.5);
 		
 		//	hide stuff
-		$("#background,#foreground,#info,#settings,intro").hide();
+		$("#background,#foreground,#info,#settings,#intro,#date,#search_overlay").hide();
 		
 		//	fade intro
 		var showIntro = <?php echo $showIntro?'true':'false' ?>;
@@ -96,10 +94,72 @@ $(document).ready
 		{
 			show();
 		}
+
+		graph = new Graph( d3 );
+		graph.addEventListener( "loadStart", onGraphLoadStart );
+		graph.addEventListener( "loadComplete", onGraphLoadComplete );
+		
+		setTheme( $.cookie("theme") != undefined ? $.cookie("theme") : 1 );
 		
 		updateInfo();
 	}
 );
+
+function onGraphLoadStart(error,g)
+{
+	showLoader();
+}
+
+function onGraphLoadComplete(error,g)
+{
+	hideLoader();
+
+	dataLoadAttempts++;
+
+	var dateSpecified = availableDates.indexOf( getHash() ) > -1;
+	
+	if( graph.totalDreams < 10
+		&& dataLoadAttempts < availableDates.length 
+		&& !dateSpecified )
+	{
+		console.log( 'Expanding search', availableDates[dataLoadAttempts] );
+		
+		$("#date_from").val( availableDates[dataLoadAttempts] );
+
+		search();
+	}
+	else
+	{
+		setHash( graph.currentDateFrom );
+		updateInfo();
+		setThemeVis();
+	}
+}
+
+function setTheme( id )
+{
+	themeId = id;
+	
+	$('head').remove("#theme").append('<link id="theme" rel="stylesheet" type="text/css" href="css/themes/'+(themeId==1?'black':'white')+'/theme.css">');
+
+	//	TODO: decouple graph from theme
+	graph.themeId = id;
+	
+	setThemeVis();
+	
+	$.cookie("theme", themeId);
+	
+	//$('#theme_toggle').attr('title', id==1?'Lights on':'Lights off');
+}
+
+function setThemeVis()
+{
+	if( graph.vis == undefined ) return;
+	
+	graph.vis.selectAll("circle.node").style("fill",function(d){ return graph.nodeColor(d); });
+	graph.vis.selectAll("circle.node").style("stroke",function(d){ return graph.nodeStrokeColor(d); });
+	graph.vis.selectAll("line.link").style("stroke",function(d){ return graph.linkColor(d); });
+}
 
 function isMobile()
 {
@@ -111,7 +171,7 @@ function onMouseUp(e) { dragging = false; }
 function onClick(e)
 {
 	//	zoom out when clicking anywhere but on a node
-	if( $(e.target).is('svg') ) zoomOut();
+	if( $(e.target).is('svg') ) graph.zoomOut();
 }
 
 /**
@@ -145,6 +205,11 @@ function show()
 	$('body').removeClass('hidden');
 	$("#background,#foreground").fadeIn();
 	
+	initSearch();
+}
+
+function initSearch()
+{
 	//	get dates for which there is data
 	$.ajax
 	(
@@ -167,34 +232,51 @@ function show()
 					.replace( /{{date}}/, 'd' )
 					.replace( /{{month}}/, 'm' )
 					.replace( /{{year}}/, 'yy' );
-				
-				//	initialize date packer
-				$("#datepicker").datepicker
+
+				$( "#date_from" ).datepicker
 				(
 					{
-						beforeShow: function(){ $('#date').tipsy("hide"); },
-						beforeShowDay: shouldEnableDate,
+						autoSize:true,
 						dateFormat: df,
-						buttonImageOnly: true,
+						changeMonth: true,
 						minDate: availableDates[ availableDates.length - 1 ],
 						maxDate: availableDates[0],
-						onSelect: onDateChange,
-						showOn: "button"
+						numberOfMonths: 1,
+						onClose: function( selectedDate ) 
+						{
+				        	$( "#date_to" ).datepicker( "option", "minDate", selectedDate );
+						}
 					}
 				);
+
+				$( "#date_to" ).datepicker
+				(
+					{
+						autoSize:true,
+						dateFormat: df,
+						changeMonth: true,
+						minDate: availableDates[ availableDates.length - 1 ],
+						maxDate: availableDates[0],
+						numberOfMonths: 1,
+						onClose: function( selectedDate ) 
+						{
+				        	$( "#date_from" ).datepicker( "option", "maxDate", selectedDate );
+				      	}
+				    }
+				);
 				
-				$("#dateselect").attr("title","Set Date");
+				$("#search > .icon").attr("title","Search");
 				
 				$.extend($.datepicker,{_checkOffset:function(inst,offset,isFixed){return offset}});
 				
 				//	get init date from hash
-				var hash = window.location.hash;
-				hash = hash.substr( hash.indexOf('#')+ 1 );
+				var hash = getHash();
 				
 				//	set initial date
-				$("#datepicker").val( availableDates.indexOf( hash ) > -1 ? hash : availableDates[0] );
+				$("#date_from").val( availableDates.indexOf( hash ) > -1 ? hash : availableDates[0] );
+				$("#date_to").val( availableDates.indexOf( hash ) > -1 ? hash : availableDates[0] );
 				
-				onDateChange();
+				search();
 			}
 		}
 	);
@@ -214,21 +296,40 @@ function shouldEnableDate( date )
 	return [false, "There are no dreams for this day"];
 }
 
+function toggleSearch()
+{
+	if( $('#search_overlay').css( "display" ) == "none" )
+	{
+		var position = $('#icon_search').offset();
+		
+		$('#search_overlay').css( {'left':position.left - $('#search_overlay').width() - 10,'top':position.top - 20} );
+		$('#search_overlay').fadeIn(250);
+	}
+	else
+	{
+		$('#search_overlay').hide();
+	}
+}
+
 /**
  * Selects a date
  */
-function onDateChange()
+function search()
 {
-	var date = $("#datepicker").datepicker( "getDate" );
+	var date_from = $("#date_from").datepicker( "getDate" );
+	var date_to = $("#date_to").datepicker( "getDate" );
 	
-	var dateString = DATE_FORMAT
-		.replace( /{{date}}/, date.getDate() )
-		.replace( /{{month}}/, date.getMonth() + 1 )
-		.replace( /{{year}}/, date.getFullYear() );
+	var dateFromString = DATE_FORMAT
+		.replace( /{{date}}/, date_from.getDate() )
+		.replace( /{{month}}/, date_from.getMonth() + 1 )
+		.replace( /{{year}}/, date_from.getFullYear() );
+
+	var dateToString = DATE_FORMAT
+		.replace( /{{date}}/, date_to.getDate() )
+		.replace( /{{month}}/, date_to.getMonth() + 1 )
+		.replace( /{{year}}/, date_to.getFullYear() );
 	
-	window.location.hash = dateString;
-	
-	initGraph( dateString );
+	graph.load( dateFromString, dateToString );
 }
 
 /**
@@ -236,11 +337,17 @@ function onDateChange()
  */
 function updateInfo()
 {
-	var date = $("#datepicker").datepicker( "getDate" );
+	//	TODO: use date format
 	
-	if( totalDreams == null || date  == null ) return;
+	var dateFrom = $("#date_from").datepicker( "getDate" );
+	var dateTo = $("#date_to").datepicker( "getDate" );
 	
-	var text = 'Showing ' + totalDreams + ' dreams for ' + date.getDate() + ' ' + MONTHS[date.getMonth()] + ' ' + date.getFullYear();
+	if( graph.totalDreams == null || dateFrom  == null ) return;
+	
+	var text = 'Showing ' + graph.totalDreams + ' dreams for ' + dateFrom.getDate() + ' ' + MONTHS[dateFrom.getMonth()] + ' ' + dateFrom.getFullYear();
+	
+	if( dateTo != dateFrom ) text += " to " + dateTo.getDate() + ' ' + MONTHS[dateTo.getMonth()] + ' ' + dateTo.getFullYear();
+	
 	$('#info').html( text );
 }
 
@@ -264,16 +371,6 @@ function toggleTheme()
 	setTheme( themeId == 1 ? 0 : 1 ); 
 }
 
-function showLoader()
-{
-	$("body").append( "<div id='loader' class='centered'><div style='width:50px;'><img src='css/themes/<?php echo THEME; ?>/loader.gif' /></div></div>" );
-}
-
-function hideLoader()
-{
-	$("#loader").remove();
-}
-
 function getTagDescription( tag )
 {
 	$.ajax
@@ -292,10 +389,40 @@ function getTagDescription( tag )
 	);
 }
 
+/**
+ * show/hide spinner
+ */
+function showLoader()
+{
+	$("body").append( "<div id='loader' class='centered'><div style='width:50px;'><img src='css/themes/<?php echo THEME; ?>/loader.gif' /></div></div>" );
+}
+
+function hideLoader()
+{
+	$("#loader").remove();
+}
+
+/**
+ * get/set url hash
+ */
+function getHash()
+{
+	var hash = window.location.hash;
+	return hash.substr( hash.indexOf('#')+ 1 );
+}
+
+function setHash(hash)
+{
+	window.location.hash = hash;
+}
+
 var MONTHS = [ "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" ];
 var DATE_FORMAT = "<?php echo DATE_FORMAT; ?>";
 var availableDates;
 var inactivityTimer;
+var graph;
+var dataLoadAttempts = 0;
+var themeId;
 </script>
 </head>
 
@@ -326,13 +453,21 @@ var inactivityTimer;
 			<div id="settings">
 				
 				<div id="save" class="setting" title="Save" style="height:20px">
-					<form id="save_form" action="svg.php" method="POST" target="_blank" style="margin:0px">
+					
+					<form id="save_form" action="svg.php" method="POST" target="_blank" style="margin:0px;">
 						<input type="hidden" id="data" name="data" />
 						<div id="icon_save" onclick="javascript:save()"></div>
 					</form>
+					
 				</div>
-				<div id="theme_toggle" class="setting"><a href="javascript:toggleTheme()"><div id="icon_theme"></div></a></div>
-				<div id="dateselect" class="setting"><input type="hidden" id="datepicker" /></div>
+				
+				<div id="theme_toggle" class="setting" title="Lights">
+					<div id="icon_theme" onclick="javascript:toggleTheme()"></div>
+				</div>
+				
+				<div id="search" class="setting" title="Search">
+					<div id="icon_search" onclick="toggleSearch();"></div>
+				</div>
 				
 			</div>
 			
@@ -345,6 +480,20 @@ var inactivityTimer;
 	</div>
 	
 	<canvas id="canvas" width="0px" height="0px"></canvas>	
+	
+	<div id="search_overlay">
+		
+		<div class="header">
+			<a href="#" onclick="javascript:toggleSearch();">Close</a>
+		</div>
+		
+		<div class="content">
+			<span>From:</span><input id="date_from" type="text" name="from" placeholder="From" style="display:inline-block" />
+			<span>To:</span><input id="date_to" type="text" name="to" placeholder="To" style="display:inline-block" />
+			<input type="button" value="Go" onclick="javascript:search();toggleSearch();" />
+		</div>
+		
+	</div>
 	
 </body>
 

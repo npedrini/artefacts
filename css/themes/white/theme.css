@@ -23,6 +23,10 @@ h3 a:link, h3 a:visited, h3 a:hover { color: #333 }
 
 /*	index page	*/
 #node_info { color: #000; }
+#search_overlay{ background-color:#000; color: #fff; }
+#search_overlay .header { background-color:#444; }
+#search_overlay a, #search_overlay a:link, #search_overlay a:visited, #search_overlay a:hover { color: #fff }
+
 a.dream_link:link, a.dream_link:visited { color: #000; background-color: none; }
 a.dream_link:hover { color: #fff; background-color: #000; }
 
@@ -40,6 +44,5 @@ a.dream_link:hover { color: #fff; background-color: #000; }
 #icon_gear { background: url("icons/gear.png") no-repeat; width:20px; height:20px; border:0px; }
 #icon_save { background: url("icons/save.png") no-repeat; width:20px; height:20px; border:0px; }
 #icon_theme { background: url("icons/theme.png") no-repeat; width:20px; height:28px; border:0px; }
-.ui-datepicker-trigger { background: url("icons/calendar.png") no-repeat; width:20px; height:20px; border:0px; }
-#icon_checkmark { background: url("icons/checkmark.png") no-repeat; width:30px; height:30px; border:0px; }
-					
+#icon_search { background: url("icons/calendar.png") no-repeat; width:20px; height:20px; border:0px; }
+#icon_checkmark { background: url("icons/checkmark.png") no-repeat; width:30px; height:30px; border:0px; }		

@@ -9,13 +9,15 @@ $date_format = preg_replace( '/{{date}}/', 'j', $date_format );
 $date_format = preg_replace( '/{{month}}/', 'n', $date_format );
 $date_format = preg_replace( '/{{year}}/', 'Y', $date_format );
 
-if( !isset( $_GET['date'] ) ) die( );
+if( !isset( $_GET['date_from'] ) ) die( );
 
-$date = DateTime::createFromFormat( $date_format, $_GET['date'], new DateTimeZone(TIME_ZONE) );
+$dateFrom = DateTime::createFromFormat( $date_format, $_GET['date_from'], new DateTimeZone(TIME_ZONE) );
+$dateTo = DateTime::createFromFormat( $date_format, $_GET['date_to'], new DateTimeZone(TIME_ZONE) );
 
 $graph = new Graph();
-$graph->dateFrom = $date->format('Y-m-d');
-$graph->dateTo = $date->format('Y-m-d');
+$graph->alchemyApiKey = ALCHEMY_API_KEY;
+$graph->dateFrom = $dateFrom->format('Y-m-d');
+$graph->dateTo = $dateTo->format('Y-m-d');
 $graph->minTagValue = 2;
 $graph->build();
 

@@ -87,8 +87,11 @@ body#vis #background, body#vis #header { background-image: none; }
 
 .artwork_title { text-transform: uppercase; }
 .artwork_artist { font-weight: normal; }
-.setting { vertical-align:middle;margin-bottom:2px;padding:2px; }
+.setting { vertical-align:middle;margin-bottom:1px;padding:2px; }
 
+#search_overlay { position:absolute; z-index:1000; font-size: .6em; }
+#search_overlay .header, #search_overlay .content { padding: 5px; }
+#search_overlay .header { font-size: .5em; text-align: right; }
 #node_info { display:inline-block; position:absolute; }
 
 /*	browse page	*/
