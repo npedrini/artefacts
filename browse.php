@@ -440,6 +440,7 @@ form input[type=text], form textarea { padding: .5em; outline-width: 0; }
 
 				echo $nl."\t\t\t</div>";
 				echo $nl."\t\t</div>";
+				
 			}
 			
 			echo $nl."\t</div>";

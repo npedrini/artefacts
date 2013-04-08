@@ -322,8 +322,6 @@ function Graph (d3,imagePath)
 					
 					for(var j=0;j<description[i].length;j++)
 					{
-						console.log( description[i][j].sentence, description[i][j].index, index );
-						
 						if( description[i][j].index != index || j==description[i][j].length )
 						{
 							var id = 'line_' + uid;
