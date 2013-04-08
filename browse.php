@@ -276,39 +276,41 @@ form input[type=text], form textarea { padding: .5em; outline-width: 0; }
 </head>
 
 <body>
-
-	<?php include "includes/header.php"; ?>
 	
-	<div id="content" class="<?php echo $isMain?'narrow':'wide'; ?>" style='display:inline-block'>
-		
-		<div id="status" style="display:<?php echo isset($status)&&$status!=''?'block':'none';?>"><?php echo isset($status)?$status:null; ?></div>
-		
-		<?php if( $isMain ) { ?>
-		<form method="get">
+	<div id="wrapper">
 	
-			<div>
-				<input 
-					id="search" type="text" name="search" 
-					placeholder="Search" style="width:300px;"
-					value="<?php echo $values['search']; ?>" 
-					rel="tooltip" title="" />
-			</div>
+		<?php include "includes/header.php"; ?>
+		
+		<div id="content" class="<?php echo $isMain?'narrow':'wide'; ?>" style='display:inline-block'>
 			
-			<div>
-				<input 
-					id="datepicker" type="text" name="date" class="date"
-					value="<?php echo $values['date']; ?>"  style='display:inline;vertical-align: middle;width:75px;'
-					placeholder="Date" 
-					rel="tooltip" title="" />
-			</div>
+			<div id="status" style="display:<?php echo isset($status)&&$status!=''?'block':'none';?>"><?php echo isset($status)?$status:null; ?></div>
 			
-			<div>
-				<input type="submit" name="submit" value="Find" />
-			</div>
-					
-		</form>
-		<?php } ?>
-		<?php
+			<?php if( $isMain ) { ?>
+			<form method="get">
+		
+				<div>
+					<input 
+						id="search" type="text" name="search" 
+						placeholder="Search" style="width:300px;"
+						value="<?php echo $values['search']; ?>" 
+						rel="tooltip" title="" />
+				</div>
+				
+				<div>
+					<input 
+						id="datepicker" type="text" name="date" class="date"
+						value="<?php echo $values['date']; ?>"  style='display:inline;vertical-align: middle;width:75px;'
+						placeholder="Date" 
+						rel="tooltip" title="" />
+				</div>
+				
+				<div>
+					<input type="submit" name="submit" value="Find" />
+				</div>
+						
+			</form>
+			<?php } ?>
+			<?php
 		$nl = "\n\n\t\t\t";
 		
 		if( isset($dream) )
@@ -429,26 +431,28 @@ form input[type=text], form textarea { padding: .5em; outline-width: 0; }
 				
 				echo $nl."\t<div class='result'>";
 				echo $nl."\t\t<a rel='tooltip' title='".$tootlip."' href='browse.php?did=".$dream['id']."'>".$title."</a>";
-				//echo "\n\t\t<div>".$date->format('M d, Y')."</div>";
+				
 				echo $nl."\t</div>";
 			}
 			
-			echo $nl."\t\t</div>";
 			echo $nl."\t</div>";
-			echo $nl."</div>";
 		}
 		?>
+			
+			<div id="sidebar">
+				<div id="quote">
+					<span class="quote"></span><br/>
+					<span class="author"></span>
+				</div>
+			</div>
+			
+		</div> <!-- end content -->
 		
-	</div>
-	
-	<div id="sidebar">
-		<div id="quote">
-			<span class="quote"></span><br/>
-			<span class="author"></span>
-		</div>
-	</div>
+		<div id="push"></div>
+		
+	</div>	<!-- end wrapper -->
 	
 	<?php include "includes/footer.php" ?>
-	
+	 
 </body>
 </html>

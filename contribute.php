@@ -162,65 +162,67 @@ var tagTimer;
 
 <body>
 
-	<?php include "includes/header.php"; ?>
+	<div id="wrapper">
 	
-	<div id="content" style='width:500px'>
-		
-		<div id="subheader">
-			<p>To contribute your dream to the digital collection, please complete the information below.</p>
-		</div>
-		
-		<div id="status" style="display:<?php echo isset($status)&&$status!=''?'block':'none';?>"><?php echo isset($status)?$status:null; ?></div>
-		
-		<form method="post" enctype="multipart/form-data">
+		<?php include "includes/header.php"; ?>
+	
+		<div id="content" style='width:500px'>
 			
-			<input type="hidden" name="id" value="<?php echo isset($dream->id)?$dream->id:''; ?>"  />
+			<div id="subheader">
+				<p>To contribute your dream to the digital collection, please complete the information below.</p>
+			</div>
 			
-			<div class="module" id="fields">
+			<div id="status" style="display:<?php echo isset($status)&&$status!=''?'block':'none';?>"><?php echo isset($status)?$status:null; ?></div>
+			
+			<form method="post" enctype="multipart/form-data">
 				
-				<div class='title'>Dream Information</div>
+				<input type="hidden" name="id" value="<?php echo isset($dream->id)?$dream->id:''; ?>"  />
 				
-				<div class="body">
-				
-					<div class="row">
-						<label style="float:left" class="emphasized" for="datepicker">When did you have your dream?</label>
-						<input id="datepicker" type="text" name="date" class="date big"
-								value="<?php echo $dream->date; ?>" style='width:350px;display:inline;vertical-align: middle' />
-					</div>
+				<div class="module" id="fields">
 					
-					<div class="row">
-						<label class="emphasized" for="description">Describe your dream</label>
-						<textarea class="big" id="description" name="description" rows="8" placeholder=""><?php echo stripslashes($dream->description); ?></textarea>
-					</div>
+					<div class='title'>Dream Information</div>
 					
-					<div class="row">
-						<label for="tags">Title of your dream</label>
-						<input 
-							id="title" type="text" name="title" class="big"
-							maxlength="255"
-							placeholder=""
-							value="<?php echo $dream->title; ?>" 
-							rel="tooltip" title="" />
-					</div>
+					<div class="body">
 					
-					<div class="row">
-						<label class="emphasized" for="description">A colour associated with your dream</label>
-						<div>
-							<input 
-								id="colorpicker1" class="colorpicker" name="color" 
-								type="minicolors" data-textfield="false"
-								value="<?php echo $dream->color; ?>" />
+						<div class="row">
+							<label style="float:left" class="emphasized" for="datepicker">When did you have your dream?</label>
+							<input id="datepicker" type="text" name="date" class="date big"
+									value="<?php echo $dream->date; ?>" style='width:350px;display:inline;vertical-align: middle' />
 						</div>
-					</div>
-					
-					<div class="row">
-						<label for="file">An image of your dream</label>
-						<input 
-							id="file" type="file" name="file" class="big"
-							rel="tooltip" title=".jpg, .png or .gif under <?php echo ($dream->max_bytes/1024/1024); ?>MB" style="width:200px" />
-					</div>
-					
-					<?php 
+						
+						<div class="row">
+							<label class="emphasized" for="description">Describe your dream</label>
+							<textarea class="big" id="description" name="description" rows="8" placeholder=""><?php echo stripslashes($dream->description); ?></textarea>
+						</div>
+						
+						<div class="row">
+							<label for="tags">Title of your dream</label>
+							<input 
+								id="title" type="text" name="title" class="big"
+								maxlength="255"
+								placeholder=""
+								value="<?php echo $dream->title; ?>" 
+								rel="tooltip" title="" />
+						</div>
+						
+						<div class="row">
+							<label class="emphasized" for="description">A colour associated with your dream</label>
+							<div>
+								<input 
+									id="colorpicker1" class="colorpicker" name="color" 
+									type="minicolors" data-textfield="false"
+									value="<?php echo $dream->color; ?>" />
+							</div>
+						</div>
+						
+						<div class="row">
+							<label for="file">An image of your dream</label>
+							<input 
+								id="file" type="file" name="file" class="big"
+								rel="tooltip" title=".jpg, .png or .gif under <?php echo ($dream->max_bytes/1024/1024); ?>MB" style="width:200px" />
+						</div>
+						
+						<?php 
 					
 					$sql = "SELECT * FROM feelings ORDER BY feeling";
 					$result = $database->query( $sql );
@@ -228,12 +230,12 @@ var tagTimer;
 					if( $database->affected_rows > 0 ) {
 
 					?>
-					<div class="row">
-						<label for="file">What you felt in your dream</label>
-						
-						<div>
-							<div class="column">
-							<?php 
+						<div class="row">
+							<label for="file">What you felt in your dream</label>
+							
+							<div>
+								<div class="column">
+								<?php 
 							$n = $database->affected_rows;
 							$i=0;
 							
@@ -246,50 +248,52 @@ var tagTimer;
 								$i++;
 							}
 							?>
+								</div>
 							</div>
 						</div>
-					</div>
-					<?php } ?>
-					
-					<div class="row">
-						<div style="vertical-align:top">
-							<label for="gender">Gender you identify as</label>
-							<div style='display:inline-block'><input id='gender_male' type='radio' name='gender'<?php echo $dream->gender=='male'?' checked':null ?> value="male"><label style='display:inline-block' for="gender_male">Male</label></div>
-							<div style='display:inline-block'><input id='gender_female' type='radio' name='gender'<?php echo $dream->gender=='female'?' checked':null ?> value="female"><label style='display:inline-block' for="gender_female">Female</label></div>
-							<div style='display:inline-block'><input id='gender_other' type='radio' name='gender'<?php echo $dream->gender=='other'?' checked':null ?> value="other"><label style='display:inline-block' for="gender_other">Other</label></div>
+						<?php } ?>
+						
+						<div class="row">
+							<div style="vertical-align:top">
+								<label for="gender">Gender you identify as</label>
+								<div style='display:inline-block'><input id='gender_male' type='radio' name='gender'<?php echo $dream->gender=='male'?' checked':null ?> value="male"><label style='display:inline-block' for="gender_male">Male</label></div>
+								<div style='display:inline-block'><input id='gender_female' type='radio' name='gender'<?php echo $dream->gender=='female'?' checked':null ?> value="female"><label style='display:inline-block' for="gender_female">Female</label></div>
+								<div style='display:inline-block'><input id='gender_other' type='radio' name='gender'<?php echo $dream->gender=='other'?' checked':null ?> value="other"><label style='display:inline-block' for="gender_other">Other</label></div>
+							</div>
 						</div>
-					</div>
-					
-					<div class="row">
-						<div style="vertical-align:top">
-							<label for="age">Age</label>
-							<input 
-								id="age" type="text" name="age" class="big"
-								placeholder=""
-								value="<?php echo $dream->age; ?>" 
-								rel="tooltip" title="" style="width:100px" />
+						
+						<div class="row">
+							<div style="vertical-align:top">
+								<label for="age">Age</label>
+								<input 
+									id="age" type="text" name="age" class="big"
+									placeholder=""
+									value="<?php echo $dream->age; ?>" 
+									rel="tooltip" title="" style="width:100px" />
+							</div>
 						</div>
+						
+						<div class="row">
+							<label for="gender">Email</label>
+							<input id="email" type="text" name="email" class="date big"
+									value="<?php echo $dream->email; ?>" style='width:350px;display:inline;vertical-align: middle' />
+						</div>
+						
+						<div class="row">
+							<input type="submit" name="submit" value="Contribute" />
+						</div>
+						
 					</div>
 					
-					<div class="row">
-						<label for="gender">Email</label>
-						<input id="email" type="text" name="email" class="date big"
-								value="<?php echo $dream->email; ?>" style='width:350px;display:inline;vertical-align: middle' />
-					</div>
-					
-					<div class="row">
-						<input type="submit" name="submit" value="Contribute" />
-					</div>
-					
-				</div>
-				
-			</div>	
-					
-		</form>
-	
-	</div>
-	
-	</div>
+				</div>	
+						
+			</form>
+		
+		</div>	<!-- 	end content  -->
+		
+		<div id="push"></div>
+		
+	</div>	<!-- 	end wrapper  -->
 	
 	<?php include "includes/footer.php" ?>
 	
