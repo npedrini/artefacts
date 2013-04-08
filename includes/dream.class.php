@@ -26,8 +26,10 @@ class Dream
 	
 	public $alchemyApiKey;
 	public $dateFormat;	//	TODO: set a default
-	public $timezone;
+	public $postToTumblr;
 	public $status;
+	public $timezone;
+	public $tumblrPostEmail;
 	
 	public $logger;
 	
@@ -240,6 +242,17 @@ class Dream
 					$this->status = "Ooops! It looks like this dream already exists.";
 				}	
 			}
+		}
+		
+		if( $valid 
+			&& $this->postToTumblr 
+			&& $this->tumblrPostEmail != null )
+		{
+			$to = $this->tumblrPostEmail;
+			$subject = isset($this->title)?$this->title:"untitled";
+			$body = $this->description;
+			
+			mail( $to, $subject, $body );		
 		}
 		
 		//	add dream tags

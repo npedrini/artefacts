@@ -30,7 +30,9 @@ $date->sub( new DateInterval("P01D") );
 $dream->alchemyApiKey = ALCHEMY_API_KEY;
 $dream->dateFormat = $date_format;
 $dream->origin = $_SESSION['origin'];
+$dream->postToTumblr = POST_TO_TUMBLR;
 $dream->timezone = TIME_ZONE;
+$dream->tumblrPostEmail = TUMBLR_POST_EMAIL;
 
 if( DEBUG )
 {
