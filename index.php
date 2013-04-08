@@ -3,12 +3,6 @@ include 'config/' . getenv('HTTP_APPLICATION_ENVIRONMENT') . "/config.php";
 include 'includes/session.php';
 
 $date = new DateTime( 'now', new DateTimeZone(TIME_ZONE) );
-$hour = $date->format("G");
-
-if( $hour >= 18 ) $mona_state = "unwinding";
-else if( $hour >= 12 ) $mona_state = "awake";
-else if( $hour >= 6 ) $mona_state = "rising";
-else $mona_state = "asleep";
 
 $showIntro = isset($_SESSION['introShown']) ? false : true;
 
@@ -16,16 +10,32 @@ $_SESSION['introShown'] = true;
 
 if( $showIntro )
 {
-	$get_location = curl_init();
+	//	get stats
+	$mysqli = new mysqli( DB_HOST, DB_USER, DB_PASS );
+	$mysqli->select_db( DB_NAME );
 	
-	curl_setopt($get_location, CURLOPT_URL, "http://freegeoip.net/json/");
-	curl_setopt($get_location, CURLOPT_RETURNTRANSFER, 1);
+	$sql = "SELECT COUNT(DISTINCT(dreams.id)) AS dream_count, ";
+	$sql .= "COUNT(DISTINCT(dreams.user_id)) AS dreamer_count, ";
+	$sql .= "COUNT(DISTINCT(dreams.occur_date)) AS dream_dates ";
+	$sql .= "FROM `dreams`";
 	
-	$location = curl_exec($get_location);
-	$location = json_decode($location);
+	$result = $mysqli->query($sql);
+	$row = $result->fetch_assoc();
 	
-	$city = $location->city;
+	$stats_temp = array
+	(
+		'dreams'=>$row['dream_count'],
+		'dreamers'=>$row['dreamer_count'],
+		'nights'=>$row['dream_dates']
+	);
+	
+	arsort($stats_temp);
+	
+	$stats = array();
+	foreach($stats_temp as $label=>$value) 
+		$stats[] = $value . ' ' . $label;
 }
+
 ?>
 <!DOCTYPE HTML>
 <html>
@@ -420,7 +430,9 @@ var themeId;
 			<?php if( isset($_SESSION['origin']) && $_SESSION['origin']=='mona' ) { ?>
 			<span id="line1" class="emphasized"><a href="javascript:show();">Artefacts of the Collective Unconscious</a></span><br/><span id="line2">A repository of MONA visitor dreams, sponsored by MONA Market.</span><div style="margin-top:50px"><img src='images/mona.png'/></div>
 			<?php } else { ?>
-			<a href="javascript:show();"><span id="line1">It's <?php echo $date->format('g:ia'); ?> in <?php echo $city; ?>.</span><br/><span id="line2">MONA is <?php echo $mona_state; ?>.</span></a>
+			<a href="javascript:show();">
+				<span id="line1"><?php echo implode( ', ', $stats ); ?></span>
+			</a>
 			<?php } ?>
 		</div>
 		
