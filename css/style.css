@@ -59,15 +59,18 @@ body#vis #background, body#vis #header { background-image: none; }
 #subheader { margin-bottom: 40px; }
 #subheader p { font-size: .8em; }
 
-#navigation { font-family: "Cedarville Cursive"; font-size: 1.1em; float: right; margin-right: 10px;}
 #navigation ul { list-style-type: none; margin:0; padding:0; }
 #navigation ul li { display:inline; margin:0; }
 #navigation ul li a, #navigation ul li a, #navigation ul li .link { font-weight: normal; }
 #navigation ul li a:link, #navigation ul li a:visited, #navigation ul li a:hover, #navigation ul li .link  { padding:.1em .4em; }
 
-#content { position: absolute; z-index: 1; margin: 50px; margin-top: 75px; }
+#header #navigation { font-family: "Cedarville Cursive"; font-size: 1.1em; float: right; margin-right: 10px;}
 
-#footer { position: absolute; font-size: .6em; bottom: 15px; right: 15px; text-align:right; }
+#content { margin: 50px; margin-top: 75px; }
+
+#footer { font-size: .5em; padding-bottom: 10px; text-align: center; }
+
+#vis #footer { font-size: .6em; position: absolute; bottom: 15px; right: 15px; text-align:right; padding-bottom: 0px; }
 
 #status 
 {

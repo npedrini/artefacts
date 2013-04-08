@@ -447,6 +447,8 @@ form input[type=text], form textarea { padding: .5em; outline-width: 0; }
 			<span class="author"></span>
 		</div>
 	</div>
-		
+	
+	<?php include "includes/footer.php" ?>
+	
 </body>
 </html>
