@@ -1,3 +1,5 @@
+* { margin: 0px; }
+html, body { height: 100%; }
 body { font-family: "Open Sans", helvetica, arial, sans-serif; font-size: 1em; padding:0px; margin:0px;}
 p { line-height: 1.5em; }
 a, a:link, a:visited, a:hover { text-decoration: none; font-weight: bold; }
@@ -43,6 +45,13 @@ button, input[type=button], input[type=submit]
 
 body#vis #background, body#vis #header { background-image: none; }
 
+#wrapper {
+	min-height: 100%;
+	height: auto !important;
+	height: 100%;
+	margin: 0 auto -20px; /* the bottom margin is the negative value of the footer's height */
+}
+
 #background, #foreground { position:absolute;left:0px;top:0px;width:100%;height:100%; }
 #background { z-index:1 }
 #foreground { z-index:2 }
@@ -66,9 +75,9 @@ body#vis #background, body#vis #header { background-image: none; }
 
 #header #navigation { font-family: "Cedarville Cursive"; font-size: 1.1em; float: right; margin-right: 10px;}
 
-#content { margin: 50px; margin-top: 75px; }
+#content { margin-left: 50px; margin-top: 75px; }
 
-#footer { font-size: .5em; padding-bottom: 10px; text-align: center; }
+#footer, #push { font-size: .5em; text-align: center; height: 20px; }
 
 #vis #footer { font-size: .6em; position: absolute; bottom: 15px; right: 15px; text-align:right; padding-bottom: 0px; }
 

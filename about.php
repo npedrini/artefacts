@@ -190,8 +190,8 @@ var cid;
 
 <body>
 	
-	<div id="foreground">
-	
+	<div id="wrapper">
+		
 		<?php include "includes/header.php"; ?>
 		
 		<div id="content" class="narrow" style="display:inline-block;position:relative">
@@ -364,29 +364,24 @@ var cid;
 			
 			</div>
 			
-		</div>
-		
-		<div id="sidebar">
-			
-			<div id="stats"><?php echo implode( ', ', $stats ); ?></div>
-			
-			<div id="quote">
-				<span class="quote"></span><br/>
-				<span class="author"></span>
+			<div id="sidebar">
+				
+				<div id="stats"><?php echo implode( ', ', $stats ); ?></div>
+				
+				<div id="quote">
+					<span class="quote"></span><br/>
+					<span class="author"></span>
+				</div>
+				
 			</div>
-			
-		</div>
 		
-		<!--
-		<div id="footer" style="width:200px;text-align:left">
-			<div><a href="http://www.momahobart.net.au/" target="_blank"><img src='images/mona.png'/></a></div>
-			<div style='font-size:.6em;'>Establishment of the collection was sponsored by the <a href="http://www.momahobart.net.au/" target="_blank">MONA Market</a></div>
-		</div>
-		-->
+		</div>	<!-- 	end content  -->
 		
-		<?php include "includes/footer.php" ?>
+		<div id="push"></div>
 		
-	</div>
+	</div> <!-- 	end wrapper  -->
+	
+	<?php include "includes/footer.php" ?>
 	
 </body>
 
