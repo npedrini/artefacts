@@ -79,7 +79,7 @@ body#vis #background, body#vis #header { background-image: none; }
 
 #footer, #push { font-size: .5em; text-align: center; height: 20px; }
 
-#vis #footer { font-size: .6em; position: absolute; bottom: 15px; right: 15px; text-align:right; padding-bottom: 0px; }
+#vis #footer { height: auto; font-size: .6em; position: absolute; bottom: 15px; right: 15px; text-align:right; padding-bottom: 0px; }
 
 #status 
 {
