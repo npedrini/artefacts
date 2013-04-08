@@ -18,6 +18,7 @@ $graph = new Graph();
 $graph->alchemyApiKey = ALCHEMY_API_KEY;
 $graph->dateFrom = $dateFrom->format('Y-m-d');
 $graph->dateTo = $dateTo->format('Y-m-d');
+$graph->maxKeywords = 30;
 $graph->minTagValue = 2;
 $graph->build();
 

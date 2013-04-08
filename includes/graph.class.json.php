@@ -20,6 +20,7 @@ class Graph
 	public $dateFrom;
 	public $dateTo;
 	public $highlightColor = '#CC3300';
+	public $maxKeywords = 20;
 	public $minTagValue;
 	
 	private $dreams;
@@ -111,7 +112,7 @@ class Graph
 								$this->indexes['tags'][$tag->id] = $this->tags[] = $tag_node = (object)array('color'=>'#000000','id'=>$tag->id,'index'=>count($this->nodes),'node_type'=>'tag','tags'=>array(),'title'=>$tag->tag,'value'=>0);
 								$this->indexes['tags_by_tag'][$tag->tag] = $tag_node;
 							}
-						}	
+						}
 						
 						$tag_node->value++;
 					}
@@ -153,7 +154,7 @@ class Graph
 							$this->nodes[] = $tag;
 						}
 						
-						$this->showTag( $tag, $dream );
+						$this->addTag( $tag, $dream );
 					}
 				}
 			}
@@ -176,8 +177,6 @@ class Graph
     
     function render()
     {
-    	//$text = "";
-    	
     	$paragraphs = array();
 		$dreams_by_value = array();
 		
@@ -208,25 +207,32 @@ class Graph
 			}
 		}
 		
-		/*
+		//	get alchemy tags for synthesized root node dynamically
 		if( self::SHOW_TAGS )
 		{
+			//	flatten node content into a string
+			$text = "";
+			
 			$sentences = array();
 			
 			foreach($paragraphs as $p)
 				foreach($p as $sentence)
-				$sentences[] = $sentence['sentence'];
+					$sentences[] = $sentence['sentence'];
 			
 			$text = implode(". ", $sentences);
 			
+			//	alchemy
 			$alchemy = new AlchemyAPI();
 			$alchemy->setAPIKey( $this->alchemyApiKey );
 			
 			$params = new AlchemyAPI_KeywordParams();
-			$params->setMaxRetrieve( 20 );
+			$params->setMaxRetrieve( $this->maxKeywords );
 			$params->setKeywordExtractMode( 'strict' );
-				
-			$result = json_decode( $alchemy->TextGetRankedKeywords( $text, AlchemyAPI::JSON_OUTPUT_MODE, $params ) );
+			
+			//	parse response
+			$response =$alchemy->TextGetRankedKeywords( $text, AlchemyAPI::JSON_OUTPUT_MODE, $params );
+			
+			$result = json_decode( $response );
 			
 			if( $result->status == "OK" )
 			{
@@ -243,11 +249,9 @@ class Graph
 					}
 					else
 					{
-						$this->tags[] = $tag_node = (object)array('color'=>'#000000','id'=>-1,'index'=>count($this->nodes),'node_type'=>'atag','tags'=>array(),'title'=>$tag,'value'=>0);
+						$this->tags[] = $tag_node = (object)array('color'=>'#000000','id'=>-1,'index'=>count($this->nodes),'node_type'=>'tag','tags'=>array(),'title'=>$tag,'value'=>0);
 						$this->indexes['tags_by_tag'][$tag] = $tag_node;
 					}
-					
-					$tag_node->value++;
 					
 					if( $tag_node->value >= $this->minTagValue )
 					{
@@ -256,12 +260,11 @@ class Graph
 							$this->nodes[] = $tag_node;
 						}
 					
-						//$this->showTag( $tag_node, $root_node );
+						$this->addTag( $tag_node, $root_node );
 					}
 				}
 			}
 		}
-		*/
 		
 		$this->nodes[0]->description = $paragraphs;
 		
@@ -280,73 +283,43 @@ class Graph
     
     function format( $data )
     {
-    	//	TODO: return based on format type
     	return json_encode($data);
     }
     
-    function showTag( $tag, $node )
+    function addTag( $tag, $node )
 	{
-		/*
-		if( self::SHOW_TAGS == false ) return;
+		if( !isset($this->indexes['tags_by_tag'][$tag->title]) ) return;
 		
-		if( isset($this->indexes['tags'][$tag->id]) )
-			$tag_node = $this->indexes['tags'][$tag->id];
-		else
-			$this->indexes['tags'][$tag->id] = $this->tags[] = $this->nodes[] = $tag_node = (object)array('color'=>'#000000','id'=>$tag->id,'index'=>count($this->nodes),'node_type'=>'tag','tags'=>array(),'title'=>$tag->tag,'value'=>0);
-		*/
-		
-		if( !isset($this->indexes['tags'][$tag->id]) ) return;
-		
-		$tag_node = $this->indexes['tags'][$tag->id];
+		$tag_node = $this->indexes['tags_by_tag'][$tag->title];
 		$tag_node->index = array_search($tag_node,$this->nodes);
 		
-		$source = $node;
-		$target = $tag_node;
-		
-		if( $source !=null 
-			&& $target !=null )
+		if( !is_null($node) )
 		{
-			$key = $source->index.'_'.$target->index;
+			$source = $node;
+			$target = $tag_node;
 			
-			if( !isset($this->keys[$key]) ) 
+			if( $source !=null
+			&& $target !=null )
 			{
-				$this->links[] = (object)array('source'=>$source->index,'target'=>$target->index,'value'=>1,'type'=>'tag');
-				$this->keys[$key] = 1;
-				
-				$tag_node->value++;
+				$key = $source->index.'_'.$target->index;
+					
+				if( !isset($this->keys[$key]) )
+				{
+					$this->links[] = (object)array('source'=>$source->index,'target'=>$target->index,'value'=>1,'type'=>'tag');
+					$this->keys[$key] = 1;
+					
+					$tag_node->value++;
+					$source->value++;
+					$target->value++;
+				}
 			}
 		}
-	}
-	
-	function getNodeById( $id, $type )
-	{
-		foreach($this->nodes as $node)
-		{
-			if( $node->id == $id
-				&& $node->node_type == $type )
-			{
-				return $node;
-			}
-		}
-		
-		return null;
 	}
 	
 	function getNodeCount()
 	{
 		return count($this->nodes);
 	}
-	
-	/*
-	function sanitizeTags(&$tags)
-	{
-		$ts = array('mona','old');
-		
-		foreach($ts as $t) 
-			if( array_search($t,$tags) > -1 ) 
-				array_splice( $tags, array_search($t,$tags), 1 );
-	}
-	*/
 }
 
 ?>

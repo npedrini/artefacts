@@ -1,6 +1,7 @@
-function Graph (d3)
+function Graph (d3,imagePath)
 {
 	this.d3 = d3;
+	this.imagePath = imagePath;
 	
 	this.LETTERS = "abcdefghijklmnopqrstuvwxyz";
 	this.LINK_OPACITY = 0;
@@ -33,6 +34,17 @@ function Graph (d3)
 			.attr("width", "100%")
 			.attr("height", "100%")
 			.attr("viewBox", "0 0 " + this.w + " " + this.h);
+		
+		var defs = this.vis.append("svg:defs");
+		
+		defs.append("svg:filter")
+					.attr("id", "blur")
+					.attr("x", "-30%")
+					.attr("y", "-30%")
+					.attr("width", "140%")
+					.attr("height", "140%")
+					.append("svg:feGaussianBlur")
+					.attr("stdDeviation", 2);
 		
 	  	var url = "json/graph.json.php?date_from="+dateFrom+"&date_to="+dateTo;
 	  	var self = this;
@@ -322,8 +334,11 @@ function Graph (d3)
 			
 			node_info += "<div class='body'>";
 			node_info += "<div>" + title + "</div>";
-			node_info += node != this.rootNode ? "<div style='margin-bottom:20px;font-size:x-small'>Dreamt in <a href='" + map_url + "'>" + node.city + "</a> at " + node.age + " on " + this.currentDateFrom + "</div>" : "";
+			node_info += node != this.rootNode ? "<div style='margin-bottom:20px;font-size:x-small'>Dreamt in <a href='" + map_url + "' target='_blank'>" + node.city + "</a> at " + node.age + " on " + this.currentDateFrom + "</div>" : "";
 			node_info += "<div>" + this.stripslashes(description) + "</div>";
+			
+			if( node.image != '' ) node_info += "<img src='" + this.imagePath + node.image + "' />";
+			
 			node_info += "</div>";
 			
 			if( node.tags.length ) 
@@ -352,7 +367,7 @@ function Graph (d3)
 			
 			node_info += "</div>";
 		}
-		else if( node.node_type == TYPE_ARTWORK )
+		else if( node.node_type == this.TYPE_ARTWORK )
 		{
 			var artist = node.artist;
 			
@@ -384,7 +399,7 @@ function Graph (d3)
 			node_info += "</div>";
 			node_info += "</div>";
 		}
-		else if( node.node_type == TYPE_ARTIST )
+		else if( node.node_type == this.TYPE_ARTIST )
 		{
 			node_info += "<div id='node_info' class='module' style='position:absolute;z-index:1000;width:600px'>";
 			
@@ -394,7 +409,7 @@ function Graph (d3)
 			
 			for(var j=0;j<nodes.length;j++)
 			{
-				if(	nodes[j].node_type==TYPE_ARTWORK
+				if(	nodes[j].node_type==this.TYPE_ARTWORK
 					&& nodes[j].artist==node.artist )
 				{
 					works.push( "<i><a href='javascript:showNodeByIndex("+j+")'>" + this.nodeTitle(nodes[j]) + "</a></i>" );
@@ -406,7 +421,7 @@ function Graph (d3)
 			
 			node_info += "</div>";
 		}
-		else if( node.node_type == "tag" )
+		else if( node.node_type == this.TYPE_TAG )
 		{
 			node_info += "<div id='node_info' class='module' style='position:absolute;z-index:1000;width:600px'>";
 			
@@ -419,16 +434,14 @@ function Graph (d3)
 			var artworks = [];
 			var dreams = [];
 			
-			this.getTagDescription( this.nodeTitle(node) );
-			
-			for(var j=0;j<nodes.length;j++)
+			for(var j=0;j<this.nodes.length;j++)
 			{
-				if(	nodes[j].tags.indexOf( node.title ) > -1 )
+				if(	this.nodes[j].tags.indexOf( node.title ) > -1 )
 				{
-					if( nodes[j].node_type == TYPE_ARTIST )
-						artworks.push( "<li><i><a href='javascript:showNodeByIndex("+j+")'>" + this.nodeTitle(nodes[j]) + "</a></i></li>" );
-					else if( nodes[j].node_type == TYPE_DREAM )
-						dreams.push( "<li><i><a href='javascript:showNodeByIndex("+j+")'>" + this.nodeTitle(nodes[j]) + "</a></i></li>" );
+					if( this.nodes[j].node_type == this.TYPE_ARTIST )
+						artworks.push( "<li><i><a href='javascript:showNodeByIndex("+j+")'>" + this.nodeTitle(this.nodes[j]) + "</a></i></li>" );
+					else if( this.nodes[j].node_type == this.TYPE_DREAM )
+						dreams.push( "<li><i><a href='javascript:showNodeByIndex("+j+")'>" + this.nodeTitle(this.nodes[j]) + "</a></i></li>" );
 						
 					break;
 				}
@@ -554,9 +567,9 @@ function Graph (d3)
 	/**
 	 * Nodes
 	 */
-	this.nodeRadius = function(d) { return Math.max( 5, Math.min( 100, d.value * 5 ) ); };
+	this.nodeRadius = function(d) { return 5 + Math.min( 100, d.value * 1.5 ); };
 	this.nodeColor = function(d) { return this.themeId == 1 ? (d.color2 != null ? d.color2 : '#fff') : d.color; };
-	this.nodeFilter = function(d) { return '';return d.node_type==this.TYPE_DREAM?"url(#blur)":""; };
+	this.nodeFilter = function(d) { return "";return d.node_type==this.TYPE_DREAM?"url(#blur)":""; };
 	this.nodeStrokeColor = function(d) { return d.stroke ? (this.themeId == 1?'#fff':'#000') : d.color2; };
 	this.nodeStrokeOpacity = function(d) { return d.stroke ? .3 : 1; };
 	

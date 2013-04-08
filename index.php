@@ -95,7 +95,7 @@ $(document).ready
 			show();
 		}
 
-		graph = new Graph( d3 );
+		graph = new Graph( d3, "<?php echo IMAGE_PATH; ?>" );
 		graph.addEventListener( "loadStart", onGraphLoadStart );
 		graph.addEventListener( "loadComplete", onGraphLoadComplete );
 		
@@ -179,7 +179,11 @@ function onClick(e)
 **/
 function save()
 {
-	var svg = new XMLSerializer().serializeToString( $('svg')[0] ).replace("href","xlink:href")
+	//graph.vis.selectAll("circle.node").attr("filter", function(d) { return ''; } );
+	
+	var svg = new XMLSerializer().serializeToString( $('svg')[0] ).replace("href","xlink:href");
+	
+	//graph.vis.selectAll("circle.node").attr("filter", function(d) { return graph.nodeFilter(d); } );
 	
 	$('canvas').attr('width',$('#visualization').width());
 	$('canvas').attr('height',$('#visualization').height());
@@ -369,24 +373,6 @@ function toggleTheme()
 {
 	$('#theme_toggle').tipsy('hide');
 	setTheme( themeId == 1 ? 0 : 1 ); 
-}
-
-function getTagDescription( tag )
-{
-	$.ajax
-	(
-		{
-			dataType: 'xml',
-			url: 'proxy.php?csurl=http://lookup.dbpedia.org/api/search.asmx/KeywordSearch&QueryString=' + tag,
-		}
-	)
-	.done
-	(
-		function(xml) 
-		{
-			console.log(xml,$(xml).find("Result").first());
-		}
-	);
 }
 
 /**
