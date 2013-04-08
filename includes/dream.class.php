@@ -271,9 +271,9 @@ class Dream
 			{
 				foreach($result->keywords as $key=>$val)
 				{
-					$tag = $val->text;
-					$tag = preg_replace( "/\./", "", $tag );
-					
+					$tag = stripslashes( $val->text );
+					$tag = preg_replace( "/^\W|\W$|\./", "", $tag );
+
 					if( empty($tag) ) continue;
 					
 					$tag = strtolower( trim($tag) );
