@@ -444,13 +444,11 @@ function Graph (d3,imagePath)
 						artworks.push( "<li><i><a href='javascript:showNodeByIndex("+j+")'>" + this.nodeTitle(this.nodes[j]) + "</a></i></li>" );
 					else if( this.nodes[j].node_type == this.TYPE_DREAM )
 						dreams.push( "<li><i><a href='javascript:showNodeByIndex("+j+")'>" + this.nodeTitle(this.nodes[j]) + "</a></i></li>" );
-						
-					break;
 				}
 			}
 			
-			if( artworks.length ) node_info += "<div style='margin-top:10px'>artworks: <ul>" + artworks.join(', ') + "</ul></div>";
-			if( dreams.length ) node_info += "<div style='margin-top:10px'>dreams:  <ul>" + dreams.join(', ') + "</ul></div>";
+			if( artworks.length ) node_info += "<div style='margin-top:10px'>artworks: <ul>" + artworks.join('\n') + "</ul></div>";
+			if( dreams.length ) node_info += "<div style='margin-top:10px'>dreams:  <ul>" + dreams.join('\n') + "</ul></div>";
 			
 			node_info += "</div>";
 			node_info += "</div>";
