@@ -337,7 +337,9 @@ function Graph (d3,imagePath)
 			node_info += node != this.rootNode ? "<div style='margin-bottom:20px;font-size:x-small'>Dreamt in <a href='" + map_url + "' target='_blank'>" + node.city + "</a> at " + node.age + " on " + this.currentDateFrom + "</div>" : "";
 			node_info += "<div>" + this.stripslashes(description) + "</div>";
 			
-			if( node.image != '' ) node_info += "<img src='" + this.imagePath + node.image + "' />";
+			console.log( node.image );
+			
+			if( node.image != '' && node.image != undefined ) node_info += "<img src='" + this.imagePath + node.image + "' />";
 			
 			node_info += "</div>";
 			
