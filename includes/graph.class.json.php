@@ -178,6 +178,8 @@ class Graph
     function render()
     {
     	$paragraphs = array();
+
+		//	build indexed array of dream values
 		$dreams_by_value = array();
 		
 		foreach($this->dreams as $dream)
@@ -189,22 +191,40 @@ class Graph
 			}
 		}
 		
-		asort( $dreams_by_value );
+		//	sort array of values by value
+		arsort( $dreams_by_value );
 		
+		//	textualization
+		$paragraphs[0] = array();
+		
+		$total_weight = 0;
+		foreach($dreams_by_value as $index=>$value) 
+			$total_weight += $this->dreams[$index]->value;
+
+		$cursor_position = 0;
+		$i=0;
+
 		foreach($dreams_by_value as $index=>$value)
 		{
 			$dream = $this->dreams[$index];
-			$sentences = explode(".",$dream->description);
 			
-			for($i=0,$j=0;$i<count($sentences);$i++)
+			$sentences = preg_split( "/(\.+\s*)/", $dream->description );
+			
+			$influence = $dream->value / $total_weight;
+			$excerpt_count = round( $influence * count($sentences) );
+			$start = round(count($sentences)*$cursor_position);
+			$length = min( count($sentences)-$start-1, $excerpt_count );
+
+			$excerpt = array_slice( $sentences, $start, $length );
+			$explanation = count($excerpt) . " sentences  taken from the " . ($i+1) . " most influential dream, starting at a relative text position of " . $cursor_position;
+
+			for($j=0;$j<count($excerpt);$j++)
 			{
-				if( $sentences[$i] == null ) continue;
-				if( !isset($paragraphs[$j]) ) $paragraphs[$j] = array();
-				
-				$paragraphs[$j][] = array( "index"=>$dream->index, "sentence"=>$sentences[$i] );
-				
-				$j++;
+				$paragraphs[0][] = array( "index"=>$dream->index, "sentence"=>$sentences[$j], "explanation"=>$explanation );
 			}
+			
+			$cursor_position = ($start+$length)/count($sentences);
+			$i++;
 		}
 		
 		//	get alchemy tags for synthesized root node dynamically
@@ -220,7 +240,7 @@ class Graph
 					$sentences[] = $sentence['sentence'];
 			
 			$text = implode(". ", $sentences);
-			
+
 			//	alchemy
 			$alchemy = new AlchemyAPI();
 			$alchemy->setAPIKey( $this->alchemyApiKey );

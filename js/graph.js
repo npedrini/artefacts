@@ -297,7 +297,7 @@ function Graph (d3,imagePath)
 		{
 			node_info += "<div id='node_info' class='module' style='position:absolute;z-index:1000;width:600px'>";
 			
-			var title = node.title;
+			var title = this.nodeTitle(node);
 			var description = node.description;
 			
 			var qs = [];
@@ -315,15 +315,29 @@ function Graph (d3,imagePath)
 				for(var i=0,uid=0;i<description.length;i++)
 				{
 					var sentences = [];
+					var index = description[i][0].index;
+					var lastIndex;
+					
+					var sentencesForDream = [];
 					
 					for(var j=0;j<description[i].length;j++)
 					{
-						var index = description[i][j].index;
-						var id = 'line_' + uid;
+						console.log( description[i][j].sentence, description[i][j].index, index );
 						
-						sentences.push( "<a id='"+id+"' class='dream_link' title='" + this.nodes[index].title + "' href='javascript:$(\"#"+id+"\").tipsy(\"hide\");showNodeByIndex("+index+")'>" + description[i][j].sentence + "</a>" );
+						if( description[i][j].index != index || j==description[i][j].length )
+						{
+							var id = 'line_' + uid;
+							
+							sentences.push( "<a id='"+id+"' class='dream_link' title='" + description[i][j].explanation + "' href='javascript:$(\"#"+id+"\").tipsy(\"hide\");showNodeByIndex("+index+")'>" + sentencesForDream.join(". ") + "</a>" );
+							
+							sentencesForDream = [];
+							
+							index = description[i][j].index;
+							
+							uid++;
+						}
 						
-						uid++;
+						sentencesForDream.push( description[i][j].sentence );
 					}
 					
 					paragraphs.push( sentences.join(". ") );
@@ -336,8 +350,6 @@ function Graph (d3,imagePath)
 			node_info += "<div>" + title + "</div>";
 			node_info += node != this.rootNode ? "<div style='margin-bottom:20px;font-size:x-small'>Dreamt in <a href='" + map_url + "' target='_blank'>" + node.city + "</a> at " + node.age + " on " + this.currentDateFrom + "</div>" : "";
 			node_info += "<div>" + this.stripslashes(description) + "</div>";
-			
-			console.log( node.image );
 			
 			if( node.image != '' && node.image != undefined ) node_info += "<img src='" + this.imagePath + node.image + "' />";
 			
