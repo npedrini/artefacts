@@ -290,7 +290,7 @@ class Dream
 					}
 					else								//	tag does not exist
 					{
-						$sql = "INSERT INTO `tags` (tag) VALUES ('".$tag."')";
+						$sql = "INSERT INTO `tags` (tag,alchemy) VALUES ('".$tag."','1')";
 						$result = $this->db->query( $sql );
 						$tag_id = $this->db->insert_id;
 					}
