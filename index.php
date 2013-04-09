@@ -41,7 +41,7 @@ if( $showIntro )
 <html>
 <meta charset="utf-8">
 <head>
-<title>Artefacts of the Collective Uncoscious</title>
+<title>Artefacts of the Collective Unconscious</title>
 <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
 <link href='http://fonts.googleapis.com/css?family=Cedarville+Cursive|Open+Sans' rel='stylesheet' type='text/css'>
 <link id="theme" rel="stylesheet" type="text/css" href="css/themes/<?php echo THEME; ?>/theme.css">
@@ -459,7 +459,13 @@ function onGraphZoomInStart( node )
 		
 		node_info += "<div class='body'>";
 		node_info += "<div>" + title + "</div>";
-		node_info += "<div style='margin-bottom:20px;font-size:x-small'>" + (node != graph.rootNode ? "Dreamt in <a href='" + map_url + "' target='_blank'>" + node.city + "</a> at " + node.age + " on " + graph.currentDateFrom + "" : "") + "</div>";
+		
+		node_info += "<div style='margin-bottom:20px;font-size:x-small'>";
+		if( node == graph.rootNode )
+			node_info += graph.currentDateFrom + " to " + graph.currentDateTo;
+		else
+			node_info += "Dreamt in <a href='" + map_url + "' target='_blank'>" + node.city + "</a> at " + node.age + " on " + graph.currentDateFrom;
+		node_info += "</div>";
 		
 		node_info += "<div>" + stripslashes(description) + "</div>";
 		

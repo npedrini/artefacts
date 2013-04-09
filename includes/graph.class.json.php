@@ -169,7 +169,7 @@ class Graph
     	$root_node->node_type = self::TYPE_DREAM;
     	$root_node->index = count($this->nodes);
     	$root_node->tags = array();
-    	$root_node->title = 'A dream of the collective unconscious';
+    	$root_node->title = 'Collective dream';
     	$root_node->value = 0;
     	
     	return $root_node;
