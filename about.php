@@ -232,9 +232,7 @@ var cid;
 
 				<p>In future, we aim to allow integration of dream data with other applications and platforms which are used to record and store dreams.</p>
 
-				<!--
 				<p>Curators: <a href='http://www.createassociate.com.au/' target='_blank'>David Patman</a> and <a href='http://www.looklisten.net/' target='_blank'>Noah Pedrini</a></p>
-				-->
 				
 			</div>
 			
