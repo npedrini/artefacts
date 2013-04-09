@@ -432,7 +432,7 @@ form input[type=text], form textarea { padding: .5em; outline-width: 0; }
 				
 					$title = isset($dream['title']) && !empty($dream['title']) ? $dream['title'] : $title_description;
 				
-					$tootlip = ($dream['gender']==1?'male':'female').(!empty($dream['age'])?', age '.$dream['age']:'');
+					$tootlip = $dream['gender'].(!empty($dream['age'])?', age '.$dream['age']:'');
 				
 					echo $nl."\t<div class='result'>";
 					echo $nl."\t\t<a rel='tooltip' title='".$tootlip."' href='browse.php?did=".$dream['id']."'>".$title."</a>";
