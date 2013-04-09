@@ -44,10 +44,10 @@ if( $showIntro )
 <title>Artefacts of the Collective Unconscious</title>
 <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
 <link href='http://fonts.googleapis.com/css?family=Cedarville+Cursive|Open+Sans' rel='stylesheet' type='text/css'>
-<link id="theme" rel="stylesheet" type="text/css" href="css/themes/<?php echo THEME; ?>/theme.css">
 <link rel="stylesheet" href="css/aristo/Aristo.css">
 <link rel="stylesheet" href="css/tipsy.css" type="text/css">
 <link rel="stylesheet" href="css/style.css">
+<link id="theme" rel="stylesheet" type="text/css" href="css/themes/<?php echo THEME; ?>/theme.css">
 <style>.ui-datepicker { margin-left: -285px; margin-top: -230px; }</style>
 <script type="text/javascript" src="js/lib/jquery-1.9.1.js"></script>
 <script type="text/javascript" src="js/lib/jquery-ui-1.10.1.custom.min.js"></script>

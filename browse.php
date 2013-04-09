@@ -174,10 +174,10 @@ $isMain = !( isset($dream) || isset($artwork) );
 <title>Artefacts of the Collective Unconscious</title>
 <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
 <link href='http://fonts.googleapis.com/css?family=Cedarville+Cursive|Open+Sans|Roboto+Condensed' rel='stylesheet' type='text/css'>
-<link rel="stylesheet" type="text/css" href="css/themes/<?php echo THEME; ?>/theme.css">
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/aristo/Aristo.css">
 <link rel="stylesheet" href="css/tipsy.css" type="text/css">
+<link rel="stylesheet" type="text/css" href="css/themes/<?php echo THEME; ?>/theme.css">
 <script type="text/javascript" src="js/lib/jquery-1.9.1.js"></script>
 <script type="text/javascript" src="js/lib/jquery-ui-1.10.1.custom.min.js"></script>
 <script type="text/javascript" src="js/lib/jquery.tipsy.js"></script>
@@ -337,6 +337,8 @@ form input[type=text], form textarea { padding: .5em; outline-width: 0; }
 			echo $nl."\t\t<div style='font-size:1em;line-height:1.8em;'>".stripslashes(nl2br($dream['description']))."</div>";
 			echo $nl."\t</div>";
 			
+			if( $dream['image'] != '' && $dream['image'] != undefined ) echo $nl."\t<img style='margin: 15px;' src='" . (IMAGE_PATH . $dream['image']) . "' />";
+			
 			echo $nl."\t<div class='footer'>";
 			
 			$tags = array();
@@ -398,7 +400,7 @@ form input[type=text], form textarea { padding: .5em; outline-width: 0; }
 			
 			$criteria = count($filters) ? " matching " . implode( ' and ' , $filters ).": <a href='browse.php' style='font-size:.7em;'>Clear</a>" : ":";
 			
-			echo $nl."<h3 style='margin-bottom:20px;'>We found <b>" . count($dreams) . " " . $result_text . "</b>".$criteria."</h3>";
+			echo $nl."<h3 style='margin-top:20px;margin-bottom:20px;'>We found <b>" . count($dreams) . " " . $result_text . "</b>".$criteria."</h3>";
 			
 			echo $nl."\t<div>";
 			

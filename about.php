@@ -129,8 +129,8 @@ foreach($stats_temp as $label=>$value) $stats[] = $value . ' ' . $label;
 <head>
 <title>Artefacts of the Collective Unconscious</title>
 <link href='http://fonts.googleapis.com/css?family=Cedarville+Cursive|Open+Sans|Roboto+Condensed' rel='stylesheet' type='text/css'>
-<link rel="stylesheet" type="text/css" href="css/themes/<?php echo THEME; ?>/theme.css">
 <link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" type="text/css" href="css/themes/<?php echo THEME; ?>/theme.css">
 <script type="text/javascript" src="js/lib/jquery-1.9.1.js"></script>
 <script type="text/javascript" src="js/lib/jquery.cookie.js"></script>
 <script type="text/javascript" src="js/random-quote.js"></script>
@@ -206,7 +206,7 @@ var cid;
 			
 			<div id='question-about' class='section'>
 				
-				<div style="font-size:.7em">
+				<div style="font-size:.7em;margin-bottom:20px;">
 				
 					<b>Artefact / Artifact</b>, <i>n</i>
 					
@@ -226,7 +226,7 @@ var cid;
 					
 				</div>
 				
-				<p><b>Artefacts of the Collective Unconscious</b> is an ongoing digital collection of data about dreams, to which anyone is free to browse or contribute. The collection is founded on the principles of <u>social dreaming</u>: the idea that dreams can tell us not just about the individual dreamer, but about our collective experience of the world: that by sharing dreams create a pictures and patterns that can illuminate concerns and hopes about about our future together.</p>
+				<p><b>Artefacts of the Collective Unconscious</b> is an ongoing digital collection of data about dreams, to which anyone is free to browse or contribute. The collection is founded on the principles of <span class='underlined'>social dreaming</span>: the idea that dreams can tell us not just about the individual dreamer, but about our collective experience of the world: that by sharing dreams create a pictures and patterns that can illuminate concerns and hopes about about our future together.</p>
 
 				<p>As well as collecting and collating dream data, we represent the data in visual form using what we have called an 'oneirogram'. This is a force diagram which uses the <a href="http://www.alchemyapi.com" target="_blank">AlchemyAPI</a> natural language processor to analyse themes and concepts in the dream text.</p>
 
@@ -348,7 +348,7 @@ var cid;
 					<div>
 						<label class="emphasized" for="comments">Comments</label>
 						<div>
-							<textarea id="comments" type="text" name="comments" class="big"><?php echo isset($form_values['comments'])?$form_values['comments']:''; ?></textarea>
+							<textarea id="comments" name="comments" class="big"><?php echo isset($form_values['comments'])?$form_values['comments']:''; ?></textarea>
 						</div>
 					</div>
 					

@@ -163,6 +163,7 @@ body#vis #background, body#vis #header { background-image: none; }
 	margin-bottom: 50px;
 }
 .emphasized { font-weight: bold; }
+.underlined { text-decoration: underline; }
 
 #foreground.alt { color: #fff; }
 #foreground.alt #footer a:link,#background.alt #footer a:visited,#background.alt #footer a:hover { color: #fff; }
