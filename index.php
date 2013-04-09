@@ -105,46 +105,18 @@ $(document).ready
 			show();
 		}
 
-		graph = new Graph( d3, "<?php echo IMAGE_PATH; ?>" );
+		graph = new Graph( d3 );
 		graph.addEventListener( "loadStart", onGraphLoadStart );
 		graph.addEventListener( "loadComplete", onGraphLoadComplete );
+		graph.addEventListener( "zoomInStart", onGraphZoomInStart );
+		graph.addEventListener( "zoomInComplete", onGraphZoomInComplete );
+		graph.addEventListener( "zoomOutStart", onGraphZoomOutStart );
 		
 		setTheme( $.cookie("theme") != undefined ? $.cookie("theme") : 1 );
 		
 		updateInfo();
 	}
 );
-
-function onGraphLoadStart(error,g)
-{
-	showLoader();
-}
-
-function onGraphLoadComplete(error,g)
-{
-	hideLoader();
-
-	dataLoadAttempts++;
-
-	var dateSpecified = availableDates.indexOf( getHash() ) > -1;
-	
-	if( graph.totalDreams < 10
-		&& dataLoadAttempts < availableDates.length 
-		&& !dateSpecified )
-	{
-		console.log( 'Expanding search', availableDates[dataLoadAttempts] );
-		
-		$("#date_from").val( availableDates[dataLoadAttempts] );
-
-		search();
-	}
-	else
-	{
-		setHash( graph.currentDateFrom );
-		updateInfo();
-		setThemeVis();
-	}
-}
 
 function setTheme( id )
 {
@@ -251,6 +223,7 @@ function initSearch()
 				(
 					{
 						autoSize:true,
+						beforeShowDay: shouldEnableDate,
 						dateFormat: df,
 						changeMonth: true,
 						minDate: availableDates[ availableDates.length - 1 ],
@@ -267,6 +240,7 @@ function initSearch()
 				(
 					{
 						autoSize:true,
+						beforeShowDay: shouldEnableDate,
 						dateFormat: df,
 						changeMonth: true,
 						minDate: availableDates[ availableDates.length - 1 ],
@@ -285,10 +259,11 @@ function initSearch()
 				
 				//	get init date from hash
 				var hash = getHash();
+				hash = hash.split(":");
 				
 				//	set initial date
-				$("#date_from").val( availableDates.indexOf( hash ) > -1 ? hash : availableDates[0] );
-				$("#date_to").val( availableDates.indexOf( hash ) > -1 ? hash : availableDates[0] );
+				$("#date_from").val( availableDates.indexOf( hash[0] ) > -1 ? hash[0] : availableDates[0] );
+				$("#date_to").val( availableDates.indexOf( hash[1] ) > -1 ? hash[1] : availableDates[0] );
 				
 				search();
 			}
@@ -342,6 +317,8 @@ function search()
 		.replace( /{{date}}/, date_to.getDate() )
 		.replace( /{{month}}/, date_to.getMonth() + 1 )
 		.replace( /{{year}}/, date_to.getFullYear() );
+
+	hideNodeInfo();
 	
 	graph.load( dateFromString, dateToString );
 }
@@ -363,6 +340,269 @@ function updateInfo()
 	if( dateTo != dateFrom ) text += " to " + dateTo.getDate() + ' ' + MONTHS[dateTo.getMonth()] + ' ' + dateTo.getFullYear();
 	
 	$('#info').html( text );
+}
+
+/**
+ * D3 wrapper event handlers
+ */
+function onGraphLoadStart(error,g)
+{
+	showLoader();
+}
+
+function onGraphLoadComplete(error,g)
+{
+	hideLoader();
+
+	dataLoadAttempts++;
+
+	var hash = getHash();
+	hash = hash.split(':');
+	
+	var dateSpecified = availableDates.indexOf( hash[0] ) > -1;
+	
+	if( graph.totalDreams < 10
+		&& dataLoadAttempts < availableDates.length 
+		&& !dateSpecified )
+	{
+		console.log( 'Expanding search', availableDates[dataLoadAttempts] );
+		
+		$("#date_from").val( availableDates[dataLoadAttempts] );
+
+		search();
+	}
+	else
+	{
+		setHash( graph.currentDateFrom + (graph.currentDateTo ? ':' + graph.currentDateTo : '') );
+		
+		updateInfo();
+		setThemeVis();
+	}
+}
+
+function onGraphZoomInStart( node )
+{
+	$('#node_info').remove();
+	
+	var node_info = "";
+	
+	if( node.node_type == graph.TYPE_DREAM && node.id == -1 )
+	{
+		node_info += "<div id='node_info' class='module' style='position:absolute;z-index:1000;width:600px'>";
+		node_info += "<div>This could be you! Click <a href='contribute.php'>here</a> to contribute a dream.</div>";
+		node_info += "</div>";
+	} 
+	else if( node.node_type == graph.TYPE_DREAM ) 
+	{
+		node_info += "<div id='node_info' class='module' style='position:absolute;z-index:1000;width:600px'>";
+		
+		var title = graph.nodeTitle(node);
+		var description = node.description;
+		
+		var qs = [];
+		
+		if( node.city != null ) qs.push( node.city );
+		if( node.state != null ) qs.push( node.state );
+		if( node.country != null ) qs.push( node.country );
+		
+		var map_url = "http://maps.google.com/maps?q=" + qs.join(', ');
+		
+		if( node == graph.rootNode )
+		{
+			var paragraphs = [];
+
+			for(var i=0,uid=0;i<description.length;i++)
+			{
+				var sentences = [];
+				var index = description[i][0].index;
+				
+				var sentencesForDream = [];
+				
+				for(var j=0;j<description[i].length;j++)
+				{
+					if( description[i][j].index != index || j == description[i].length-1 )
+					{
+						var explanation = description[i][j-1].explanation;
+						
+						if( j == description[i].length-1 ) 
+						{
+							if( description[i][j].index != index )
+							{
+								sentencesForDream = [description[i][j].sentence];
+								explanation = description[i][j].explanation;
+							}
+							else
+							{
+								sentencesForDream.push( description[i][j].sentence );
+							}
+						}
+						
+						var id = 'line_' + uid;
+						
+						sentences.push( "<a id='"+id+"' class='dream_link' title='" + explanation + "' href='javascript:$(\"#"+id+"\").tipsy(\"hide\");graph.showNodeByIndex("+index+")'>" + sentencesForDream.join(". ") + "</a>" );
+						
+						sentencesForDream = [];
+						
+						index = description[i][j].index;
+						
+						uid++;
+					}
+
+					sentencesForDream.push( description[i][j].sentence );
+				}
+				
+				paragraphs.push( sentences.join(". ") );
+			}
+			
+			description = "<p>" + paragraphs.join( "</p>.<p>" ) + ".</p>";
+		}
+		
+		node_info += "<div class='body'>";
+		node_info += "<div>" + title + "</div>";
+		node_info += "<div style='margin-bottom:20px;font-size:x-small'>" + (node != graph.rootNode ? "Dreamt in <a href='" + map_url + "' target='_blank'>" + node.city + "</a> at " + node.age + " on " + graph.currentDateFrom + "" : "") + "</div>";
+		
+		node_info += "<div>" + stripslashes(description) + "</div>";
+		
+		if( node.image != '' && node.image != undefined ) node_info += "<img src='<?php echo IMAGE_PATH; ?>" + node.image + "' />";
+		
+		node_info += "</div>";
+		
+		if( node.tags.length ) 
+		{
+			var tags = [];
+			
+			for(var i=0;i<node.tags.length;i++)
+			{
+				tags.push( node.tags[i] );
+				
+				/*
+				for(var j=0;j<nodes.length;j++)
+				{
+					if(	nodes[j].node_type==TYPE_TAG
+						&& nodes[j].title==node.tags[i] )
+					{
+						tags.push( "<a href='javascript:showNodeByIndex("+j+")'>" + nodeTitle(nodes[j]) + "</a>" );
+						break;
+					}
+				}
+				*/
+			}
+						
+			node_info += "<div class='footer'>associations: " + tags.join(', ') + "</div>";
+		}
+		
+		node_info += "</div>";
+	}
+	else if( node.node_type == graph.TYPE_ARTWORK )
+	{
+		var artist = node.artist;
+		
+		node_info += "<div id='node_info' class='module' style='position:absolute;z-index:1000;width:600px'>";
+		
+		node_info += "<div class='header'>";
+		node_info += "<div class='title artwork_title'>" + node.title + (node.year != null ? ', ' + node.year : '') + "</div>";
+		node_info += "<div class='subtitle artwork_artist'>" + artist + "</div>";
+		node_info += "</div>";
+		
+		node_info += "<div class='body'>";
+		node_info += "<img src='images/artworks/" + node.image + "' />";
+		node_info += "</div>";
+		
+		node_info += "<div class='footer'>";
+		node_info += "<div style='font-size:.5em;font-style:italic'>Image sourced from <a href='http://mona-vt.artpro.net.au/theo.php'>MONA</a></div>";
+		
+		if( taggedArtworkIds.indexOf( node.id ) == -1 )
+		{
+			node_info += "<div id='tag_action' style='font-size:.7em;'><a href='#' onclick=\"javascript:showTagArtwork()\">Help us tag this artwork</a></div>";
+			
+			node_info += "<form id='tag_form' method='get' style='display:none'>";
+			node_info += "<input type='text' name='tags' style='width:200px;padding:.5em' placeholder='a,b,c' /><br/>";
+			node_info += "<a href='javascript:tagArtwork( " + node.id + ", $(\"#tag_form > input\").val() );' style='font-size:.7em;'>submit</a> ";
+			node_info += "<a href='#' style='font-size:.7em;' onclick=\"javascript:hideTagArtwork()\">cancel</a>";
+			node_info += "</form>";
+		}
+		
+		node_info += "</div>";
+		node_info += "</div>";
+	}
+	else if( node.node_type == graph.TYPE_ARTIST )
+	{
+		node_info += "<div id='node_info' class='module' style='position:absolute;z-index:1000;width:600px'>";
+		
+		node_info += "<div><b><i>" + node.artist + "</i></b></div>";
+		
+		var works = new Array();
+		
+		for(var j=0;j<nodes.length;j++)
+		{
+			if(	nodes[j].node_type==graph.TYPE_ARTWORK
+				&& nodes[j].artist==node.artist )
+			{
+				works.push( "<i><a href='javascript:graph.showNodeByIndex("+j+")'>" + graph.nodeTitle(nodes[j]) + "</a></i>" );
+				break;
+			}
+		}
+		
+		if( works.length ) node_info += works.join( ', ' );
+		
+		node_info += "</div>";
+	}
+	else if( node.node_type == graph.TYPE_TAG )
+	{
+		node_info += "<div id='node_info' class='module' style='position:absolute;z-index:1000;width:600px'>";
+		
+		node_info += "<div class='header'>";
+		node_info += "<div class='title'>\"" + graph.nodeTitle(node) + "\"</div>";
+		node_info += "</div>";
+		
+		node_info += "<div class='body' style='width:400px'>";
+		
+		var artworks = [];
+		var dreams = [];
+		
+		for(var j=0;j<graph.nodes.length;j++)
+		{
+			if(	graph.nodes[j].tags.indexOf( node.title ) > -1 )
+			{
+				if( graph.nodes[j].node_type == graph.TYPE_ARTIST )
+					artworks.push( "<li><i><a href='javascript:graph.showNodeByIndex("+j+")'>" + graph.nodeTitle(graph.nodes[j]) + "</a></i></li>" );
+				else if( graph.nodes[j].node_type == graph.TYPE_DREAM )
+					dreams.push( "<li><i><a href='javascript:graph.showNodeByIndex("+j+")'>" + graph.nodeTitle(graph.nodes[j]) + "</a></i></li>" );
+			}
+		}
+		
+		if( artworks.length ) node_info += "<div style='margin-top:10px'>artworks: <ul>" + artworks.join('\n') + "</ul></div>";
+		if( dreams.length ) node_info += "<div style='margin-top:10px'>dreams:  <ul>" + dreams.join('\n') + "</ul></div>";
+		
+		node_info += "</div>";
+		node_info += "</div>";
+	}
+		
+	$('body').append( node_info );
+	$('#node_info').hide();
+	$('a[title]').tipsy( { gravity: 'e', offset: 10, opacity: 1 } );
+}
+
+function onGraphZoomInComplete( node )
+{
+	var k = graph.r / graph.nodeRadius(node) / 2;
+	
+	var x_pos = graph.x(node.x) + (k * graph.nodeRadius(node)) + 40;
+	var y_pos = graph.y(node.y) - (k * graph.nodeRadius(node)) + 20;
+	
+	$('#node_info').fadeIn();
+	$('#node_info').css("left",x_pos);
+	$('#node_info').css("top",y_pos);
+}
+
+function onGraphZoomOutStart()
+{
+	hideNodeInfo();
+}
+
+function hideNodeInfo()
+{
+	$('#node_info').remove();
 }
 
 function showTagArtwork()
@@ -411,6 +651,28 @@ function setHash(hash)
 {
 	window.location.hash = hash;
 }
+
+/**
+ * utility
+ */
+function stripslashes(str) 
+{
+	return (str + '').replace(/\\(.?)/g, function (s, n1) 
+		{
+			switch (n1) 
+			{
+				case '\\':
+				  return '\\';
+				case '0':
+				  return '\u0000';
+				case '':
+				  return '';
+				default:
+				  return n1;
+			}
+		}
+	);
+};
 
 var MONTHS = [ "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" ];
 var DATE_FORMAT = "<?php echo DATE_FORMAT; ?>";

@@ -216,7 +216,8 @@ class Graph
 			$length = min( count($sentences)-$start-1, $excerpt_count );
 
 			$excerpt = array_slice( $sentences, $start, $length );
-			$explanation = count($excerpt) . " sentences  taken from the " . ($i+1) . " most influential dream, starting at a relative text position of " . $cursor_position;
+			$explanation = count($excerpt) . " sentences  taken from the " . $this->cardinalize($i+1) . " most influential dream";
+			//, starting at a relative text position of " . number_format( $cursor_position, 2 )  . ".";
 
 			for($j=0;$j<count($excerpt);$j++)
 			{
@@ -334,6 +335,29 @@ class Graph
 				}
 			}
 		}
+	}
+	
+	function cardinalize($n)
+	{
+		//	> 10
+		if( $n > 10 ) return $n."th";
+		
+		//	<= 10
+		switch( (int)substr($n,strlen((string)$n)-1) )
+		{
+			case 0:
+				return $n."th";
+			case 1:
+				return $n."st";
+			case 2:
+				return $n."nd";
+			case 3:
+				return $n."rd";
+			default:
+				return $n."th";
+		}
+
+		return $n;
 	}
 	
 	function getNodeCount()
