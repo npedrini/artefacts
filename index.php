@@ -469,7 +469,7 @@ function onGraphZoomInStart( node )
 		
 		node_info += "<div>" + stripslashes(description) + "</div>";
 		
-		if( node.image != '' && node.image != undefined ) node_info += "<img src='<?php echo IMAGE_PATH; ?>" + node.image + "' />";
+		if( node.image != '' && node.image != undefined ) node_info += "<img style='margin-top: 15px;' src='<?php echo IMAGE_PATH; ?>" + node.image + "' />";
 		
 		node_info += "</div>";
 		

@@ -126,24 +126,21 @@ class Dream
 				if ($this->file["error"] == 0)
 				{
 					$image_name = time();
-					
-					$this->image = $image_name . "." . $extension;
-					
-					if ( !move_uploaded_file( $this->file["tmp_name"], getcwd()."/images/dreams/" . $this->image ) )
+					$image_raw = $image_name . "_orig." . $extension;
+
+					if ( !move_uploaded_file( $this->file["tmp_name"], getcwd()."/images/dreams/" . $image_raw ) )
 					{
 						$this->status = "Oops! We had trouble moving the image. Please try again later.";
 						$valid = $disable_fields = false;
 					}
 					else
 					{
-						$size = getimagesize( $this->file["tmp_name"] );
+						$this->image = $image_name . $extension;
 						
-						$w = 200;
-						$h = $size[1] * ($w/$size[0]);
-						
-						$thumb = $this->image . '_sm.' . $extension;
-						
-						exec("convert -size {$size[0]}x{$size[1]} {$this->file["tmp_name"]} -thumbnail {$w}x{$h} $thumb");
+						$thumb = new Imagick( getcwd()."/images/dreams/" . $image_raw );
+						$thumb->scaleImage( 500, 0 );
+						$thumb->writeImage( getcwd() . "/images/dreams/" . $this->image );
+						$thumb->destroy();
 					}
 				}
 				else
