@@ -135,7 +135,7 @@ class Dream
 					}
 					else
 					{
-						$this->image = $image_name . $extension;
+						$this->image = $image_name . "." . $extension;
 						
 						$thumb = new Imagick( getcwd()."/images/dreams/" . $image_raw );
 						$thumb->scaleImage( 500, 0 );

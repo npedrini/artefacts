@@ -44,7 +44,9 @@ if ( ($handle = fopen("../dummy_data/dreams.csv", "r")) !== FALSE )
 		$dream->alchemyApiKey = ALCHEMY_API_KEY;
 		$dream->dateFormat = $date_format;
 		$dream->origin = "mona";
+		$dream->postToTumblr = POST_TO_TUMBLR;
 		$dream->timezone = TIME_ZONE;
+		$dream->tumblrPostEmail = TUMBLR_POST_EMAIL;
 
 		$dream->date = array_shift($data);
         $dream->description = array_shift($data);

@@ -185,13 +185,13 @@ var tagTimer;
 					<div class="body">
 					
 						<div class="row">
-							<label style="float:left" class="emphasized" for="datepicker">When did you have your dream?</label>
+							<label style="float:left" for="datepicker">When did you have your dream?</label>
 							<input id="datepicker" type="text" name="date" class="date big"
 									value="<?php echo $dream->date; ?>" style='width:350px;display:inline;vertical-align: middle' />
 						</div>
 						
 						<div class="row">
-							<label class="emphasized" for="description">Describe your dream</label>
+							<label for="description">Describe your dream</label>
 							<textarea class="big" id="description" name="description" rows="8" placeholder=""><?php echo stripslashes($dream->description); ?></textarea>
 						</div>
 						
@@ -206,7 +206,7 @@ var tagTimer;
 						</div>
 						
 						<div class="row">
-							<label class="emphasized" for="description">A colour associated with your dream</label>
+							<label for="description">A colour associated with your dream</label>
 							<div>
 								<input 
 									id="colorpicker1" class="colorpicker" name="color" 
@@ -266,7 +266,7 @@ var tagTimer;
 							<div style="vertical-align:top">
 								<label for="age">Age</label>
 								<input 
-									id="age" type="text" name="age" class="big"
+									id="age" class="big" type="text" name="age"
 									placeholder=""
 									value="<?php echo $dream->age; ?>" 
 									rel="tooltip" title="" style="width:100px" />
