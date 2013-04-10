@@ -59,3 +59,6 @@ foreach($links as $name=>$url)
 		<?php echo $current == 'index.php' ? '<div style="clear:both"><div id="info"></div></div>' : null; ?>
 	</div>
 </div>
+<?php if( $current != 'index.php' ) { ?>
+<img src="images/beta.png" style="position:absolute;top:0px;left:0px;z-index:2"/>
+<? } ?>
