@@ -47,7 +47,7 @@ class Dream
     	$this->color = "#333333";
     	$this->description = "";
     	$this->email = "";
-    	$this->gender = "female";
+    	$this->gender = "";
     	$this->feelings = array();
     	$this->tags = "";
     	$this->title = "";
@@ -156,6 +156,13 @@ class Dream
 			}
 		}
 		
+		$get_location = curl_init(); 
+		curl_setopt($get_location, CURLOPT_URL, "http://freegeoip.net/json/");
+		curl_setopt($get_location, CURLOPT_RETURNTRANSFER, 1);
+				
+		$location = curl_exec($get_location);
+		$location = json_decode($location);
+
 		//	import dream
 		if( $valid )
 		{
@@ -171,14 +178,7 @@ class Dream
 			$title = $this->db->real_escape_string($this->title);
 				
 			$date = DateTime::createFromFormat( $this->dateFormat, $this->date, new DateTimeZone($this->timezone) ); 
-				
-			$get_location = curl_init(); 
-			curl_setopt($get_location, CURLOPT_URL, "http://freegeoip.net/json/");
-			curl_setopt($get_location, CURLOPT_RETURNTRANSFER, 1);
-				
-			$location = curl_exec($get_location);
-			$location = json_decode($location);
-			
+
 			$fields  = array( "age", "city", "color", "country", "description", "gender", "image", "latitude", "longitude", "occur_date", "origin", "region", "title", "user_id" );
 			$values  = array( $age, $location->city, $color, $location->country_name, $description, $gender, $image, $location->latitude, $location->longitude, $date->format('Y-m-d'), $origin, $location->region_name, $title, $this->user_id );
 
@@ -241,17 +241,8 @@ class Dream
 			}
 		}
 		
-		if( $valid 
-			&& $this->postToTumblr 
-			&& $this->tumblrPostEmail != null )
-		{
-			$to = $this->tumblrPostEmail;
-			$subject = isset($this->title)?$this->title:"untitled";
-			$body = $this->description;
-			
-			mail( $to, $subject, $body );		
-		}
-		
+		$tags = array();
+
 		//	add dream tags
 		if( $valid )
 		{
@@ -297,10 +288,29 @@ class Dream
 						$sql = "INSERT INTO `dream_tags` (dream_id,tag_id) VALUES ('".$dream_id."','".$tag_id."')";
 						$result = $this->db->query( $sql );
 					}
+
+					$tags[] = $tag;
 				}
 			}
 		}
 		
+		if( $valid 
+			&& $this->postToTumblr 
+			&& $this->tumblrPostEmail != null )
+		{
+			$to = $this->tumblrPostEmail;
+			$subject = isset($this->title)?$this->title:"untitled";
+			
+			$body = $this->description;
+			$body .= ("\n\nDreamt on " . $this->date . " by a " . $this->age . " year old " . ($this->gender == "male" ? "man" : "woman") . " in " . $location->city);
+			$body .= ("\n\nhttp://artefactsofthecollectiveunconscious.net/browse.php?did=" . $dream_id);
+			
+			foreach($tags as $tag) $tagline .= ("#".$tag." ");
+			$body .= "\n\n".$tagline;
+			
+			mail( $to, $subject, $body );		
+		}
+	
 		if( $valid )
 		{
 			foreach($this->feelings as $feeling_id)
