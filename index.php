@@ -464,7 +464,7 @@ function onGraphZoomInStart( node )
 		if( node == graph.rootNode )
 			node_info += graph.currentDateFrom + " to " + graph.currentDateTo;
 		else
-			node_info += "Dreamt in <a href='" + map_url + "' target='_blank'>" + node.city + "</a> at " + node.age + " on " + graph.currentDateFrom;
+			node_info += "Dreamt on " + graph.currentDateFrom + " by a " + node.age + " year old " + (node.gender == "male" ? "man" : "woman") + " in <a href='" + map_url + "' target='_blank'>" + node.city + "</a>";
 		node_info += "</div>";
 		
 		node_info += "<div>" + stripslashes(description) + "</div>";
