@@ -258,25 +258,25 @@ var tagTimer;
 								<label for="gender">Gender you identify as</label>
 								<div style='display:inline-block'><input id='gender_male' type='radio' name='gender'<?php echo $dream->gender=='male'?' checked':null ?> value="male"><label style='display:inline-block' for="gender_male">Male</label></div>
 								<div style='display:inline-block'><input id='gender_female' type='radio' name='gender'<?php echo $dream->gender=='female'?' checked':null ?> value="female"><label style='display:inline-block' for="gender_female">Female</label></div>
-								<div style='display:inline-block'><input id='gender_other' type='radio' name='gender'<?php echo $dream->gender=='other'?' checked':null ?> value="other"><label style='display:inline-block' for="gender_other">Other</label></div>
 							</div>
 						</div>
 						
 						<div class="row">
 							<div style="vertical-align:top">
-								<label for="age">Age</label>
+								<label for="age" class="inline-label">Age</label>
 								<input 
 									id="age" class="big" type="text" name="age"
 									placeholder=""
 									value="<?php echo $dream->age; ?>" 
-									rel="tooltip" title="" style="width:100px" />
+									rel="tooltip" title="" style="width:30px" />
 							</div>
 						</div>
 						
 						<div class="row">
-							<label for="gender">Email</label>
+							<label for="gender" class="inline-label">Email</label>
 							<input id="email" type="text" name="email" class="date big"
-									value="<?php echo $dream->email; ?>" style='width:350px;display:inline;vertical-align: middle' />
+									value="<?php echo $dream->email; ?>" style='width:350px;display:inline;vertical-align: middle'
+									rel="tooltip" title="We won't share this with anybody, promise." />
 						</div>
 						
 						<div class="row">
