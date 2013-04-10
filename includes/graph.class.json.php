@@ -103,14 +103,13 @@ class Graph
 						{
 							$tag = (object)$t;
 							
-							if( isset($this->indexes['tags'][$tag->id]) )
+							if( isset($this->indexes['tags'][$tag->tag]) )
 							{
-								$tag_node = $this->indexes['tags'][$tag->id];
+								$tag_node = $this->indexes['tags'][$tag->tag];
 							}
 							else
 							{
-								$this->indexes['tags'][$tag->id] = $this->tags[] = $tag_node = (object)array('color'=>'#000000','id'=>$tag->id,'index'=>count($this->nodes),'node_type'=>'tag','tags'=>array(),'title'=>$tag->tag,'value'=>0);
-								$this->indexes['tags_by_tag'][$tag->tag] = $tag_node;
+								$this->indexes['tags'][$tag->tag] = $this->tags[] = $tag_node = (object)array('color'=>'#000000','id'=>$tag->id,'index'=>count($this->nodes),'node_type'=>'tag','tags'=>array(),'title'=>$tag->tag,'value'=>0);
 							}
 						}
 						
@@ -118,6 +117,7 @@ class Graph
 					}
 				}
 				
+				//	create root_node<>dream link
 				if( $root_node !=null 
 					&& $dream !=null )
 				{
@@ -132,20 +132,21 @@ class Graph
 						$dream->value++;
 					}
 				}
-				
+
 				if( self::SHOW_ROOT 
 					&& isset($root_node) ) 
 					$root_node->value++;
 			}
 		}
 		
+		//	add tag nodes and dream<>tag links
 		if( self::SHOW_TAGS )
 		{
 			foreach($this->dreams as $dream)
 			{
 				foreach($dream->tags as $tag)
 				{
-					$tag = $this->indexes['tags_by_tag'][$tag];
+					$tag = $this->indexes['tags'][$tag];
 					
 					if( $tag->value >= $this->minTagValue )
 					{
@@ -264,14 +265,13 @@ class Graph
 					$tag = $val->text;
 					$tag = preg_replace( "/\./", "", $tag );
 					
-					if( isset($this->indexes['tags_by_tag'][$tag]) )
+					if( isset($this->indexes['tags'][$tag]) )
 					{
-						$tag_node = $this->indexes['tags_by_tag'][$tag];
+						$tag_node = $this->indexes['tags'][$tag];
 					}
 					else
 					{
-						$this->tags[] = $tag_node = (object)array('color'=>'#000000','id'=>-1,'index'=>count($this->nodes),'node_type'=>'tag','tags'=>array(),'title'=>$tag,'value'=>0);
-						$this->indexes['tags_by_tag'][$tag] = $tag_node;
+						$this->indexes['tags'][$tag] = $this->tags[] = $tag_node = (object)array('color'=>'#000000','id'=>-1,'index'=>count($this->nodes),'node_type'=>'tag','tags'=>array(),'title'=>$tag,'value'=>0);
 					}
 					
 					if( $tag_node->value >= $this->minTagValue )
@@ -309,9 +309,9 @@ class Graph
     
     function addTag( $tag, $node )
 	{
-		if( !isset($this->indexes['tags_by_tag'][$tag->title]) ) return;
+		if( !isset($this->indexes['tags'][$tag->title]) ) return;
 		
-		$tag_node = $this->indexes['tags_by_tag'][$tag->title];
+		$tag_node = $this->indexes['tags'][$tag->title];
 		$tag_node->index = array_search($tag_node,$this->nodes);
 		
 		if( !is_null($node) )
@@ -320,7 +320,7 @@ class Graph
 			$target = $tag_node;
 			
 			if( $source !=null
-			&& $target !=null )
+				&& $target !=null )
 			{
 				$key = $source->index.'_'.$target->index;
 					
@@ -329,9 +329,7 @@ class Graph
 					$this->links[] = (object)array('source'=>$source->index,'target'=>$target->index,'value'=>1,'type'=>'tag');
 					$this->keys[$key] = 1;
 					
-					$tag_node->value++;
 					$source->value++;
-					$target->value++;
 				}
 			}
 		}
