@@ -40,7 +40,6 @@ if ( ($handle = fopen("../dummy_data/dreams.csv", "r")) !== FALSE )
     	}
 
 		$dream = new Dream();
-		$dream->age = 1;
 		$dream->alchemyApiKey = ALCHEMY_API_KEY;
 		$dream->dateFormat = $date_format;
 		$dream->origin = "mona";
@@ -52,7 +51,9 @@ if ( ($handle = fopen("../dummy_data/dreams.csv", "r")) !== FALSE )
         $dream->description = array_shift($data);
         $dream->color = array_shift($data);
 		$dream->email = array_shift($data);
-		
+		$dream->age = array_shift($data);
+		$dream->gender = array_shift($data);
+
 		$tags = array();
 
 		foreach($raw_tags as $tag)
