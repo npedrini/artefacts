@@ -226,11 +226,11 @@ var cid;
 					
 				</div>
 				
-				<p><b>Artefacts of the Collective Unconscious</b> is an ongoing digital collection of data about dreams, to which anyone is free to browse or contribute. The collection is founded on the principles of <span class='underlined'>social dreaming</span>: the idea that dreams can tell us not just about the individual dreamer, but about our collective experience of the world: that by sharing dreams create a pictures and patterns that can illuminate concerns and hopes about about our future together.</p>
+				<p><span class="emphasized">Artefacts of the Collective Unconscious</span> is an ongoing digital collection of data about dreams, to which anyone is free to browse or contribute. The collection is inspired by the concept of <a href='http://en.wikipedia.org/wiki/Social_dreaming' target='_blank'>social dreaming</a>: the idea that dreams can tell us not just about the individual dreamer, but about our collective experience of the world: that by sharing dreams we create pictures and patterns that can illuminate concerns and hopes about about our future together.</p>
 
-				<p>As well as collecting and collating dream data, we represent the data in visual form using what we have called an 'oneirogram'. This is a force diagram which uses the <a href="http://www.alchemyapi.com" target="_blank">AlchemyAPI</a> natural language processor to analyse themes and concepts in the dream text.</p>
+				<p>As well as collecting and collating dream data, we represent the data in visual form using what we have called an 'oneirogram'. This is a force diagram which uses the <a href='http://www.alchemyapi.com/' target='_blank'>AlchemyAPI</a>'s natural language processor to analyse themes and concepts in the dream text.</p>
 
-				<p>In future, we aim to allow integration of dream data with other applications and platforms which are used to record and store dreams.</p>
+				<p>In the future, we aim to allow integration of dream data with other applications and platforms which are used to record and store dreams.</p>
 
 				<p>Curators: <a href='http://www.createassociate.com.au/' target='_blank'>David Patman</a> and <a href='http://www.looklisten.net/' target='_blank'>Noah Pedrini</a></p>
 				
@@ -241,59 +241,38 @@ var cid;
 				<div>
 					<div class='question'>Why are you doing this?</div>
 					<div class='answer'>
-						<p>We're interested in the social aspect of dreams - what they can tell us about experiences we have in common, rather than just our personal history.</p>
+						<p>We're interested in the social aspect of dreams - what they can tell us about experiences we have in common, rather than just our personal history&mdash;inspired by the concept of <a href='http://en.wikipedia.org/wiki/Social_dreaming' target='_blank'>social dreaming</a>. We are also interested in exploring interactions between computers and non-conscious states of being, such as dreams: e.g. how dreams might (or might not) be computational and also how computing and interacting with computers might be made dream-like (<a href='http://www.ics.uci.edu/~wmt/pubs/CHI08NightWorkshopBaumer.pdf' target='_blank'>Baumer and Tomlinson, 2008</a>).</p>
 					</div>
 				</div>
 				
 				<div>
-					<div class='question'>Isn't my dream just about me?</div>
-					<div class='answer'><p>Part of your dream is likely to be about your personal experience that is unique to you, and only you will be able to understand that part. However, part of your dream will also be about the experiences that you share with other people: e.g. your family, your friends, colleagues. We hope that by looking at lots of dreams that we'll be able to see common themes and patterns emerge.</p>
-					</div>
-				</div>
-				
-				<div>
-					<div class='question'>What's an 'oneirogram'?</div>
-					<div class='answer'><p>We invented what we call an oneirogram as a way to visualise connections between dreams using the <a href="http://www.alchemyapi.com" target="_blank">AlchemyAPI</a> natural language processor. The oneirogram can show dreams for specific dates, locations, tags and other data selected by the user.</p></div>
-				</div>
-				
-				<div>
-					<div class='question'>How are connections made?</div>
+					<div class='question'>What is an oneirogram?</div>
 					<div class='answer'>
-						<p>We aggregate the text of all dreams for the selected parameters (date, location, tags) and determine thematic tags for the 'combined dream'. The combined dream tags are then compared with tags for the individual dreams. If a dream shares a tag with another dream, a line (or 'edge') is drawn between them. The more connections a dream or tag has, the larger its node is shown.</p>
-					</div>
-				</div>
-				
-				<div>
-					<div class='question'>How will you use my dreams and my personal information?</div>
-					<div class='answer'>
-						<p>We will store your dream data in our digital collection, but no personal information. However, anyone will be able to see the text of the dream you record, so you may wish to disguise any details that you think could identify you or others.</p>
+						<p>We invented what we call an oneirogram as a way to visualise connections between the text record of dreams and a computer-generated 'collective dream'.</p>
+
+						<p>The collective dream appears as the central node and is created in real-time from the text of dreams displayed for the user-selected date range. For each dream, the number of sentences extracted and the decision of which sentences to take is based on a uniformly-applied set of rules.</p>
+
+						<p>The connections between dreams are made using the free AlchemyAPI natural language processor. Alchemy analyses a text string and identifies concept tags using algorithms and a lexical database. Connections, or 'edges', are drawn from a dream 'node' (solid colour) to a node representing the Alchemy tag (dotted outline). The size of each node is proportional to the number of connections. Thus, dreams and tags which are most 'influential' are shown as more prominent in the oneirogram.</p>
+
+						<p>The oneirogram can currently show dreams for specific date ranges, and we will add functionality so that users can select locations, tags and other data.</p>
 					</div>
 				</div>
 				
 				<div>
 					<div class='question'>Can I use your site to keep a personal dream journal?</div>
 					<div class='answer'>
-						<p>Yes! If you tag each of your dreams with a unique identifier, you can search for and visualise just your dreams.</p>
+						<p>We plan to add functionality so that users can tag individual dreams. So, if you tag each of your dreams with a unique identifier, you will be able to search for and visualise just your dreams.</p>
 					</div>
 				</div>
 				
 				<div>
-					<div class='question'>Can I edit my dreams once they have been recorded?</div>
+					<div class='question'>What technology do you use?</div>
 					<div class='answer'>
-						<p>At this point, no. We would need to create a personal account to enable you to do this. We may consider doing this in a future release. Please contact us at <a href="mailto:dreams@artefactsofthecollectiveunconscious.net">dreams@artefactsofthecollectiveunconscious.net</a> if you need a dream removed, e.g. if you have inadvertently recorded identifying information about yourself or someone else.</p>
+						<p>When a user submits a dream and other information on Artefacts, we store it in a MySQL database along with other data we automatically collect, such as geo-location based on IP address. We also analyse the dream text using the free <a href="http://www.alchemyapi.com" target="_blank">AlchemyAPI</a> natural language processor and store the returned concept tags.</p>
+						<p>When a user chooses paramaters for the visualisation (e.g. date range), we use an algorithm to generate a 'collective dream' in real time, which is also analysed using Alchemy. Using the stored tags, we create a JSON file representing node-link relationships between all of the dreams. This data file is then used to drive the visualization.</p>
+						<p>The visualization itself is a force-directed layout built using the <a href="http://d3js.org/" target="_blank">D3js</a> javascript library, and the image export feature leverages the canvg library. A few of the other javascript libraries we use include jQuery, jQuery UI, and tipsy.</p>
+						<p>A big thank you to thank the development communities who made and contributed to all of these great open-source projects, as well as the designers over at <a href="http://thenounproject.com/" target="_blank">The Noun Project</a> for letting us use a few of their icons.</p>
 					</div>
-				</div>
-				
-				<div>
-					<div class='question'>How did you do it?</div>
-					<div class='answer'>
-						<p>When a user submits a dream on Artefacts, we load and parse the corresponding tour data collected via this system and migrate it to a MySQL database. This allows us to create a JSON file representing node-link relationships between artworks viewed for a given day, the dreams that were dreamt that night, and the associations that bind them. This data file is then used to drive the visualization.</p><p>The visualization itself is a <a href="http://en.wikipedia.org/wiki/Force-directed_graph_drawing" target="_blank">force-directed layout</a> built using the <a href="http://d3js.org/" target="_blank">D3js</a> javascript library, and the image export feature leverages the <a href="http://code.google.com/p/canvg/" target="_blank">canvg</a> library. A few of the other javascript libraries we use include <a href="http://jquery.com/" target="_blank">jQuery</a>, <a href="http://jqueryui.com/" target="_blank">jQuery UI</a>, and <a href="http://onehackoranother.com/projects/jquery/tipsy/" target="_blank">tipsy</a>.</p><p>A big thank you to thank the development communities who made and contributed to all of these great open-source projects, the designers over at <a href="http://thenounproject.com/" target="_blank">The Noun Project</a> for letting us use a few of their icons, and of course, <a href='http://www.mona.net.au/' target='_blank'>MONA</a>.</p>
-					</div>
-				</div>
-				
-				<div>
-					<div class='question'>Did you know that 'artefact' is spelled wrong?</div>
-					<div class='answer'><p>Yes!</p></div>
 				</div>
 			
 			</div>
