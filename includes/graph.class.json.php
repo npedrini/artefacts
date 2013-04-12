@@ -118,6 +118,7 @@ class Graph
 				}
 				
 				//	create root_node<>dream link
+				/*
 				if( $root_node !=null 
 					&& $dream !=null )
 				{
@@ -132,6 +133,7 @@ class Graph
 						$dream->value++;
 					}
 				}
+				*/
 
 				if( self::SHOW_ROOT 
 					&& isset($root_node) ) 
@@ -200,7 +202,7 @@ class Graph
 		
 		$total_weight = 0;
 		foreach($dreams_by_value as $index=>$value) 
-			$total_weight += $this->dreams[$index]->value;
+			$total_weight += max(1,$this->dreams[$index]->value);
 
 		$cursor_position = 0;
 		$i=0;
@@ -211,7 +213,7 @@ class Graph
 			
 			$sentences = preg_split( "/(\.+\s*)/", $dream->description );
 			
-			$influence = $dream->value / $total_weight;
+			$influence = max(1,$dream->value) / $total_weight;
 			$excerpt_count = round( $influence * count($sentences) );
 			$start = round(count($sentences)*$cursor_position);
 			$length = min( count($sentences)-$start-1, $excerpt_count );

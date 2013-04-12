@@ -37,14 +37,14 @@ function Graph (d3)
 		var defs = this.vis.append("svg:defs");
 		
 		defs.append("svg:filter")
-					.attr("id", "blur")
-					.attr("x", "-30%")
-					.attr("y", "-30%")
-					.attr("width", "140%")
-					.attr("height", "140%")
-					.append("svg:feGaussianBlur")
-					.attr("stdDeviation", 2);
-		
+			.attr("id", "blur")
+			.attr("x", "-30%")
+			.attr("y", "-30%")
+			.attr("width", "140%")
+			.attr("height", "140%")
+			.append("svg:feGaussianBlur")
+			.attr("stdDeviation", 2);
+	
 	  	var url = "json/graph.json.php?date_from="+dateFrom+"&date_to="+dateTo;
 	  	var self = this;
 	  	
@@ -171,6 +171,7 @@ function Graph (d3)
 			.on("mouseover", function(d,s){ self.onNodeOver(d,s); })
 			.on("mouseout", function(d){ self.onNodeOut(d); })
 			.on("click", function(d){ self.onNodeClick(d); })
+			.on("touchstart", function(d){ self.onNodeClick(d); })
 			.on("dragstart", function(d){ self.onNodeDragStart(d); })
 			.on("dragend", function(d){ self.onNodeDragEnd(d); })
 			.call(this.force.drag);
@@ -368,7 +369,7 @@ function Graph (d3)
 
 	this.onNodeClick = function(d)
 	{
-		dragging = false;
+		this.dragging = false;
 		
 		var node = this.vis.select('[id=node_'+d.index+']');
 		
@@ -383,9 +384,9 @@ function Graph (d3)
 	/**
 	 * Nodes
 	 */
-	this.nodeRadius = function(d) { return 5 + Math.min( 100, d.value * 1.5 ); };
+	this.nodeRadius = function(d) { return (d.node_type==this.TYPE_TAG?1.5:3) + Math.min( 100, d.value * 1.5 ); };
 	this.nodeColor = function(d) { return this.themeId == 1 ? (d.color2 != null ? d.color2 : '#fff') : d.color; };
-	this.nodeFilter = function(d) { return "";return d.node_type==this.TYPE_DREAM?"url(#blur)":""; };
+	this.nodeFilter = function(d) { return '';return d.node_type==this.TYPE_DREAM?"url(#blur)":""; };
 	this.nodeStrokeColor = function(d) { return d.stroke ? (this.themeId == 1?'#fff':'#000') : d.color2; };
 	this.nodeStrokeOpacity = function(d) { return d.stroke ? .3 : 1; };
 	
@@ -501,7 +502,7 @@ function Graph (d3)
 			var inner = tip.find('.tipsy-inner')[0];
 			
 			tip.css('left',d.fisheye?d.fisheye.x - 22:d.x);
-			tip.css('top',d.fisheye?d.fisheye.y - (d.fisheye.z * nodeRadius(d)) - inner.offsetHeight - 20:(d.y - nodeRadius(d)) - inner.offsetHeight - 20);
+			tip.css('top',d.fisheye?d.fisheye.y - (d.fisheye.z * this.nodeRadius(d)) - inner.offsetHeight - 20:(d.y - this.nodeRadius(d)) - inner.offsetHeight - 20);
 		}
 	};
 	
