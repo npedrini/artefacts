@@ -1,5 +1,5 @@
 <?php
-include '../config/' . getenv('HTTP_APPLICATION_ENVIRONMENT') . "/config.php";
+include "../config/config.php";
 
 if( isset($_GET['id']) 
 	&& isset($_GET['tags']) )

@@ -1,7 +1,7 @@
 <?php
 set_include_path( "../" );
 
-include "config/" . getenv('HTTP_APPLICATION_ENVIRONMENT') . "/config.php";
+include "config/config.php";
 include "includes/dream.class.php";
 
 $mysqli = new mysqli( DB_HOST, DB_USER, DB_PASS );

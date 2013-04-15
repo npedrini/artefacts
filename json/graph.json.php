@@ -2,7 +2,7 @@
 session_start();
 
 include_once "../includes/graph.class.json.php";
-include_once '../config/' . getenv('HTTP_APPLICATION_ENVIRONMENT') . "/config.php";
+include_once "../config//config.php";
 
 $date_format = DATE_FORMAT;
 $date_format = preg_replace( '/{{date}}/', 'j', $date_format );

@@ -1,7 +1,7 @@
 <?php
 set_include_path( '../' );
 
-include_once 'config/' . getenv('HTTP_APPLICATION_ENVIRONMENT') . "/config.php";
+include_once "config/config.php";
 
 class Database
 {

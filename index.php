@@ -1,6 +1,6 @@
 <?php 
-include 'config/' . getenv('HTTP_APPLICATION_ENVIRONMENT') . "/config.php";
-include 'includes/session.php';
+include_once "config/config.php";
+include_once "includes/session.php";
 
 $date = new DateTime( 'now', new DateTimeZone(TIME_ZONE) );
 

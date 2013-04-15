@@ -1,7 +1,7 @@
 <?php
+include_once "config/config.php";
 include_once "includes/db.class.php";
 include_once "includes/dream.class.php";
-include_once 'config/' . getenv('HTTP_APPLICATION_ENVIRONMENT') . "/config.php";
 
 /*
 echo "<pre>";

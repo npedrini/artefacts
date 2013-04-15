@@ -1,6 +1,6 @@
 <?php
-include 'config/' . getenv('HTTP_APPLICATION_ENVIRONMENT') . "/config.php";
-include 'includes/session.php';
+include_once "config/config.php";
+include_once 'includes/session.php';
 
 $mysqli = new mysqli( DB_HOST, DB_USER, DB_PASS );
 $mysqli->select_db( DB_NAME );

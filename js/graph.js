@@ -3,8 +3,8 @@ function Graph (d3)
 	this.d3 = d3;
 	
 	this.LETTERS = "abcdefghijklmnopqrstuvwxyz";
-	this.LINK_OPACITY = 0;
-	this.LINK_OPACITY_OVER = .4;
+	this.LINK_OPACITY = .1;
+	this.LINK_OPACITY_OVER = .8;
 	this.NODE_OPACITY = 1;
 	this.NODE_OPACITY_ALT = .3;
 	this.MONA_ID = 962;
@@ -12,6 +12,10 @@ function Graph (d3)
 	this.TYPE_ARTIST = 'artist';
 	this.TYPE_DREAM = 'dream';
 	this.TYPE_TAG = 'tag';
+	
+	this.dragging = false;
+	this.zoomed = false;
+	this.zooming = false;
 	
 	this._events = {};
 	
@@ -172,8 +176,6 @@ function Graph (d3)
 			.on("mouseout", function(d){ self.onNodeOut(d); })
 			.on("click", function(d){ self.onNodeClick(d); })
 			.on("touchstart", function(d){ self.onNodeClick(d); })
-			.on("dragstart", function(d){ self.onNodeDragStart(d); })
-			.on("dragend", function(d){ self.onNodeDragEnd(d); })
 			.call(this.force.drag);
 		
 		this.nodes = graph.nodes;
@@ -208,7 +210,7 @@ function Graph (d3)
 		this.dispatchEvent( "loadComplete" );
 		
 		//	initialize tooltips now that nodes have been displayed
-		$('circle.node').tipsy( { delayIn: 0, delayOut: 0, fade: false, gravity: 'sw', hoverlock:true, html: true, offset: 5, opacity: 1 } );
+		$('circle.node').tipsy( { delayIn: 0, delayOut: 0, fade: false, gravity: 'sw', html: true, offset: 5, opacity: 1 } );
 	};
 	
 	this.collide = function(node) 
@@ -292,7 +294,10 @@ function Graph (d3)
 		this.dispatchEvent( "zoomOutStart" );
 		
 		var self = this;
+		
 		var t = this.vis.transition().duration(750).each('end',function(){self.onZoomOut();});
+		
+		this.vis.selectAll("line").style("stroke-opacity", function(d){ return self.linkOpacity(d); } );
 		
 		t.selectAll("circle")
 			.attr("cx", function(d) { return d.x; })
@@ -369,6 +374,7 @@ function Graph (d3)
 
 	this.onNodeClick = function(d)
 	{
+		
 		this.dragging = false;
 		
 		var node = this.vis.select('[id=node_'+d.index+']');
@@ -378,13 +384,15 @@ function Graph (d3)
 			node.style("fill", d.color2);
 		}
 		
+		$( '#node_'+d.index ).tipsy("hide");
+		
 		this.showNode(d);
 	};
 	
 	/**
 	 * Nodes
 	 */
-	this.nodeRadius = function(d) { return (d.node_type==this.TYPE_TAG?1.5:3) + Math.min( 100, d.value * 1.5 ); };
+	this.nodeRadius = function(d) { return (d.node_type==this.TYPE_TAG?7:7) + Math.min( 100, d.value * 2 ); };
 	this.nodeColor = function(d) { return this.themeId == 1 ? (d.color2 != null ? d.color2 : '#fff') : d.color; };
 	this.nodeFilter = function(d) { return '';return d.node_type==this.TYPE_DREAM?"url(#blur)":""; };
 	this.nodeStrokeColor = function(d) { return d.stroke ? (this.themeId == 1?'#fff':'#000') : d.color2; };
@@ -435,7 +443,7 @@ function Graph (d3)
 	/**
 	 * Edges
 	 */
-	this.linkDistance = function(link,index) { return this.nodeRadius(link.source) + this.nodeRadius(link.target) + (100 - (100/10*Math.min(10,link.value))); };
+	this.linkDistance = function(link,index) { return this.nodeRadius(link.source) + this.nodeRadius(link.target) + (75 - (75/10*Math.min(10,link.value))); };
 	this.linkOpacity = function(d) { return this.LINK_OPACITY; };
 	this.linkColor = function(d) { return this.themeId == 1 ? '#fff':'#000'; };
 	this.linkDashArray = function(d) { return d.type == 'museum_artwork' || d.type == 'museum_artist' ? "2,4" : ""; };

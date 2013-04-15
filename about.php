@@ -1,7 +1,7 @@
 <?php
-include 'config/' . getenv('HTTP_APPLICATION_ENVIRONMENT') . "/config.php";
-include 'includes/session.php';
-include 'includes/recaptcha/recaptchalib.php';
+include_once "config/config.php";
+include_once "includes/session.php";
+include_once "includes/recaptcha/recaptchalib.php";
 
 $publickey = "6LdEQd0SAAAAAHivyVeW7KROMA2upIL6Npbxr99D";
 $privatekey = "6LdEQd0SAAAAAEPXsQsULbZ2R1qk1B2cC7f-nv4K";
@@ -246,6 +246,12 @@ var cid;
 				</div>
 				
 				<div>
+					<div class='question'>Isn't my dream just about me?</div>
+					<div class='answer'><p>Part of your dream is likely to be about your personal experience that is unique to you, and only you will be able to understand that part. However, part of your dream will also be about the experiences that you share with other people: e.g. your family, your friends, colleagues. We hope that by looking at lots of dreams that we'll be able to see common themes and patterns emerge.</p>
+					</div>
+				</div>
+				
+				<div>
 					<div class='question'>What is an oneirogram?</div>
 					<div class='answer'>
 						<p>We invented what we call an oneirogram as a way to visualise connections between the text record of dreams and a computer-generated 'collective dream'.</p>
@@ -259,9 +265,30 @@ var cid;
 				</div>
 				
 				<div>
+					<div class='question'>How are connections made?</div>
+					<div class='answer'>
+						<p>We aggregate the text of all dreams for the selected parameters (date, location, tags) and determine thematic tags for the 'combined dream'. The combined dream tags are then compared with tags for the individual dreams. If a dream shares a tag with another dream, a line (or 'edge') is drawn between them. The more connections a dream or tag has, the larger its node is shown.</p>
+					</div>
+				</div>
+				
+				<div>
+					<div class='question'>How will you use my dreams and my personal information?</div>
+					<div class='answer'>
+						<p>We will store your dream data in our digital collection, but no personal information. However, anyone will be able to see the text of the dream you record, so you may wish to disguise any details that you think could identify you or others.</p>
+					</div>
+				</div>
+				
+				<div>
 					<div class='question'>Can I use your site to keep a personal dream journal?</div>
 					<div class='answer'>
 						<p>We plan to add functionality so that users can tag individual dreams. So, if you tag each of your dreams with a unique identifier, you will be able to search for and visualise just your dreams.</p>
+					</div>
+				</div>
+				
+				<div>
+					<div class='question'>Can I edit my dreams once they have been recorded?</div>
+					<div class='answer'>
+						<p>At this point, no. We would need to create a personal account to enable you to do this. We may consider doing this in a future release. Please contact us at <a href="mailto:dreams@artefactsofthecollectiveunconscious.net">dreams@artefactsofthecollectiveunconscious.net</a> if you need a dream removed, e.g. if you have inadvertently recorded identifying information about yourself or someone else.</p>
 					</div>
 				</div>
 				
@@ -273,6 +300,11 @@ var cid;
 						<p>The visualization itself is a force-directed layout built using the <a href="http://d3js.org/" target="_blank">D3js</a> javascript library, and the image export feature leverages the canvg library. A few of the other javascript libraries we use include jQuery, jQuery UI, and tipsy.</p>
 						<p>A big thank you to thank the development communities who made and contributed to all of these great open-source projects, as well as the designers over at <a href="http://thenounproject.com/" target="_blank">The Noun Project</a> for letting us use a few of their icons.</p>
 					</div>
+				</div>
+				
+				<div>
+					<div class='question'>Did you know that 'artefact' is spelled wrong?</div>
+					<div class='answer'><p>Yes!</p></div>
 				</div>
 			
 			</div>
