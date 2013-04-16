@@ -156,27 +156,41 @@ function Graph (d3)
 			.style("stroke", function(d) { return self.linkColor(d); } )
 			.style("stroke-dasharray", function(d) { return self.linkDashArray(d); });
 		
-		var nodes = this.vis.selectAll("circle.node")
+		//	node fill and outline wrapped in a group
+		var nodes = this.vis.selectAll("g.node")
 			.data(graph.nodes)
 			.enter()
-			.append("svg:circle")
+			.append("g")
 			.attr("class", "node")
-			.attr("filter", function(d) { return self.nodeFilter(d); } )
-			.attr("id", function(d) { return 'node_'+d.index; } )
-			.attr("r", function(d) { return self.nodeRadius(d); } )
-			.attr("stroke-width", function(d){ return self.nodeStrokeWidth(d); } )
-			.attr("title", function(d) { return self.nodeTitle(d,true); } )
+			.attr("id", function(d) { return 'node_'+d.index; })
+			.attr("title", function(d) { return self.nodeTitle(d,true); })
 			.style("cursor","pointer")
-			.style("fill",function(d){ return self.nodeColor(d); })
-			.style("fill-opacity",function(d){ return self.nodeFillOpacity(d); })
-			.style("stroke", function(d){ return self.nodeStrokeColor(d); })
-			.style("stroke-opacity", function(d){ return self.nodeStrokeOpacity(d); })
-			.style("stroke-dasharray", function(d) { return self.nodeDashArray(d); })
 			.on("mouseover", function(d,s){ self.onNodeOver(d,s); })
 			.on("mouseout", function(d){ self.onNodeOut(d); })
 			.on("click", function(d){ self.onNodeClick(d); })
 			.on("touchstart", function(d){ self.onNodeClick(d); })
-			.call(this.force.drag);
+			.on("dragstart", function(d){ self.onNodeDragStart(d); } )
+			.on("dragend", function(d){ self.onNodeDragEnd(d); });
+		
+		//	node fill
+		nodes.append("svg:circle")
+			.attr("class", "inner")
+			/*.attr("filter", function(d) { return self.nodeFilter(d); } )*/
+			.attr("r", function(d) { return self.nodeRadius(d,!d.stroke); } )
+			.style("fill",function(d){ return self.nodeColor(d); })
+			.style("fill-opacity",function(d){ return self.nodeFillOpacity(d); });
+		
+		//	node outline
+		nodes.append("svg:circle")
+			.attr("class", "outer")
+			.attr("r", function(d) { return self.nodeRadius(d,d.stroke); } )
+			.style("fill","none")
+			.style("stroke", function(d){ return self.nodeColor(d); })
+			.style("stroke-opacity", function(d){ return self.nodeStrokeOpacity(d); })
+			.style("stroke-dasharray", function(d) { return self.nodeDashArray(d); })
+			.style("stroke-width", function(d) { return self.nodeStrokeWidth(d); });
+			
+		nodes.call(this.force.drag);
 		
 		this.nodes = graph.nodes;
 		
@@ -193,8 +207,7 @@ function Graph (d3)
 				
 				var p = 15;
 				
-				nodes.attr("cx", function(d) { return d.x = Math.max(p, Math.min(self.w-p, d.x)); } )
-					.attr("cy", function(d) { return d.y = Math.max(p, Math.min(self.h-p, d.y)); } );
+				nodes.attr("transform", function(d) { return "translate(" + Math.max(p, Math.min(self.w-p, d.x)) + "," + Math.max(p, Math.min(self.h-p, d.y)) + ")"; } )
 				
 				links.attr("x1", function(d) { return d.source.x; })
 					.attr("y1", function(d) { return d.source.y; })
@@ -210,7 +223,7 @@ function Graph (d3)
 		this.dispatchEvent( "loadComplete" );
 		
 		//	initialize tooltips now that nodes have been displayed
-		$('circle.node').tipsy( { delayIn: 0, delayOut: 0, fade: false, gravity: 'sw', html: true, offset: 5, opacity: 1 } );
+		$('g.node').tipsy( { delayIn: 0, delayOut: 0, fade: false, gravity: 'sw', hoverlock:true, html: true, offset: 5, opacity: 1 } );
 	};
 	
 	this.collide = function(node) 
@@ -270,12 +283,16 @@ function Graph (d3)
 		var t = this.vis.transition().duration(750).each('end',function(){self.onZoomIn();});
 		var k = this.r / this.nodeRadius(this.node) / 2;
 		
-		t.selectAll("circle")
-			.attr("cx", function(d) { return self.x(d.x); })
-			.attr("cy", function(d) { return self.y(d.y); })
-			.attr("r", function(d) { return k * self.nodeRadius(d); })
+		t.selectAll("g")
+			.attr("transform", function(d) { return 'translate(' + self.x(d.x) + ',' + self.y(d.y) + ')'; })
 			.style("fill-opacity",function(d){ return self.nodeFillOpacity(d); });
-		  
+		 
+		t.selectAll("circle.inner")
+			.attr("r", function(d) { return k * self.nodeRadius(d,!d.stroke); })
+		
+		t.selectAll("circle.outer")
+			.attr("r", function(d) { return k * self.nodeRadius(d,d.stroke); })
+			
 		t.selectAll("line")
 			.attr("x1", function(d) { return self.x(d.source.x); })
 			.attr("y1", function(d) { return self.y(d.source.y); })
@@ -299,12 +316,16 @@ function Graph (d3)
 		
 		this.vis.selectAll("line").style("stroke-opacity", function(d){ return self.linkOpacity(d); } );
 		
-		t.selectAll("circle")
-			.attr("cx", function(d) { return d.x; })
-			.attr("cy", function(d) { return d.y; })
-			.attr("r", function(d) { return self.nodeRadius(d); })
+		t.selectAll("g")
+			.attr("transform", function(d) { return 'translate(' + d.x + ',' + d.y + ')'; })
 			.style("fill-opacity",function(d){ return self.nodeFillOpacity(d); });
 		
+		t.selectAll("circle.inner")
+			.attr("r", function(d) { return self.nodeRadius(d,!d.stroke); })
+		
+		t.selectAll("circle.outer")
+			.attr("r", function(d) { return self.nodeRadius(d,d.stroke); })
+			
 		t.selectAll("line")
 			.attr("x1", function(d) { return d.source.x; })
 			.attr("y1", function(d) { return d.source.y; })
@@ -332,7 +353,7 @@ function Graph (d3)
 		if( this.node != undefined ) 
 		{
 			this.vis.select('[id=node_'+this.node.index+']').style("fill", self.nodeColor(self.node) );
-			this.vis.select('[id=node_'+this.node.index+']').style("stroke", self.nodeStrokeColor(self.node) );
+			//this.vis.select('[id=node_'+this.node.index+']').style("stroke", self.nodeStrokeColor(self.node) );
 		}
 		
 		this.force.alpha( .3 );
@@ -374,7 +395,6 @@ function Graph (d3)
 
 	this.onNodeClick = function(d)
 	{
-		
 		this.dragging = false;
 		
 		var node = this.vis.select('[id=node_'+d.index+']');
@@ -384,24 +404,21 @@ function Graph (d3)
 			node.style("fill", d.color2);
 		}
 		
-		$( '#node_'+d.index ).tipsy("hide");
-		
 		this.showNode(d);
 	};
 	
 	/**
 	 * Nodes
 	 */
-	this.nodeRadius = function(d) { return (d.node_type==this.TYPE_TAG?7:7) + Math.min( 100, d.value * 2 ); };
+	this.nodeRadius = function(d,outer) { return (d.node_type==this.TYPE_TAG?1.5:3) + Math.min( 100, d.value * 1.5 ) + (outer?2:0); };
 	this.nodeColor = function(d) { return this.themeId == 1 ? (d.color2 != null ? d.color2 : '#fff') : d.color; };
-	this.nodeFilter = function(d) { return '';return d.node_type==this.TYPE_DREAM?"url(#blur)":""; };
 	this.nodeStrokeColor = function(d) { return d.stroke ? (this.themeId == 1?'#fff':'#000') : d.color2; };
-	this.nodeStrokeOpacity = function(d) { return d.stroke ? .3 : 1; };
+	this.nodeStrokeOpacity = function(d) { return d.node_type==this.TYPE_TAG?.3:this.nodeFillOpacity(d); };
 	
 	this.nodeStrokeWidth = function(d)
 	{ 
 		if(d.node_type==this.TYPE_DREAM || d.node_type==this.TYPE_ARTWORK) 
-			return d.stroke ? .5 : 0;
+			return d.stroke ? 1 : 0;
 		else if(d.node_type==this.TYPE_TAG)
 			return 2;
 			
@@ -443,7 +460,7 @@ function Graph (d3)
 	/**
 	 * Edges
 	 */
-	this.linkDistance = function(link,index) { return this.nodeRadius(link.source) + this.nodeRadius(link.target) + (75 - (75/10*Math.min(10,link.value))); };
+	this.linkDistance = function(link,index) { return this.nodeRadius(link.source) + this.nodeRadius(link.target) + (100 - (100/10*Math.min(10,link.value))); };
 	this.linkOpacity = function(d) { return this.LINK_OPACITY; };
 	this.linkColor = function(d) { return this.themeId == 1 ? '#fff':'#000'; };
 	this.linkDashArray = function(d) { return d.type == 'museum_artwork' || d.type == 'museum_artist' ? "2,4" : ""; };

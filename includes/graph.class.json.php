@@ -19,7 +19,6 @@ class Graph
 	public $alchemyApiKey;
 	public $dateFrom;
 	public $dateTo;
-	public $highlightColor = '#CC3300';
 	public $maxKeywords = 20;
 	public $minTagValue;
 	
@@ -86,7 +85,7 @@ class Graph
 				$dream->node_type = self::TYPE_DREAM;
 				$dream->index = count($this->nodes);
 				$dream->value = 0;
-				$dream->color2 = ($dream->ip == $_SERVER['REMOTE_ADDR']) ? $this->highlightColor : $dream->color;
+				$dream->color2 = $dream->color;
 				$dream->color = 0x000000;
 				$dream->tags = array();
 				
@@ -293,7 +292,8 @@ class Graph
 		
 		foreach($this->nodes as $node)
 		{
-			if( $node->node_type == self::TYPE_TAG )
+			if( $node->node_type == self::TYPE_TAG 
+				|| ($node->node_type == self::TYPE_DREAM && $node->ip == $_SERVER['REMOTE_ADDR']) )
 				$node->stroke = true;
 			else
 				$node->stroke = isset($node->color2) ? (hexdec(preg_replace("/#/","0x",$node->color2)) < 0x666666 ? true : false) : false;
