@@ -37,17 +37,6 @@ function Graph (d3)
 			.attr("width", "100%")
 			.attr("height", "100%")
 			.attr("viewBox", "0 0 " + this.w + " " + this.h);
-		
-		var defs = this.vis.append("svg:defs");
-		
-		defs.append("svg:filter")
-			.attr("id", "blur")
-			.attr("x", "-30%")
-			.attr("y", "-30%")
-			.attr("width", "140%")
-			.attr("height", "140%")
-			.append("svg:feGaussianBlur")
-			.attr("stdDeviation", 2);
 	
 	  	var url = "json/graph.json.php?date_from="+dateFrom+"&date_to="+dateTo;
 	  	var self = this;
@@ -175,7 +164,6 @@ function Graph (d3)
 		//	node fill
 		nodes.append("svg:circle")
 			.attr("class", "inner")
-			/*.attr("filter", function(d) { return self.nodeFilter(d); } )*/
 			.attr("r", function(d) { return self.nodeRadius(d,!d.stroke); } )
 			.style("fill",function(d){ return self.nodeColor(d); })
 			.style("fill-opacity",function(d){ return self.nodeFillOpacity(d); });
@@ -283,10 +271,10 @@ function Graph (d3)
 		var t = this.vis.transition().duration(750).each('end',function(){self.onZoomIn();});
 		var k = this.r / this.nodeRadius(this.node) / 2;
 		
-		t.selectAll("g")
+		t.selectAll("g.node")
 			.attr("transform", function(d) { return 'translate(' + self.x(d.x) + ',' + self.y(d.y) + ')'; })
 			.style("fill-opacity",function(d){ return self.nodeFillOpacity(d); });
-		 
+		
 		t.selectAll("circle.inner")
 			.attr("r", function(d) { return k * self.nodeRadius(d,!d.stroke); })
 		
@@ -316,7 +304,7 @@ function Graph (d3)
 		
 		this.vis.selectAll("line").style("stroke-opacity", function(d){ return self.linkOpacity(d); } );
 		
-		t.selectAll("g")
+		t.selectAll("g.node")
 			.attr("transform", function(d) { return 'translate(' + d.x + ',' + d.y + ')'; })
 			.style("fill-opacity",function(d){ return self.nodeFillOpacity(d); });
 		

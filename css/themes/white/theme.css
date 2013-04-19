@@ -23,9 +23,15 @@ h3 a:link, h3 a:visited, h3 a:hover { color: #333 }
 
 /*	index page	*/
 #node_info { color: #000; }
-#search_overlay{ background-color:#000; color: #fff; }
-#search_overlay .header { background-color:#444; }
-#search_overlay a, #search_overlay a:link, #search_overlay a:visited, #search_overlay a:hover { color: #fff }
+
+.legend { border: solid 3px #444; color: #444; }
+.legend a, .legend a:link, .legend a:visited, .legend a:hover { color: #444 }
+.legend text { fill:#444; }
+.legend .node { fill:#444; }
+.legend .node_outline { stroke:#444; }
+
+#search { border: solid 2px #444; color: #444; }
+#search input[type=text] { color: #444; border:none; border-bottom: solid 1px #444; }
 
 a.dream_link:link, a.dream_link:visited { color: #000; background-color: none; }
 a.dream_link:hover { color: #fff; background-color: #000; }

@@ -60,5 +60,5 @@ foreach($links as $name=>$url)
 	</div>
 </div>
 <?php if( $current != 'index.php' ) { ?>
-<img src="images/beta.png" style="position:absolute;top:0px;left:0px;z-index:2"/>
+<img src="images/beta.png" style="position:fixed;top:0px;left:0px;z-index:2"/>
 <? } ?>

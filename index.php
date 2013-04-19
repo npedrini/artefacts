@@ -69,25 +69,11 @@ $(document).ready
 		$('#header h1').on("mouseenter",function(e){ $('#info').fadeIn(); });
 		$('#header h1').on("mouseleave",function(e){ $('#info').hide(); });
 		
-		$('#search').on("mouseover",function(e){ $(e.currentTarget).tipsy("show"); });
-		$('#search').on("mouseout", function(e){ $(e.currentTarget).tipsy("hide"); });
-		$('#icon_search').on("click", function(e){ $(e.currentTarget).parent().tipsy("hide"); });
-		
-		$('#footer').on("mouseenter",function(e){ $('#search,#gear,#theme_toggle').css('opacity',1);$("#settings").show(); });
-		$('#settings').on("mouseleave", function(e){ $('#search,#gear,#theme_toggle').css('opacity',.5);$("#settings").hide(); });
-		
 		//	pointer cursor
-		$('#header h1,#footer,#search').css('cursor', 'pointer');
-		
-		//	tooltips
-		$('#search').tipsy( { gravity: 'e', offset: 10, opacity: 1, trigger: "manual" } );
-		$('#theme_toggle,#save').tipsy( { gravity: 'e', offset: 10, opacity: 1 } );
-		
-		//	init opacity
-		$('#search,#gear,#theme_toggle').css('opacity',.5);
+		$('#header h1').css('cursor', 'pointer');
 		
 		//	hide stuff
-		$("#background,#foreground,#info,#settings,#intro,#date,#search_overlay").hide();
+		$("#background,#foreground,#info,#intro,#date,#legend,#search").hide();
 		
 		//	fade intro
 		var showIntro = <?php echo $showIntro?'true':'false' ?>;
@@ -104,7 +90,7 @@ $(document).ready
 		{
 			show();
 		}
-
+		
 		graph = new Graph( d3 );
 		graph.addEventListener( "loadStart", onGraphLoadStart );
 		graph.addEventListener( "loadComplete", onGraphLoadComplete );
@@ -112,8 +98,13 @@ $(document).ready
 		graph.addEventListener( "zoomInComplete", onGraphZoomInComplete );
 		graph.addEventListener( "zoomOutStart", onGraphZoomOutStart );
 		
-		setTheme( $.cookie("theme") != undefined ? $.cookie("theme") : 1 );
+		$('#footer > div > div')
+			.css('opacity',.3)
+			.on('mouseover',function(){ d3.select(this).style('opacity',.8);})
+			.on('mouseout',function(){ d3.select(this).style('opacity',.3); });
 		
+		setTheme( $.cookie("theme") != undefined ? $.cookie("theme") : 1 );
+
 		updateInfo();
 	}
 );
@@ -130,23 +121,15 @@ function setTheme( id )
 	setThemeVis();
 	
 	$.cookie("theme", themeId);
-	
-	//$('#theme_toggle').attr('title', id==1?'Lights on':'Lights off');
 }
 
 function setThemeVis()
 {
 	if( graph.vis == undefined ) return;
 	
-	graph.vis.selectAll("circle.node").style("fill",function(d){ return graph.nodeColor(d); });
-	graph.vis.selectAll("circle.node").style("stroke",function(d){ return graph.nodeStrokeColor(d); });
+	graph.vis.selectAll("circle.inner").style("fill",function(d){ return graph.nodeColor(d); });
+	graph.vis.selectAll("circle.outer").style("stroke",function(d){ return graph.nodeStrokeColor(d); });
 	graph.vis.selectAll("line.link").style("stroke",function(d){ return graph.linkColor(d); });
-}
-
-function isMobile()
-{
-	var a = (navigator.userAgent||navigator.vendor||window.opera);
-	return /android.+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|symbian|treo|up\.(browser|link)|vodafone|wap|windows (ce|phone)|xda|xiino/i.test(a)||/1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|e\-|e\/|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(di|rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|xda(\-|2|g)|yas\-|your|zeto|zte\-/i.test(a.substr(0,4));
 }
 
 function onMouseUp(e) { dragging = false; }
@@ -161,23 +144,19 @@ function onClick(e)
 **/
 function save()
 {
-	//graph.vis.selectAll("circle.node").attr("filter", function(d) { return ''; } );
-	
-	var svg = new XMLSerializer().serializeToString( $('svg')[0] ).replace("href","xlink:href");
-	
-	//graph.vis.selectAll("circle.node").attr("filter", function(d) { return graph.nodeFilter(d); } );
+	var svg = new XMLSerializer().serializeToString( $('#visualization > svg')[0] ).replace("href","xlink:href");
 	
 	$('canvas').attr('width',$('#visualization').width());
 	$('canvas').attr('height',$('#visualization').height());
-
+	
 	canvg('canvas',svg);
-
+	
 	var canvas = document.getElementById( "canvas" );
 	var data = canvas.toDataURL( "image/png" );
-				
+	
 	$('#save_form #data').val( data );
 	$('#save_form').submit();
-
+	
 	$('canvas').attr('width',0);
 	$('canvas').attr('height',0);
 }
@@ -253,8 +232,6 @@ function initSearch()
 				    }
 				);
 				
-				$("#search > .icon").attr("title","Search");
-				
 				$.extend($.datepicker,{_checkOffset:function(inst,offset,isFixed){return offset}});
 				
 				//	get init date from hash
@@ -265,7 +242,7 @@ function initSearch()
 				$("#date_from").val( availableDates.indexOf( hash[0] ) > -1 ? hash[0] : availableDates[0] );
 				$("#date_to").val( availableDates.indexOf( hash[1] ) > -1 ? hash[1] : availableDates[0] );
 				
-				search();
+				doSearch();
 			}
 		}
 	);
@@ -287,23 +264,29 @@ function shouldEnableDate( date )
 
 function toggleSearch()
 {
-	if( $('#search_overlay').css( "display" ) == "none" )
-	{
-		var position = $('#icon_search').offset();
-		
-		$('#search_overlay').css( {'left':position.left - $('#search_overlay').width() - 10,'top':position.top - 20} );
-		$('#search_overlay').fadeIn(250);
-	}
-	else
-	{
-		$('#search_overlay').hide();
-	}
+	$('#search').css( "display" ) == "none" ? showSearch() : hideSearch();
+}
+
+function showSearch()
+{
+	if( $('#search').css( "display" ) == "visible" ) return;
+	
+	$('#legend').fadeOut(250);
+	$('#search').delay(250).fadeIn(250);
+}
+
+function hideSearch()
+{
+	if( $('#search').css( "display" ) == "none" ) return;
+	
+	$('#search').fadeOut(250);
+	$('#legend').delay(250).fadeIn(250);
 }
 
 /**
  * Selects a date
  */
-function search()
+function doSearch()
 {
 	var date_from = $("#date_from").datepicker( "getDate" );
 	var date_to = $("#date_to").datepicker( "getDate" );
@@ -321,6 +304,8 @@ function search()
 	hideNodeInfo();
 	
 	graph.load( dateFromString, dateToString );
+
+	hideSearch();
 }
 
 /**
@@ -369,7 +354,7 @@ function onGraphLoadComplete(error,g)
 		
 		$("#date_from").val( availableDates[dataLoadAttempts] );
 
-		search();
+		doSearch();
 	}
 	else
 	{
@@ -377,6 +362,7 @@ function onGraphLoadComplete(error,g)
 		
 		updateInfo();
 		setThemeVis();
+		drawLegend();
 	}
 }
 
@@ -583,7 +569,7 @@ function onGraphZoomInStart( node )
 		node_info += "</div>";
 		node_info += "</div>";
 	}
-		
+	
 	$('body').append( node_info );
 	$('#node_info').hide();
 	$('a[title]').tipsy( { gravity: 'e', offset: 10, opacity: 1 } );
@@ -604,6 +590,42 @@ function onGraphZoomInComplete( node )
 function onGraphZoomOutStart()
 {
 	hideNodeInfo();
+}
+
+function drawLegend()
+{
+	if( $("#legend").children().length ) return;
+	
+	var width = $("#footer > div").width();
+	var height = 50;
+	
+	var svg = "<svg width='"+width+"px' height='"+height+"px'>";
+
+	var legendItems = [ {label:"Dream",node_type:'dream'}, {label:"Tag",node_type:'tag'} ];
+	
+	var padding = width / (legendItems.length+1);
+	
+	for(var i=0,x=padding,y = height/2 - 5;i<legendItems.length;i++)
+	{
+		var item = legendItems[i];
+		var d = { node_type: item.node_type, value: 3 };
+		
+		var g = "<g>";
+		
+		g += "<circle class='node' r='" + graph.nodeRadius(d) + "' cx='" + x + "px' cy='" + y + "px' style='" + ('fill-opacity:'+graph.nodeFillOpacity(d)) + "' />";
+		g += "<circle class='node_outline' r='" + graph.nodeRadius(d) + "' cx='" + x + "px' cy='" + y + "px' style='" + ('fill:none;stroke-dasharray:'+graph.nodeDashArray(d)+';stroke-width:'+graph.nodeStrokeWidth(d)) + "' />";
+		g += "<text x='" + x + "px' y='" + (y+20) + "px' text-anchor='middle'>" + item.label + "</text>";
+		g += "</g>";
+		
+		svg += g;
+
+		x += padding;
+	}
+
+	svg += "</svg>";
+	
+	$("#legend").append( svg );
+	$("#legend").show();
 }
 
 function hideNodeInfo()
@@ -628,7 +650,7 @@ function hideTagArtwork()
 function toggleTheme()
 {
 	$('#theme_toggle').tipsy('hide');
-	setTheme( themeId == 1 ? 0 : 1 ); 
+	setTheme( themeId == 1 ? 0 : 1 );
 }
 
 /**
@@ -713,54 +735,55 @@ var themeId;
 		<?php include "includes/header.php"; ?>
 		
 		<div id="visualization"></div>
-	
+		
 		<div id="footer">
 			
-			<div id="settings">
+			<div style="width:150px">
 				
-				<div id="save" class="setting" title="Save" style="height:20px">
+				<div id="legend" class="legend"></div>
+				
+				<div id="search">
 					
-					<form id="save_form" action="svg.php" method="POST" target="_blank" style="margin:0px;">
-						<input type="hidden" id="data" name="data" />
-						<div id="icon_save" onclick="javascript:save()"></div>
-					</form>
+					<div class="content">
+						
+						<div class="row">
+							<span>From:</span>
+							<input id="date_from" type="text" name="from" placeholder="From" style="display:inline-block" />
+						</div>
+						
+						<div class="row">
+							<span>To:</span>
+							<input id="date_to" type="text" name="to" placeholder="To" style="display:inline-block" />
+						</div>
+						
+						<div style="margin-top:5px">
+							<a href="#" onclick="javascript:doSearch()">Search</a>
+						</div>
+						
+					</div>
 					
 				</div>
 				
-				<div id="theme_toggle" class="setting" title="Lights">
-					<div id="icon_theme" onclick="javascript:toggleTheme()"></div>
+				<div>
+					 
+					<div id="settings">
+						<a id="themeToggle" href="#" onclick="toggleTheme();return false;">Get the lights</a>, <a href="#" onclick="save();return false;">save</a>, <a href="#" onclick="toggleSearch();return false;">search</a>
+					</div>
+					
 				</div>
-				
-				<div id="search" class="setting" title="Search">
-					<div id="icon_search" onclick="toggleSearch();"></div>
-				</div>
-				
+				 
 			</div>
-			
-			<div id="gear" class="setting">
-				<div id="icon_gear" style="display:inline-block;vertical-align:middle;"></div>
-			</div>
-			
+			 
 		</div>
 		
 	</div>
 	
 	<canvas id="canvas" width="0px" height="0px"></canvas>	
 	
-	<div id="search_overlay">
-		
-		<div class="header">
-			<a href="#" onclick="javascript:toggleSearch();">Close</a>
-		</div>
-		
-		<div class="content">
-			<span>From:</span><input id="date_from" type="text" name="from" placeholder="From" style="display:inline-block" />
-			<span>To:</span><input id="date_to" type="text" name="to" placeholder="To" style="display:inline-block" />
-			<input type="button" value="Go" onclick="javascript:search();toggleSearch();" />
-		</div>
-		
-	</div>
-	
+	<form id="save_form" action="svg.php" method="POST" target="_blank">
+		<input type="hidden" id="data" name="data" />
+	</form>
+					
 </body>
 
 </html>
