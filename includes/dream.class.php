@@ -156,8 +156,8 @@ class Dream
 			}
 		}
 		
-		$get_location = curl_init(); 
-		curl_setopt($get_location, CURLOPT_URL, "http://freegeoip.net/json/");
+		$get_location = curl_init();
+		curl_setopt($get_location, CURLOPT_URL, "http://freegeoip.net/json/" . $_SERVER['REMOTE_ADDR'] );
 		curl_setopt($get_location, CURLOPT_RETURNTRANSFER, 1);
 				
 		$location = curl_exec($get_location);
