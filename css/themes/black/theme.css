@@ -25,14 +25,14 @@ h3 a:link, h3 a:visited, h3 a:hover { color: #fff }
 /*	index page	*/
 #node_info { color: #fff; }
 
-.legend { border: solid 3px #999; color: #999; }
-.legend a, .legend a:link, .legend a:visited, .legend a:hover { color: #999 }
-.legend text { fill:#999; }
-.legend .node { fill:#999; }
-.legend .node_outline { stroke:#999; }
+#search_overlay { background-color:#fff; color: #000; }
+#search_overlay .header { background-color:#ccc; }
+#search_overlay a, #search_overlay a:link, #search_overlay a:visited, #search_overlay a:hover { color: #000 }
+#search_overlay input[type=text] { color: #000; border:none; }
 
-#search { border: solid 2px #999; color: #999; }
-#search input[type=text] { color: #999; border:none; border-bottom: solid 1px #999; }
+#legend text { fill:#999; }
+#legend .node { fill:#999; }
+#legend .node_outline { stroke:#999; }
 
 a.dream_link:link, a.dream_link:visited { color: #fff; background-color: none; }
 a.dream_link:hover { color: #000; background-color: #fff; }
@@ -48,8 +48,7 @@ a.dream_link:hover { color: #000; background-color: #fff; }
 .result a:hover {  color: #fff; }
 
 /*	icons	*/
-#icon_gear { background: url("icons/gear.png") no-repeat; width:20px; height:20px; }
-#icon_save { background: url("icons/save.png") no-repeat; width:20px; height:20px; border:0px; }
-#icon_theme { background: url("icons/theme.png") no-repeat; width:20px; height:28px; border:none; }
-#icon_search { background: url("icons/calendar.png") no-repeat; width:20px; height:20px; border:none; }
-#icon_checkmark { background: url("icons/checkmark.png") no-repeat; width:30px; height:30px; border:none; }
+#icon_help { background: url("icons/help.png") no-repeat; }
+#icon_save { background: url("icons/save.png") no-repeat; }
+#icon_search { background: url("icons/calendar.png") no-repeat; }
+#icon_theme { background: url("icons/theme.png") no-repeat; }

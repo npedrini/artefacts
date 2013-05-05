@@ -16,6 +16,7 @@ function Graph (d3)
 	this.dragging = false;
 	this.zoomed = false;
 	this.zooming = false;
+	this.higlightedNodeType = null;
 	
 	this._events = {};
 	
@@ -272,14 +273,14 @@ function Graph (d3)
 		var k = this.r / this.nodeRadius(this.node) / 2;
 		
 		t.selectAll("g.node")
-			.attr("transform", function(d) { return 'translate(' + self.x(d.x) + ',' + self.y(d.y) + ')'; })
-			.style("fill-opacity",function(d){ return self.nodeFillOpacity(d); });
+			.attr("transform", function(d) { return 'translate(' + self.x(d.x) + ',' + self.y(d.y) + ')'; });
 		
 		t.selectAll("circle.inner")
 			.attr("r", function(d) { return k * self.nodeRadius(d,!d.stroke); })
+			.style("fill-opacity",function(d){ return self.nodeFillOpacity(d); });
 		
 		t.selectAll("circle.outer")
-			.attr("r", function(d) { return k * self.nodeRadius(d,d.stroke); })
+			.attr("r", function(d) { return k * self.nodeRadius(d,d.stroke); });
 			
 		t.selectAll("line")
 			.attr("x1", function(d) { return self.x(d.source.x); })
@@ -305,14 +306,14 @@ function Graph (d3)
 		this.vis.selectAll("line").style("stroke-opacity", function(d){ return self.linkOpacity(d); } );
 		
 		t.selectAll("g.node")
-			.attr("transform", function(d) { return 'translate(' + d.x + ',' + d.y + ')'; })
-			.style("fill-opacity",function(d){ return self.nodeFillOpacity(d); });
+			.attr("transform", function(d) { return 'translate(' + d.x + ',' + d.y + ')'; });
 		
 		t.selectAll("circle.inner")
 			.attr("r", function(d) { return self.nodeRadius(d,!d.stroke); })
+			.style("fill-opacity",function(d){ return self.nodeFillOpacity(d); });
 		
 		t.selectAll("circle.outer")
-			.attr("r", function(d) { return self.nodeRadius(d,d.stroke); })
+			.attr("r", function(d) { return self.nodeRadius(d,d.stroke); });
 			
 		t.selectAll("line")
 			.attr("x1", function(d) { return d.source.x; })
@@ -341,7 +342,6 @@ function Graph (d3)
 		if( this.node != undefined ) 
 		{
 			this.vis.select('[id=node_'+this.node.index+']').style("fill", self.nodeColor(self.node) );
-			//this.vis.select('[id=node_'+this.node.index+']').style("stroke", self.nodeStrokeColor(self.node) );
 		}
 		
 		this.force.alpha( .3 );
@@ -398,10 +398,16 @@ function Graph (d3)
 	/**
 	 * Nodes
 	 */
-	this.nodeRadius = function(d,outer) { return (d.node_type==this.TYPE_TAG?1.5:3) + Math.min( 100, d.value * 1.5 ) + (outer?2:0); };
+	this.nodeRadius = function(d,outer) { return 4 + Math.min( 100, d.value * 1.5 ) + (outer&&d!=this.rootNode?2:0); };
 	this.nodeColor = function(d) { return this.themeId == 1 ? (d.color2 != null ? d.color2 : '#fff') : d.color; };
-	this.nodeStrokeColor = function(d) { return d.stroke ? (this.themeId == 1?'#fff':'#000') : d.color2; };
-	this.nodeStrokeOpacity = function(d) { return d.node_type==this.TYPE_TAG?.3:this.nodeFillOpacity(d); };
+	this.nodeStrokeColor = function(d) { return d.strokeContrast ? (this.themeId == 1?'#fff':'#000') : this.nodeColor(d); };
+	this.nodeStrokeOpacity = function(d) 
+	{ 
+		if( this.higlightedNodeType != null ) 
+			return d.node_type == this.higlightedNodeType ? 1 : .1;
+		
+		return d.node_type==this.TYPE_TAG?.3:this.nodeFillOpacity(d);
+	};
 	
 	this.nodeStrokeWidth = function(d)
 	{ 
@@ -435,12 +441,16 @@ function Graph (d3)
 		return d.description.substr( 0, d.description.indexOf('.')+1 );
 	};
 
-	this.nodeFillOpacity = function(d)
+	this.nodeFillOpacity = function(d,defaultAlpha)
 	{
+		defaultAlpha = defaultAlpha || this.NODE_OPACITY;
+		
 		if( d == this.rootNode ) return this.NODE_OPACITY_ALT;
 		if( d.node_type==this.TYPE_ARTIST || d.node_type==this.TYPE_TAG ) return 0;
 		
-		return this.NODE_OPACITY;
+		if( this.higlightedNodeType != null ) return d.node_type == this.higlightedNodeType ? 1 : .1;
+		
+		return defaultAlpha;
 	};
 
 	this.nodeDashArray = function(d) { return d.node_type == this.TYPE_TAG ? "2,2" : ""; };
@@ -453,6 +463,18 @@ function Graph (d3)
 	this.linkColor = function(d) { return this.themeId == 1 ? '#fff':'#000'; };
 	this.linkDashArray = function(d) { return d.type == 'museum_artwork' || d.type == 'museum_artist' ? "2,4" : ""; };
 	this.linkOpacityOver = function(d) { return (d.source === this.hoverNode || d.target === this.hoverNode) ? this.LINK_OPACITY_OVER : this.LINK_OPACITY; };
+	
+	this.highlightNodeType = function(node_type)
+	{
+		var self = this;
+
+		this.higlightedNodeType = node_type != null ? node_type : null;
+		
+		this.vis.selectAll("circle.inner")
+			.style("fill-opacity",function(d){ return self.nodeFillOpacity(d); });
+		this.vis.selectAll("circle.outer")
+			.style("stroke-opacity", function(d) { return self.nodeStrokeOpacity(d); } );
+	};
 	
 	/**
 	 * Event dispatching

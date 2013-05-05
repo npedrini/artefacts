@@ -79,13 +79,13 @@ body#vis #background, body#vis #header { background-image: none; }
 
 #footer, #push { font-size: .5em; text-align: center; height: 20px; }
 
-#vis #footer { height: auto; font-size: .5em; position: absolute; bottom: 15px; right: 25px; padding-bottom: 0px; }
+#vis #footer { height: auto; font-size: .6em; position: absolute; bottom: 10px; right: 15px; text-align:right; padding-bottom: 0px; }
 
 #status 
 {
 	display: inline-block; 
 	font-size: .7em; 
-	color: #fff;
+	color: #fff;  
 	padding: 10px;
 	background-color: #cc3300;
 	margin-bottom: 20px;
@@ -94,25 +94,22 @@ body#vis #background, body#vis #header { background-image: none; }
 .framed { padding: 10px; }
 
 /*	index page	*/
-.legend, #search { margin-bottom: 10px; }
-.legend, #search { font-size: 1.2em; }
-#search input[type=text] { background-color: transparent; padding: 3px; }
-
-#settings { padding:3px; font-style:italic; }
-#settings a, .legend a:link, .legend a:visited { text-decoration: none; }
-#settings a:hover { text-decoration: underline; }
-
 #info { display: inline-block; margin-left: 10px; font-size: .6em; padding: 3px; }
 #visualization{ width: 100%; height: 100%; } 
 
 .artwork_title { text-transform: uppercase; }
 .artwork_artist { font-weight: normal; }
-.setting { margin-right:1px;padding:2px;display:inline-block; }
 
-#search { text-align: left; padding: 5px; }
-#search > .content { padding: 5px; }
-#search > .content > .row { padding-bottom: 5px; }
-#search > .content > .row > span { display: inline-block; width: 35px; }
+#settings { float:right; width: 25px; margin-right:15px; }
+.setting { vertical-align:middle;margin-bottom:1px;padding:2px; }
+
+#legend { clear: both; opacity: .75; }
+.legend_item{ display:inline-block; }
+
+#search_overlay { position:absolute; z-index:1000; font-size: .6em; }
+#search_overlay .header, #search_overlay .content { padding: 5px; }
+#search_overlay .header { font-size: .5em; text-align: right; }
+#search_overlay input[type=text] { background:transparent; padding: 4px; }
 
 #node_info { display:inline-block; position:absolute; }
 
@@ -135,8 +132,8 @@ body#vis #background, body#vis #header { background-image: none; }
 .toggle > a:hover, .toggle > a.selected { padding:.1em .4em; }
 .question { font-weight: bold; margin-bottom: 10px; font-size: .8em; }
 
-#content .section { margin-bottom: 5px; }
-#content .section p { font-size: .8em; line-height: 1.6em; padding: 10px; }
+#content .section { margin-bottom: 0px; }
+#content .section p { font-size: .8em; line-height: 1.6em; padding: 10px; margin-bottom: 10px; }
 
 #content.narrow { width: 500px; }
 #content.wide { width: 800px; }
@@ -176,8 +173,18 @@ body#vis #background, body#vis #header { background-image: none; }
 	line-height:1em;
 	margin-bottom: 50px;
 }
+
+.x-small { font-size: .6em; }
+.small { font-size: .7em; }
 .emphasized { font-weight: bold; }
 .underlined { text-decoration: underline; }
 
 #foreground.alt { color: #fff; }
 #foreground.alt #footer a:link,#background.alt #footer a:visited,#background.alt #footer a:hover { color: #fff; }
+
+/*	icons	*/
+#icon_gear { width:20px; height:20px; border:0px; }
+#icon_help { width:20px; height:20px; border:0px; }
+#icon_save { height:15px; border:0px; }
+#icon_search { width:20px; height:20px; border:none; }
+#icon_theme { width:20px; height:28px; border:none; }

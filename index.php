@@ -69,11 +69,21 @@ $(document).ready
 		$('#header h1').on("mouseenter",function(e){ $('#info').fadeIn(); });
 		$('#header h1').on("mouseleave",function(e){ $('#info').hide(); });
 		
+		$('#search').on("mouseover",function(e){ $(e.currentTarget).tipsy("show"); });
+		$('#search').on("mouseout", function(e){ $(e.currentTarget).tipsy("hide"); });
+		$('#icon_search').on("click", function(e){ $(e.currentTarget).parent().tipsy("hide"); });
+		
 		//	pointer cursor
-		$('#header h1').css('cursor', 'pointer');
+		$('#header h1,#footer,#search,#icon_help').css('cursor', 'pointer');
+
+		$('#icon_help').on("click",function(e){ window.location.href = "about.php"; } );
+		
+		//	tooltips
+		$('#search').tipsy( { gravity: 'e', offset: 10, opacity: 1, trigger: "manual" } );
+		$('#theme_toggle,#save,#help').tipsy( { gravity: 'e', offset: 10, opacity: 1 } );
 		
 		//	hide stuff
-		$("#background,#foreground,#info,#intro,#date,#legend,#search").hide();
+		$("#background,#foreground,#info,#intro,#date,#settings,#search_overlay").hide();
 		
 		//	fade intro
 		var showIntro = <?php echo $showIntro?'true':'false' ?>;
@@ -97,11 +107,8 @@ $(document).ready
 		graph.addEventListener( "zoomInStart", onGraphZoomInStart );
 		graph.addEventListener( "zoomInComplete", onGraphZoomInComplete );
 		graph.addEventListener( "zoomOutStart", onGraphZoomOutStart );
-		
-		$('#footer > div > div')
-			.css('opacity',.3)
-			.on('mouseover',function(){ d3.select(this).style('opacity',.8);})
-			.on('mouseout',function(){ d3.select(this).style('opacity',.3); });
+
+		$('#gear,#help,#search,#theme_toggle').css('opacity',.3);
 		
 		setTheme( $.cookie("theme") != undefined ? $.cookie("theme") : 1 );
 
@@ -119,6 +126,8 @@ function setTheme( id )
 	graph.themeId = id;
 	
 	setThemeVis();
+	
+	$("#legend div:nth-child(3) image").attr("xlink:href","css/themes/"+(themeId==1?'black':'white')+"/icons/gear.png");
 	
 	$.cookie("theme", themeId);
 }
@@ -232,6 +241,8 @@ function initSearch()
 				    }
 				);
 				
+				$("#search > .icon").attr("title","Search");
+				
 				$.extend($.datepicker,{_checkOffset:function(inst,offset,isFixed){return offset}});
 				
 				//	get init date from hash
@@ -264,23 +275,24 @@ function shouldEnableDate( date )
 
 function toggleSearch()
 {
-	$('#search').css( "display" ) == "none" ? showSearch() : hideSearch();
+	$('#search_overlay').css( "display" ) == "none" ? showSearch() : hideSearch();
 }
 
 function showSearch()
 {
-	if( $('#search').css( "display" ) == "visible" ) return;
+	if( $('#search_overlay').css( "display" ) == "visible" ) return;
 	
-	$('#legend').fadeOut(250);
-	$('#search').delay(250).fadeIn(250);
+	var position = $('#icon_search').offset();
+		
+	$('#search_overlay').css( {'left':position.left - $('#search_overlay').width() - 10,'top':position.top - 10} );
+	$('#search_overlay').fadeIn(250);
 }
 
 function hideSearch()
 {
-	if( $('#search').css( "display" ) == "none" ) return;
+	if( $('#search_overlay').css( "display" ) == "none" ) return;
 	
-	$('#search').fadeOut(250);
-	$('#legend').delay(250).fadeIn(250);
+	$('#search_overlay').hide();
 }
 
 /**
@@ -350,8 +362,6 @@ function onGraphLoadComplete(error,g)
 		&& dataLoadAttempts < availableDates.length 
 		&& !dateSpecified )
 	{
-		console.log( 'Expanding search', availableDates[dataLoadAttempts] );
-		
 		$("#date_from").val( availableDates[dataLoadAttempts] );
 
 		doSearch();
@@ -594,38 +604,78 @@ function onGraphZoomOutStart()
 
 function drawLegend()
 {
-	if( $("#legend").children().length ) return;
-	
-	var width = $("#footer > div").width();
-	var height = 50;
-	
-	var svg = "<svg width='"+width+"px' height='"+height+"px'>";
+	if( $("#legend").children().length > 1 ) return;
 
-	var legendItems = [ {label:"Dream",node_type:'dream'}, {label:"Tag",node_type:'tag'} ];
+	var legendItems = 
+		[ 
+			{label:"Dream",node_type:'dream',tooltip:'Contributed dreams'}, 
+			{label:"Connection",node_type:'tag',tooltip:'Common words or phrases'}, 
+			{label:"Settings",image_url:"gear.png",width:20,height:20}
+		];
 	
-	var padding = width / (legendItems.length+1);
+	var width=60,height=40;
 	
-	for(var i=0,x=padding,y = height/2 - 5;i<legendItems.length;i++)
+	for(var i=0,x=width/2,y=height/2;i<legendItems.length;i++)
 	{
 		var item = legendItems[i];
-		var d = { node_type: item.node_type, value: 3 };
 		
-		var g = "<g>";
+		var g = "<div class='legend_item' width='"+width+"px' height='"+height+"px'>";
 		
-		g += "<circle class='node' r='" + graph.nodeRadius(d) + "' cx='" + x + "px' cy='" + y + "px' style='" + ('fill-opacity:'+graph.nodeFillOpacity(d)) + "' />";
-		g += "<circle class='node_outline' r='" + graph.nodeRadius(d) + "' cx='" + x + "px' cy='" + y + "px' style='" + ('fill:none;stroke-dasharray:'+graph.nodeDashArray(d)+';stroke-width:'+graph.nodeStrokeWidth(d)) + "' />";
+		g += "<svg width='"+width+"px' height='"+height+"px'>";
+		g += "<g>";
+		
+		if( item.node_type )
+		{
+			var d = { node_type: item.node_type, value: 3 };
+			
+			g += "<circle class='node' r='" + graph.nodeRadius(d) + "' cx='" + x + "px' cy='" + y + "px' style='" + ('fill-opacity:' + graph.nodeFillOpacity(d,1)) + "' />";
+			g += "<circle class='node_outline' r='" + graph.nodeRadius(d) + "' cx='" + x + "px' cy='" + y + "px' style='" + ('fill:none;stroke-dasharray:'+graph.nodeDashArray(d)+';stroke-width:'+graph.nodeStrokeWidth(d)) + "' />";
+		}
+		else if( item.image_url )
+		{
+			item.image_url = "css/themes/" + (themeId==1?'black':'white') + "/icons/" + item.image_url;
+			
+			g += "<image xlink:href='" + item.image_url + "' x='" + (width-item.width)/2 + "px' y='" + (height-item.height)/2 + "px' width='" + item.width + "px' height='" + item.height + "px' />";
+		}
+		
 		g += "<text x='" + x + "px' y='" + (y+20) + "px' text-anchor='middle'>" + item.label + "</text>";
 		g += "</g>";
+		g += "</svg>";
 		
-		svg += g;
-
-		x += padding;
+		g += "</div>";
+		
+		$("#legend").append( g );
+		
+		if( item.node_type )
+		{
+			$("#legend div:nth-child(" + (i+1) + ")").attr('data-node_type',item.node_type);
+			$("#legend div:nth-child(" + (i+1) + ")").on("mouseenter",function(){ graph.highlightNodeType( $(this).attr('data-node_type') ); } );
+			$("#legend div:nth-child(" + (i+1) + ")").on("mouseleave",function(){ graph.highlightNodeType(); } );
+		}
+		
+		if( item.tooltip )
+		{
+			$("#legend div:nth-child(" + (i+1) + ")").attr('title',item.tooltip);
+		}
 	}
 
-	svg += "</svg>";
+	$("#legend div").css("opacity",.5);
+	$("#legend div").on("mouseenter",function(){ $(this).css("opacity",1); } );
+	$("#legend div").on("mouseleave",function(){ $(this).css("opacity",.5); } );
 	
-	$("#legend").append( svg );
+	$("#legend div:nth-child(3)").on("mouseenter",function(e){ $('#gear,#help,#search,#theme_toggle').css('opacity',1);$("#settings").show(); });
+	$("#legend div:nth-child(1),#legend div:nth-child(2)").on("mouseenter",hideSettings);
+	$('#settings').on("mouseleave", hideSettings);
+
+	$('.legend_item').tipsy( { gravity: 's', offset: 0, opacity: 1} );
+
 	$("#legend").show();
+}
+
+function hideSettings()
+{
+	$('#gear,#help,#search,#theme_toggle').css('opacity',.5);
+	$("#settings").hide();
 }
 
 function hideNodeInfo()
@@ -738,52 +788,56 @@ var themeId;
 		
 		<div id="footer">
 			
-			<div style="width:150px">
+			<div id="settings">
 				
-				<div id="legend" class="legend"></div>
+				<div id="search" class="setting" title="Search">
+					<div id="icon_search" onclick="toggleSearch();"></div>
+				</div>
 				
-				<div id="search">
+				<div id="theme_toggle" class="setting" title="Lights">
+					<div id="icon_theme" onclick="javascript:toggleTheme()"></div>
+				</div>
+				
+				<div id="save" class="setting" title="Export">
 					
-					<div class="content">
-						
-						<div class="row">
-							<span>From:</span>
-							<input id="date_from" type="text" name="from" placeholder="From" style="display:inline-block" />
-						</div>
-						
-						<div class="row">
-							<span>To:</span>
-							<input id="date_to" type="text" name="to" placeholder="To" style="display:inline-block" />
-						</div>
-						
-						<div style="margin-top:5px">
-							<a href="#" onclick="javascript:doSearch()">Search</a>
-						</div>
-						
-					</div>
+					<form id="save_form" action="svg.php" method="POST" target="_blank" style="margin:0px;">
+						<input type="hidden" id="data" name="data"></input>
+						<div id="icon_save" onclick="javascript:save()"></div>
+					</form>
 					
 				</div>
 				
-				<div>
-					 
-					<div id="settings">
-						<a id="themeToggle" href="#" onclick="toggleTheme();return false;">Get the lights</a>, <a href="#" onclick="save();return false;">save</a>, <a href="#" onclick="toggleSearch();return false;">search</a>
-					</div>
-					
+				<div id="help" class="setting" title="Help">
+					<div id="icon_help"></div>
 				</div>
-				 
+				
 			</div>
-			 
+			<!-- end settings -->
+			
+			<div id="legend"></div>	
+			
 		</div>
+		<!-- end footer -->
 		
 	</div>
+	<!-- end foreground -->
 	
 	<canvas id="canvas" width="0px" height="0px"></canvas>	
 	
-	<form id="save_form" action="svg.php" method="POST" target="_blank">
-		<input type="hidden" id="data" name="data" />
-	</form>
-					
+	<div id="search_overlay">
+		
+		<div class="header">
+			<a href="#" onclick="javascript:toggleSearch();">Close</a>
+		</div>
+		
+		<div class="content">
+			<span>From:</span><input id="date_from" type="text" name="from" placeholder="From" style="display:inline-block" />
+			<span>To:</span><input id="date_to" type="text" name="to" placeholder="To" style="display:inline-block" />
+			<input type="button" value="Go" onclick="javascript:doSearch();" />
+		</div>
+		
+	</div>
+			
 </body>
 
 </html>
