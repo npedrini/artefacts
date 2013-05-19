@@ -1,6 +1,9 @@
 <?php
-include_once "db.class.php";
-include_once "logger.class.php";
+set_include_path("../");
+
+include_once "includes/db.class.php";
+include_once "includes/dream.class.php";
+include_once "includes/logger.class.php";
 include_once "includes/alchemy/module/AlchemyAPI.php";
 include_once "includes/alchemy/module/AlchemyAPIParams.php";
 
@@ -64,75 +67,63 @@ class Graph
     	$this->nodes[] = $root_node;
     	
 		//	GET ALL DREAMS FOR SPECIFIED DATE RANGE
-		$sql = "SELECT dreams.*, users.ip FROM `dreams` ";
-		$sql .= "LEFT JOIN `users` on dreams.user_id=users.id ";
+		$sql = "SELECT id FROM `dreams` ";
 		$sql .= "WHERE occur_date >= '" . $this->dateFrom . "' AND occur_date <= '" . $this->dateTo . "' ";
 		
 		$result = $this->db->query( $sql );
 		
 		if( $this->db->affected_rows > 0 )
 		{
-			while( $dream = $result->fetch_assoc() )
+			while( $row = $result->fetch_assoc() )
 			{
+				$dream = new Dream( $row['id'] );
 				$dream = (object)$dream;
-				$dream->tags = array();
+
+				$node = (object)array();
+				$node->age = $dream->age;
+				$node->city = $dream->city;
+				$node->color2 = $dream->color;
+				$node->color = 0x000000;
+				$node->description = $dream->description;
+				$node->gender = $dream->gender;
+				$node->node_type = self::TYPE_DREAM;
+				$node->index = count($this->nodes);
+				$node->tags = array();			
+				$node->title = $dream->title;
+				$node->value = 0;
 				
-				$sql  = "SELECT tags.tag,tags.id FROM `dream_tags` LEFT JOIN tags ON dream_tags.tag_id=tags.id ";
-				$sql .= "WHERE dream_tags.dream_id='" . $dream->id . "'";
-				
-				$result_tags = $this->db->query( $sql );
-				
-				$dream->node_type = self::TYPE_DREAM;
-				$dream->index = count($this->nodes);
-				$dream->value = 0;
-				$dream->color2 = $dream->color;
-				$dream->color = 0x000000;
-				$dream->tags = array();
-				
-				$this->dreams[] = $dream;
-				$this->nodes[]  = $dream;
-				
-				if( $this->db->affected_rows > 0 )
+				if( $dream->getImage() ) 
 				{
-					while( $t = $result_tags->fetch_assoc() ) 
+					$node->image_path = $dream->getImage()->getPath('med');
+					$node->thumb_path = $dream->getImage()->getPath('small');
+				}
+
+				if( $dream->getAudio() ) 
+				{
+					$node->audio_path = $dream->getAudio()->getPath();
+				}
+				
+				$this->dreams[] = $node;
+				$this->nodes[]  = $node;
+				
+				foreach($dream->tags as $tag)
+				{
+					$node->tags[] = $tag->tag;
+
+					if( self::SHOW_TAGS )
 					{
-						$dream->tags[] = $t['tag'];
-						
-						if( self::SHOW_TAGS )
+						if( isset($this->indexes['tags'][$tag->tag]) )
 						{
-							$tag = (object)$t;
-							
-							if( isset($this->indexes['tags'][$tag->tag]) )
-							{
-								$tag_node = $this->indexes['tags'][$tag->tag];
-							}
-							else
-							{
-								$this->indexes['tags'][$tag->tag] = $this->tags[] = $tag_node = (object)array('color'=>'#000000','id'=>$tag->id,'index'=>count($this->nodes),'node_type'=>'tag','tags'=>array(),'title'=>$tag->tag,'value'=>0);
-							}
+							$tag_node = $this->indexes['tags'][$tag->tag];
 						}
-						
-						$tag_node->value++;
+						else
+						{
+							$this->indexes['tags'][$tag->tag] = $this->tags[] = $tag_node = (object)array('color'=>'#000000','id'=>$tag->id,'index'=>count($this->nodes),'node_type'=>'tag','tags'=>array(),'title'=>$tag->tag,'value'=>0);
+						}
 					}
-				}
-				
-				//	create root_node<>dream link
-				/*
-				if( $root_node !=null 
-					&& $dream !=null )
-				{
-					$key = $root_node->index.'_'.$dream->index;
-					
-					if( !isset($this->keys[$key]) )
-					{
-						$this->links[] = (object)array('source'=>$root_node->index,'target'=>$dream->index,'value'=>1,'type'=>'artist_artwork');
 						
-						$this->keys[$key] = 1;
-						
-						$dream->value++;
-					}
+					$tag_node->value++;
 				}
-				*/
 
 				if( self::SHOW_ROOT 
 					&& isset($root_node) ) 
@@ -293,7 +284,7 @@ class Graph
 		foreach($this->nodes as $node)
 		{
 			if( $node->node_type == self::TYPE_TAG 
-				|| ($node->node_type == self::TYPE_DREAM && $node->ip == $_SERVER['REMOTE_ADDR']) )
+				|| ($node->node_type == self::TYPE_DREAM && (isset($node->ip) && $node->ip == $_SERVER['REMOTE_ADDR'])) )
 				$node->stroke = true;
 			else
 				$node->stroke = $node->strokeContrast = isset($node->color2) ? (hexdec(preg_replace("/#/","0x",$node->color2)) < 0x666666 ? true : false) : false;

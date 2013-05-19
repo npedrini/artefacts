@@ -83,16 +83,14 @@ function Graph (d3)
 			d.x = d.px = x;
 			d.y = d.py = y;
 			
-			/*
-			if( d.node_type == this.TYPE_ARTWORK
-				&& d.image )
+			if( d.thumb_path )
 			{
 				thumbNodes.push( d );
 			}
-			*/
 		}
 		
-		/*
+		var self = this;
+		
 		$(thumbNodes).each
 		(
 			function()
@@ -107,23 +105,20 @@ function Graph (d3)
 						
 						for(var i=0;i<thumbNodes.length;i++)
 						{
-							if( thumbNodes[i].image.replace(/_lg/,'_sm') == src )
+							if( thumbNodes[i].thumb_path == src )
 							{
-								positionNodeTip( thumbNodes[i] );
+								self.positionNodeTip( thumbNodes[i] );
 							}
 						}
 					}
-				)[0].src = "images/artworks/" + this.image.replace(/_lg/,'_sm');
+				)[0].src = this.thumb_path;
 			}
 		);
-    	*/
     	
 		var root = graph.nodes[0];
 		root.x = this.w/2;
 		root.y = this.h/2;
 		root.fixed = true;
-		
-		var self = this;
 		
 		this.rootNode = root;
 		
@@ -419,26 +414,32 @@ function Graph (d3)
 		return 0;
 	};
 
-	this.nodeTitle = function(d,expanded)
+	this.nodeTitle = function(d,isTooltip)
 	{
-		expanded = expanded || false;
+		isTooltip = isTooltip || false;
+		
+		var title = d.title ? d.title : ( d.description != null ? d.description.substr( 0, d.description.indexOf('.')+1 ) : '' );
 		
 		if( d.node_type==this.TYPE_ARTIST )
-			return d.artist;
+		{
+			title = d.artist;
+		}
 		else if( d.node_type==this.TYPE_ARTWORK )
 		{
-			var thumb = d.image.replace(/_lg/,'_sm');
-			var title = '<div style="margin-bottom:5px">' + d.title + '</div>';
-			title += expanded?'<img onerror="$(this).hide();" src="images/artworks/' + thumb + '"/>':'';
-			
-			return title;
+			title = '<div style="margin-bottom:5px">' + d.title + '</div>';
 		}
 		else if( d.node_type==this.TYPE_TAG ) 
-			return d.title;
+		{
+			title = d.title;
+		}
 		else if( d.node_type==this.TYPE_DREAM )
-			return (expanded?'DREAM: ':'') + (d.title ? d.title : ( d.description != null ? d.description.substr( 0, d.description.indexOf('.')+1 ) : '' ) );
+		{
+			title = (isTooltip?'DREAM: ':'') + (d.title ? d.title : ( d.description != null ? d.description.substr( 0, d.description.indexOf('.')+1 ) : '' ) );
+		}
 		
-		return d.description.substr( 0, d.description.indexOf('.')+1 );
+		title += isTooltip && d.thumb_path != undefined ? '<img onerror="$(this).hide();" src="' + d.thumb_path + '"/>' : '';
+		
+		return title;
 	};
 
 	this.nodeFillOpacity = function(d,defaultAlpha)

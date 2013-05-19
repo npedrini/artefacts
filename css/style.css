@@ -18,6 +18,7 @@ form .help { position: absolute; font-size: .7em; color: #666; font-weight: norm
 
 form .module .body { padding-top: 20px; margin-bottom: 40px; border: none; }
 form .row { margin-bottom: 20px; }
+form .row label { display: block; }
 
 button, input[type=button], input[type=submit] 
 {

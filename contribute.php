@@ -2,14 +2,9 @@
 include_once "config/config.php";
 include_once "includes/db.class.php";
 include_once "includes/dream.class.php";
+include_once "includes/media.class.php";
 
-/*
-echo "<pre>";
-print_r($_POST);
-echo "</pre>";
-*/
-
-session_start();
+if( !isset($_SESSION) ) session_start();
 
 $database = new Database();
 $dream = new Dream();
@@ -29,7 +24,7 @@ $date->sub( new DateInterval("P01D") );
 
 $dream->alchemyApiKey = ALCHEMY_API_KEY;
 $dream->dateFormat = $date_format;
-$dream->origin = $_SESSION['origin'];
+$dream->origin = isset($_SESSION['origin'])?$_SESSION['origin']:null;
 $dream->postToTumblr = POST_TO_TUMBLR;
 $dream->timezone = TIME_ZONE;
 $dream->tumblrPostEmail = TUMBLR_POST_EMAIL;
@@ -67,7 +62,7 @@ if( !isset($_SESSION['submission']) )
 if( isset($_POST['submit']) )
 {
 	//	set values to what user submitted in case there are errors
-	$dream->setValues( $_POST, isset($_FILES['file'])?$_FILES['file']:null );
+	$dream->setValues( $_POST, isset($_FILES['image_file'])?$_FILES['image_file']:null, isset($_FILES['audio_file'])?$_FILES['audio_file']:null );
 	
 	//	enable all form fields in case there are errors
 	$disable_fields = false;
@@ -78,7 +73,7 @@ if( isset($_POST['submit']) )
 	if( DEBUG )
 	{
 		echo "<pre>";
-		print_r( $dream->logger->log );
+		print_r( $dream->getLog() );
 		echo "</pre>";
 	}
 	
@@ -89,9 +84,7 @@ if( isset($_POST['submit']) )
 		//	validation error
 		$dream->setValues( $_POST );
 		
-		//if( isset($dream_id) ) $dream->id = $dream_id;
-		
-		if( !isset($status) ) $status = "Please complete all the fields";
+		if( !isset($status) ) $status = "Oops! Something went wrong.";
 	}
 	else
 	{
@@ -174,7 +167,7 @@ var tagTimer;
 			
 			<div id="status" style="display:<?php echo isset($status)&&$status!=''?'block':'none';?>"><?php echo isset($status)?$status:null; ?></div>
 			
-			<form method="post" enctype="multipart/form-data">
+			<form method="post" enctype="multipart/form-data" accept-charset="UTF-8">
 				
 				<input type="hidden" name="id" value="<?php echo isset($dream->id)?$dream->id:''; ?>"  />
 				
@@ -218,18 +211,25 @@ var tagTimer;
 						<div class="row">
 							<label for="file">An image of your dream</label>
 							<input 
-								id="file" type="file" name="file" class="big"
-								rel="tooltip" title=".jpg, .png or .gif under <?php echo ($dream->max_bytes/1024/1024); ?>MB" style="width:200px" />
+								id="file" type="file" name="image_file" class="big"
+								rel="tooltip" title=".jpg, .png or .gif under <?php echo (Media::MAX_BYTES/1024/1024); ?>MB" style="width:200px" />
+						</div>
+						
+						<div class="row">
+							<label for="file">A recording of your dream</label>
+							<input 
+								id="file" type="file" name="audio_file" class="big"
+								rel="tooltip" title=".mp3 under <?php echo (Media::MAX_BYTES/1024/1024); ?>MB" style="width:200px" />
 						</div>
 						
 						<?php 
 					
-					$sql = "SELECT * FROM feelings ORDER BY feeling";
-					$result = $database->query( $sql );
+						$sql = "SELECT * FROM feelings ORDER BY feeling";
+						$result = $database->query( $sql );
 					
-					if( $database->affected_rows > 0 ) {
+						if( $database->affected_rows > 0 ) {
 
-					?>
+						?>
 						<div class="row">
 							<label for="file">What you felt in your dream</label>
 							
@@ -268,7 +268,7 @@ var tagTimer;
 									id="age" class="big" type="text" name="age"
 									placeholder=""
 									value="<?php echo $dream->age; ?>" 
-									rel="tooltip" title="" style="width:30px" />
+									rel="tooltip" title="" style="width:50px" />
 							</div>
 						</div>
 						

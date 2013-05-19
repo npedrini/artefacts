@@ -1,5 +1,6 @@
 <?php
 include_once "config/config.php";
+include_once 'includes/dream.class.php';
 include_once 'includes/session.php';
 
 $date_format = DATE_FORMAT;
@@ -17,11 +18,8 @@ $filters = array();
 
 if( isset($_GET['did']) )
 {
-	$sql  = "SELECT * FROM `dreams` ";
-	$sql .= "WHERE id = '" . $mysqli->real_escape_string( $_GET['did'] ) . "'";
-	
-	$result = $mysqli->query( $sql );
-	
+	$dream = new Dream( $_GET['did'] );
+
 	if( $mysqli->affected_rows > 0 )
 	{
 		$dream = $result->fetch_assoc();
@@ -315,15 +313,18 @@ form input[type=text], form textarea { padding: .5em; outline-width: 0; }
 		
 		if( isset($dream) )
 		{
-			$date = new DateTime( $dream['occur_date'], new DateTimeZone('Australia/Melbourne') );
+			$image = $dream->getImage();
+			$audio = $dream->getAudio();
+
+			$date = new DateTime( $dream->occur_date, new DateTimeZone(TIME_ZONE) );
 			
 			echo $nl."<div class='module'>";
 			
 			echo $nl."\t<div class='header'>";
 			
-			if( isset($dream['title']) ) 
+			if( isset($dream->title) ) 
 			{
-				echo $nl."\t\t<div class='title'>" . $dream['title'] . "</div>";
+				echo $nl."\t\t<div class='title'>" . $dream->title . "</div>";
 				echo $nl."\t\t<div class='subtitle'>".$date->format('d F, Y')."</div>";
 			}
 			else
@@ -333,16 +334,18 @@ form input[type=text], form textarea { padding: .5em; outline-width: 0; }
 			
 			echo $nl."\t</div>";
 			
-			echo $nl."\t<div class='body'>";
-			echo $nl."\t\t<div style='font-size:1em;line-height:1.8em;'>".stripslashes(nl2br($dream['description']))."</div>";
-			echo $nl."\t</div>";
+			if( $audio != null ) echo $nl."\t<audio controls='controls' preload='auto' style='margin: 15px;'><source src='" . $audio->getPath() . "'></audio>";
 			
-			if( $dream['image'] != '' && $dream['image'] != undefined ) echo $nl."\t<img style='margin: 15px;' src='" . (IMAGE_PATH . $dream['image']) . "' />";
+			echo $nl."\t<div class='body'>";
+			echo $nl."\t\t<div style='font-size:1em;line-height:1.8em;'>".stripslashes(nl2br($dream->description))."</div>";
+			echo $nl."\t</div>";
+
+			if( $image != null ) echo $nl."\t<img style='margin: 15px;' src='" . $image->getPath('med') . "' />";
 			
 			echo $nl."\t<div class='footer'>";
 			
 			$tags = array();
-			foreach($dream['tags'] as $tag) $tags[] = "<a href='browse.php?search=".$tag['tag']."'>".$tag['tag']."</a>";
+			foreach($dream->tags as $tag) $tags[] = "<a href='browse.php?search=".$tag->tag."'>".$tag->tag."</a>";
 			
 			echo $nl."\t\t<div class='footer'>associations: " . implode( ', ' , $tags ) . "</div>";
 			
@@ -428,7 +431,6 @@ form input[type=text], form textarea { padding: .5em; outline-width: 0; }
 					}
 				
 					$title_description = implode( ' ', array_splice( explode( ' ', $dream['description'] ), 0, 10 ) ) . '...';
-					$title_description = substr( $title_description, 0, strpos($title_description,'.')+1 );
 				
 					$title = isset($dream['title']) && !empty($dream['title']) ? $dream['title'] : $title_description;
 				

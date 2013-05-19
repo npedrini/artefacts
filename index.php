@@ -462,10 +462,15 @@ function onGraphZoomInStart( node )
 		else
 			node_info += "Dreamt on " + graph.currentDateFrom + " by a " + node.age + " year old " + (node.gender == "male" ? "man" : "woman") + " in <a href='" + map_url + "' target='_blank'>" + node.city + "</a>";
 		node_info += "</div>";
+
+		if( node.audio_path != null )
+		{
+			node_info += "<audio controls='controls' preload='auto' style='margin: 15px;'><source src='" + node.audio_path + "'></audio>";
+		}
 		
 		node_info += "<div>" + stripslashes(description) + "</div>";
 		
-		if( node.image != '' && node.image != undefined ) node_info += "<img style='margin-top: 15px;' src='<?php echo IMAGE_PATH; ?>" + node.image + "' />";
+		if( node.image_path != '' && node.image_path != undefined ) node_info += "<img style='margin-top: 15px;' src='" + node.image_path + "' />";
 		
 		node_info += "</div>";
 		
