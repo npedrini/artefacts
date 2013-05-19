@@ -27,7 +27,9 @@ echo $graph->render();
 if( isset($_SESSION['submission'])
 	&& $_SESSION['submission'] == 1 )
 {
-	$dream = (object)array('id'=>'-1', 'user_id'=>'-1', 'description'=>'Your dream here', 'color'=>$graph->highlightColor, 'color2'=>$graph->highlightColor, 'index'=>$graph->getNodeCount(), 'interactive'=>false, 'node_type'=>'dream', 'tags'=>array(), 'value'=>0);
+	$highlightColor = "#cc3300";
+
+	$dream = (object)array('id'=>'-1', 'user_id'=>'-1', 'description'=>'Your dream here', 'color'=>$highlightColor, 'color2'=>$highlightColor, 'index'=>$graph->getNodeCount(), 'interactive'=>false, 'node_type'=>'dream', 'tags'=>array(), 'value'=>0);
 	
 	$dreams[] = $dream;
 	$nodes[] = $dream;
