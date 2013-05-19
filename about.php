@@ -205,34 +205,11 @@ var cid;
 			<div id="status" style="display:<?php echo isset($status)&&$status!=''?'block':'none';?>"><?php echo isset($status)?$status:null; ?></div>
 			
 			<div id='question-about' class='section'>
-				
-				<div style="font-size:.7em;margin-bottom:20px;">
-				
-					<b>Artefact / Artifact</b>, <i>n</i>
-					
-					<ul>
-						<li>anything created by humans which gives information about the culture of its creator and users</li>
-						<li>a product of individuals or groups (social beings) or of their social behavior</li>
-						<li>an object in a digital environment</li>
-					</ul>
-					
-					<br/>
-					
-					<b>Collective unconscious</b>, <i>n</i>
-					
-					<ul>
-						<li>A part of the unconscious mind, expressed in humanity and all life forms with nervous systems, which describes how the structure of the psyche autonomously organizes experience.</li>
-					</ul>
-					
-				</div>
-				
+				 
 				<p><span class="emphasized">Artefacts of the Collective Unconscious</span> is an ongoing digital collection of data about dreams, to which anyone is free to browse or contribute. The collection is inspired by the concept of <a href='http://en.wikipedia.org/wiki/Social_dreaming' target='_blank'>social dreaming</a>: the idea that dreams can tell us not just about the individual dreamer, but about our collective experience of the world: that by sharing dreams we create pictures and patterns that can illuminate concerns and hopes about about our future together.</p>
-
 				<p>As well as collecting and collating dream data, we represent the data in visual form using what we have called an 'oneirogram'. This is a force diagram which uses the <a href='http://www.alchemyapi.com/' target='_blank'>AlchemyAPI</a>'s natural language processor to analyse themes and concepts in the dream text.</p>
-
 				<p>In the future, we aim to allow integration of dream data with other applications and platforms which are used to record and store dreams.</p>
-
-				<p>Curators: <a href='http://www.createassociate.com.au/' target='_blank'>David Patman</a> and <a href='http://www.looklisten.net/' target='_blank'>Noah Pedrini</a></p>
+				<p>Curators: <a href='http://www.createassociate.com.au/' target='_blank'>David Patman</a> and <a href='http://www.looklisten.net/' target='_blank'>Noah Pedrini</a><br/><a class='x-small' style='margin-top:10px;' href='javascript:show("faq")'>Want to know more?</a></p>
 				
 			</div>
 			
@@ -247,7 +224,8 @@ var cid;
 				
 				<div>
 					<div class='question'>Isn't my dream just about me?</div>
-					<div class='answer'><p>Part of your dream is likely to be about your personal experience that is unique to you, and only you will be able to understand that part. However, part of your dream will also be about the experiences that you share with other people: e.g. your family, your friends, colleagues. We hope that by looking at lots of dreams that we'll be able to see common themes and patterns emerge.</p>
+					<div class='answer'>
+						<p>Part of your dream is likely to be about your personal experience that is unique to you, and only you will be able to understand that part. However, part of your dream will also be about the experiences that you share with other people: e.g. your family, your friends, colleagues. We hope that by looking at lots of dreams that we'll be able to see common themes and patterns emerge.</p>
 					</div>
 				</div>
 				
@@ -255,11 +233,8 @@ var cid;
 					<div class='question'>What is an oneirogram?</div>
 					<div class='answer'>
 						<p>We invented what we call an oneirogram as a way to visualise connections between the text record of dreams and a computer-generated 'collective dream'.</p>
-
 						<p>The collective dream appears as the central node and is created in real-time from the text of dreams displayed for the user-selected date range. For each dream, the number of sentences extracted and the decision of which sentences to take is based on a uniformly-applied set of rules.</p>
-
 						<p>The connections between dreams are made using the free AlchemyAPI natural language processor. Alchemy analyses a text string and identifies concept tags using algorithms and a lexical database. Connections, or 'edges', are drawn from a dream 'node' (solid colour) to a node representing the Alchemy tag (dotted outline). The size of each node is proportional to the number of connections. Thus, dreams and tags which are most 'influential' are shown as more prominent in the oneirogram.</p>
-
 						<p>The oneirogram can currently show dreams for specific date ranges, and we will add functionality so that users can select locations, tags and other data.</p>
 					</div>
 				</div>
@@ -298,7 +273,15 @@ var cid;
 						<p>When a user submits a dream and other information on Artefacts, we store it in a MySQL database along with other data we automatically collect, such as geo-location based on IP address. We also analyse the dream text using the free <a href="http://www.alchemyapi.com" target="_blank">AlchemyAPI</a> natural language processor and store the returned concept tags.</p>
 						<p>When a user chooses paramaters for the visualisation (e.g. date range), we use an algorithm to generate a 'collective dream' in real time, which is also analysed using Alchemy. Using the stored tags, we create a JSON file representing node-link relationships between all of the dreams. This data file is then used to drive the visualization.</p>
 						<p>The visualization itself is a force-directed layout built using the <a href="http://d3js.org/" target="_blank">D3js</a> javascript library, and the image export feature leverages the canvg library. A few of the other javascript libraries we use include jQuery, jQuery UI, and tipsy.</p>
-						<p>A big thank you to thank the development communities who made and contributed to all of these great open-source projects, as well as the designers over at <a href="http://thenounproject.com/" target="_blank">The Noun Project</a> for letting us use a few of their icons.</p>
+					</div>
+				</div>
+				
+				<div>
+					<div class='question'>Whose behind it?</div>
+					<div class='answer'>
+						<p><a href='http://www.createassociate.com.au/' target='_blank'>David Patman</a> is an engineer, social theorist and management consultant specialising in the study of unconscious group and organizational dynamics. David uses creative and associative techniques to help client groups become aware of and manage the underlying pressures that affect how they go about their work. David has a keen interest in how the spread of electronic communication technologies is changing what organizations need to do in order to survive and thrive. David divides his time between Melbourne, Australia and Hobart, where he grew up within cooee of MONA.</p>
+						<p><a href='http://www.looklisten.net/' target='_blank'>Noah Pedrini</a> is a digital artist interested in exploring the changing face of community and the self in contemporary society. Anthroposts, a net art installation featuring found notes and the recordings of crowd-sourced workers reading them, was a finalist in the Venice-based Arte Laguna awards, and has been recognized by Communication Arts and other leaders in design and data visualization. His projects have been used in course materials for schools including the Maryland Institute of Art and UNC Chapel Hill He currently resides in Brooklyn, NY.</p>
+						<p>We would like to thank the development communities who contributed to the open-source projects used in this project. We'd also like to thank and Henry Ryder and the rest of the designers at <a href="http://thenounproject.com/" target="_blank">The Noun Project</a> for letting us use their icons.</p>
 					</div>
 				</div>
 				
