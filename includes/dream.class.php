@@ -304,7 +304,7 @@ class Dream extends DBObject
 				try
 				{
 					$result = $alchemy->keywords( 'text', $this->description, $params );
-					$this->logger->log( "alchemy " . $result['status'] . ", " . count($result['keywords']) . " keywords, " . $this->description );
+					$this->logger->log( "alchemy " . $result['status'] . ", " . (isset($result['keywords'])?count($result['keywords']):0) . " keywords, " . $this->description );
 				}
 				catch(Exception $e)
 				{
