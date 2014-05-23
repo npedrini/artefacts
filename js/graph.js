@@ -17,6 +17,9 @@ function Graph (d3)
 	this.zoomed = false;
 	this.zooming = false;
 	this.higlightedNodeType = null;
+	this.dateFormat = "mm/dd/yy";
+	
+	this.ringIntervals = {};
 	
 	this._events = {};
 	
@@ -39,10 +42,10 @@ function Graph (d3)
 			.attr("height", "100%")
 			.attr("viewBox", "0 0 " + this.w + " " + this.h);
 	
-	  	var url = "json/graph.json.php?date_from="+dateFrom+"&date_to="+dateTo;
+	  	var url = "api/graph/?date_from="+dateFrom+"&date_to="+dateTo;
 	  	var self = this;
 	  	
-	  	this.d3.json(url, function(error,graph){ self.loadComplete(error,graph); } );
+	  	this.d3.json(url, function(error,response){ self.loadComplete(error,response.result); } );
 	};
 	
 	this.loadComplete = function(error, graph)
@@ -58,7 +61,14 @@ function Graph (d3)
 		y_pos.domain([0,graph.nodes.length]);
 		
 		thumbNodes = [];
-		thumbnails = [];
+		soundEffectNodes = [];
+		
+		soundEffects = [];
+		
+		this.currentDateFrom = graph.date_from;
+		this.currentDateTo = graph.date_to;
+		
+		var nodesIndexed = {};
 		
 		//	set initial node positions from title for consistent layout
 		for(var i=1;i<graph.nodes.length;i++) 
@@ -87,7 +97,16 @@ function Graph (d3)
 			{
 				thumbNodes.push( d );
 			}
+			
+			if( d.soundeffect_path )
+			{
+				soundEffectNodes.push( d );
+			}
+			
+			nodesIndexed[ d.index ] = d;
 		}
+		
+		this.nodesIndexed = nodesIndexed;
 		
 		var self = this;
 		
@@ -99,13 +118,9 @@ function Graph (d3)
 				(
 					function(e)
 					{
-						var src = e.target.src;
-						src = src.substr( src.lastIndexOf('/')+1 );
-						thumbnails.push( src );
-						
 						for(var i=0;i<thumbNodes.length;i++)
 						{
-							if( thumbNodes[i].thumb_path == src )
+							if( thumbNodes[i].thumb_path == e.target.src )
 							{
 								self.positionNodeTip( thumbNodes[i] );
 							}
@@ -114,7 +129,46 @@ function Graph (d3)
 				)[0].src = this.thumb_path;
 			}
 		);
+		
+		$(soundEffectNodes).each
+		(
+			function()
+			{
+				var id = this.soundeffect_path;
+				var audioElement = $("#audio_" + id);
+				
+				if( !audioElement.length )
+				{
+					var path = "assets/audio/" + id + ".mp3";
+					
+					audioElement = $('<audio/>').attr("id","audio_" + id).attr("src",path).prop("volume",0.1);
+					
+					$('body').append(audioElement);
+				}
+			}
+		);
     	
+		var nodeChildren = {};
+		
+		for(var l in graph.links)
+		{
+			var link = graph.links[l];
+			
+			if( !nodeChildren[link.source] )
+				nodeChildren[link.source] = [];
+			
+			if( !nodeChildren[link.target] )
+				nodeChildren[link.target] = [];
+			
+			if( nodeChildren[link.source].indexOf(link.target) == -1 )
+				nodeChildren[link.source].push(link.target);
+			
+			if( nodeChildren[link.target].indexOf(link.source) == -1 )
+				nodeChildren[link.target].push(link.source);
+		}
+		
+		this.nodeChildren = nodeChildren;
+		
 		var root = graph.nodes[0];
 		root.x = this.w/2;
 		root.y = this.h/2;
@@ -244,7 +298,7 @@ function Graph (d3)
 	};
 	
 	this.showNodeByIndex = function(index){ this.showNode( this.nodes[index] ); };
-	this.showNode = function(d){ this.zoom(d); };
+	this.showNode = function(d){ this.quiet(); this.zoom(d); };
 	
 	/**
 	 * Internal event handlers
@@ -337,6 +391,7 @@ function Graph (d3)
 		if( this.node != undefined ) 
 		{
 			this.vis.select('[id=node_'+this.node.index+']').style("fill", self.nodeColor(self.node) );
+			this.node = undefined;
 		}
 		
 		this.force.alpha( .3 );
@@ -345,6 +400,8 @@ function Graph (d3)
 	this.onNodeOver = function (d,s)
 	{
 		if( this.zooming || this.zoomed || this.dragging ) return;
+		
+		this.dispatchEvent( "nodeRollOver", [d] );
 		
 		if( !this.zoomed ) this.forceAlpha = this.force.alpha();
 		
@@ -357,6 +414,8 @@ function Graph (d3)
 			this.vis.select('[id=node_'+d.index+']').style("fill", d.color2);
 		}
 		
+		this.reverberate(d);
+		
 		var self = this;
 		
 		this.vis.selectAll("line").style("stroke-opacity", function(d){ return self.linkOpacityOver(d); } );
@@ -366,6 +425,8 @@ function Graph (d3)
 	{
 		if( this.zooming || this.zoomed || this.dragging ) return;
 		
+		this.dispatchEvent( "nodeRollOut", [d] );
+		
 		this.hoverNode = null;
 		
 		this.vis.select('[id=node_'+d.index+']').style("fill", this.nodeColor(d) );
@@ -373,6 +434,7 @@ function Graph (d3)
 		if( !this.zoomed ) this.force.alpha( this.forceAlpha > .05 ? this.forceAlpha : .1 );
 		
 		var self = this;
+		
 		this.vis.selectAll("line").style("stroke-opacity", function(d){ return self.linkOpacity(d); } );
 	};
 
@@ -388,6 +450,108 @@ function Graph (d3)
 		}
 		
 		this.showNode(d);
+	};
+	
+	this.reverberate = function (d,nodes)
+	{
+		nodes = nodes || this.graph.nodes.slice();
+		
+		if( !d )
+		{
+			var index = Math.floor(Math.random() * nodes.length);
+			
+			d = nodes[ index ];
+			
+			nodes.splice(index,1);
+			
+			if( !$("#audio_" + d.soundeffect_path).length
+				&& nodes.length ) 
+				return this.reverberate(null,nodes);
+		}
+		
+		this.pluck(d);
+		
+		if( this.nodeChildren[d.index] )
+		{
+			var self = this;
+			
+			$.each
+			(
+				this.nodeChildren[d.index],
+				function(i,nodeIndex)
+				{
+					setTimeout
+					(
+						function()
+						{
+							self.pluck(self.nodesIndexed[nodeIndex]);
+						}
+						,(i+1)*500
+					);
+				}
+			);
+		}
+	};
+	
+	this.pluck = function(d)
+	{
+		if( !d ) return;
+		
+		var hasAudio = $("#audio_" + d.soundeffect_path).length;
+		if( !hasAudio ) return;
+		
+		var self = this;
+		
+		if( this.ringIntervals[ d.index ] )
+			clearInterval( this.ringIntervals[ d.index ].interval );
+		
+		this.ringIntervals[ d.index ] = {count:1,interval:setInterval( function() { self.echo(d,self); },150 )};
+		
+		this.echo(d,self);
+		
+		//	play sound
+		$("#audio_" + d.soundeffect_path )[0].src = $("#audio_" + d.soundeffect_path )[0].src;
+		$("#audio_" + d.soundeffect_path )[0].play();
+		
+		this.force.alpha( this.forceAlpha > .05 ? this.forceAlpha : .05 );
+	};
+	
+	this.echo = function(d,self)
+	{
+		var node = self.vis.select('[id=node_'+d.index+']');
+		var circle = node.select("circle.outer");
+		var radius = parseFloat(circle.attr("r"));
+		
+		var def = self.ringIntervals[ d.index];
+		
+		if( d == this.node || def.count >= Math.round(radius) )
+			return clearInterval( def.interval );
+		
+		self.d3.select("svg")
+			.append("circle")
+				.attr("class","ring")
+				.attr("r",radius)
+				.attr("transform",node.attr("transform"))
+				.style("fill-opacity",0)
+				.style("stroke", circle.style("stroke") )
+				.style("stroke-opacity",1)
+				.style("pointer-events","none")
+			.transition()
+				.ease("linear")
+				.duration(2000)
+				.attr("r",radius*radius*2)
+				.style("stroke-opacity",0)
+				.remove();	
+		
+		def.count++;
+	};
+	
+	this.quiet = function()
+	{
+		for(var i in this.ringIntervals)
+			clearInterval( this.ringIntervals[i].interval );
+		
+		this.d3.selectAll(".ring").remove();
 	};
 	
 	/**
@@ -434,7 +598,18 @@ function Graph (d3)
 		}
 		else if( d.node_type==this.TYPE_DREAM )
 		{
-			title = (isTooltip?'DREAM: ':'') + (d.title ? d.title : ( d.description != null ? d.description.substr( 0, d.description.indexOf('.')+1 ) : '' ) );
+			var dateString;
+			
+			if( d.occur_date )
+			{
+				var occurDate = d.occur_date.split('-');
+				dateString = DATE_FORMAT
+					.replace( /{{date}}/, occurDate[2] )
+					.replace( /{{month}}/, occurDate[1] - 1 )
+					.replace( /{{year}}/, occurDate[0] );
+			}
+			
+			title = (isTooltip?'DREAM' + (dateString ? ' (' + dateString + ')' : '' ) + ': ' : '') + (d.title ? d.title : ( d.description != null ? d.description.substr( 0, d.description.indexOf('.')+1 ) : '' ) );
 		}
 		
 		title += isTooltip && d.thumb_path != undefined ? '<img onerror="$(this).hide();" src="' + d.thumb_path + '"/>' : '';
@@ -541,7 +716,4 @@ function Graph (d3)
 			tip.css('top',d.fisheye?d.fisheye.y - (d.fisheye.z * this.nodeRadius(d)) - inner.offsetHeight - 20:(d.y - this.nodeRadius(d)) - inner.offsetHeight - 20);
 		}
 	};
-	
-	
-	
 };

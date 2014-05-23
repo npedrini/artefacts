@@ -1,13 +1,12 @@
 <?php
+session_start();
+
 include_once "config/config.php";
 include_once "includes/db.class.php";
 include_once "includes/dream.class.php";
 include_once "includes/media.class.php";
 
-if( !isset($_SESSION) ) session_start();
-
-$database = new Database();
-$dream = new Dream();
+$formDatabase = new Database();
 
 //	set up 'tour not found' text, appending tag artwork call to action
 $errorText = "<p>Oops, we had trouble locating your tour information. Please make sure you correctly typed the email address you used when recording your tour via The O. We use this only to link your dream to your tour information, and it will not be disclosed to anyone.</p>";
@@ -22,14 +21,16 @@ $date_format = preg_replace( '/{{year}}/', 'Y', $date_format );
 $date = new DateTime( 'now', new DateTimeZone( TIME_ZONE ) );
 $date->sub( new DateInterval("P01D") );
 
-$dream->alchemyApiKey = ALCHEMY_API_KEY;
-$dream->dateFormat = $date_format;
-$dream->origin = isset($_SESSION['origin'])?$_SESSION['origin']:null;
-$dream->postToTumblr = POST_TO_TUMBLR;
-$dream->timezone = TIME_ZONE;
-$dream->tumblrPostEmail = TUMBLR_POST_EMAIL;
+$dreamDefault = new Dream();
+$dreamDefault->alchemyApiKey = ALCHEMY_API_KEY;
+$dreamDefault->dateFormat = $date_format;
+$dreamDefault->origin = isset($_SESSION['origin'])?$_SESSION['origin']:null;
+$dreamDefault->postToTumblr = POST_TO_TUMBLR;
+$dreamDefault->timezone = TIME_ZONE;
+$dreamDefault->tumblrPostEmail = TUMBLR_POST_EMAIL;
+$dreamDefault->date = $date->format($date_format);
 
-if( DEBUG )
+if( false )
 {
 	$testValues = array
 	(
@@ -44,12 +45,10 @@ if( DEBUG )
 		'title' => 'me and mark'
 	);
 	
-	$dream->setValues( $testValues );
+	$dreamDefault->setValues( $testValues );
 }
-else
-{
-	$dream->date = $date->format($date_format);
-}
+
+$dream = $dreamDefault;
 
 //	whether or not to disable fields other than those related to tour retrieval
 $disable_fields = true;
@@ -58,33 +57,88 @@ $disable_fields = true;
 if( !isset($_SESSION['submission']) )
 	$_SESSION['submission'] = 1;
 
+$formData = EMBEDDED ? $_GET : $_POST;
+
 //	process form submit
-if( isset($_POST['submit']) )
+if( isset($formData['submit']) )
 {
-	//	set values to what user submitted in case there are errors
-	$dream->setValues( $_POST, isset($_FILES['image_file'])?$_FILES['image_file']:null, isset($_FILES['audio_file'])?$_FILES['audio_file']:null );
+	$path = parse_url($_SERVER["REQUEST_URI"]);
+	
+	$url = "http://" . $_SERVER['HTTP_HOST'] . (isset($path['path']) ? substr($path['path'],0,strrpos($path['path'],'/')) : '') . "/api/dream/".(isset($formData['id'])?$formData['id']:'');
+	
+	foreach($_FILES as $key=>$file)
+		if( $file['tmp_name'] )
+			$formData[$key] = '@' . $file['tmp_name'] . ';filename=' . $file['name'] . ';type=' . $file['type'];
+	
+	$curl = curl_init();
+	
+	curl_setopt($curl, CURLOPT_POST, 1);
+	curl_setopt($curl, CURLOPT_POSTFIELDS, $formData);
+	curl_setopt($curl, CURLOPT_URL, $url);
+	curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+	
+	$response = curl_exec($curl);
+	
+	if ($response === false) 
+	{
+		$info = curl_getinfo($curl);
+		
+		curl_close($curl);
+		
+		$status = "Oops, something went wrong.";
+	}
+	else
+	{
+		$response = (object)json_decode($response);
+		
+		curl_close($curl);
+	}
 	
 	//	enable all form fields in case there are errors
 	$disable_fields = false;
 	
 	//	save
-	$success = $dream->save();
+	$success = $response->success;
 	
-	if( DEBUG )
+	if( !$success && isset($response->error) )
+		$status = $response->error;
+	
+	if( isset($response->result) )
+		$dream = $response->result;
+	
+	if( EMBEDDED )
 	{
-		echo "<pre>";
-		print_r( $dream->getLog() );
-		echo "</pre>";
-	}
+		if( !$success )
+		{
+			if( !$status )
+				$status = $response->error ? $response->error : "There were problems with your submission.";
+			
+			echo $status . " Click <a href='javascript:window.history.back()'>here</a> to go back.";
+		}
+		else
+		{
+			if( isset($formData['redirect_url']) )
+			{
+				header("Location: " . urldecode($formData['redirect_url']) );
+			}
+			else
+			{
+				echo "Your dream was submitted";
+			}
+		}
 	
-	$status = $dream->status;
+		die();
+	}
 	
 	if( !$success )
 	{
-		//	validation error
-		$dream->setValues( $_POST );
+		$dream = $dreamDefault;
 		
-		if( !isset($status) ) $status = "Oops! Something went wrong.";
+		//	validation error
+		$dream->setValues( $formData );
+		
+		if( !isset($status) ) 
+			$status = "Oops! Something went wrong.";
 	}
 	else
 	{
@@ -92,6 +146,7 @@ if( isset($_POST['submit']) )
 		
 		$disable_fields = true;
 		$date = DateTime::createFromFormat( $date_format, $dream->date, new DateTimeZone(TIME_ZONE) ); 
+		$status = "Your dream was submitted";
 		
 		header("Location: index.php?status=".$status."#".$date->format('j/n/Y'));
 	}
@@ -221,37 +276,6 @@ var tagTimer;
 								id="file" type="file" name="audio_file" class="big"
 								rel="tooltip" title=".mp3 under <?php echo (Media::MAX_BYTES/1024/1024); ?>MB" style="width:200px" />
 						</div>
-						
-						<?php 
-					
-						$sql = "SELECT * FROM feelings ORDER BY feeling";
-						$result = $database->query( $sql );
-					
-						if( $database->affected_rows > 0 ) {
-
-						?>
-						<div class="row">
-							<label for="file">What you felt in your dream</label>
-							
-							<div>
-								<div class="column">
-								<?php 
-							$n = $database->affected_rows;
-							$i=0;
-							
-							while( $feeling = $result->fetch_assoc() )
-							{
-								echo "<label><input ".(in_array($feeling['id'],$dream->feelings)?'checked':'')." type='checkbox' name='feelings[]' value='".$feeling['id']."' />".$feeling['feeling']."</label><br/>";
-								
-								if( $i==floor($n/2) ) echo "</div><div class='column'>";
-								
-								$i++;
-							}
-							?>
-								</div>
-							</div>
-						</div>
-						<?php } ?>
 						
 						<div class="row">
 							<div style="vertical-align:top">

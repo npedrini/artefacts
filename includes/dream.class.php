@@ -2,8 +2,7 @@
 include_once "includes/dbobject.class.php";
 include_once "includes/media.class.php";
 include_once "includes/user.class.php";
-include_once "includes/alchemy/module/AlchemyAPI.php";
-include_once "includes/alchemy/module/AlchemyAPIParams.php";
+include_once "includes/alchemyapi_php/alchemyapi.php";
 
 class Dream extends DBObject
 {
@@ -30,22 +29,25 @@ class Dream extends DBObject
 	public $tags;
 
 	public $email;
-
+	public $username;
+	
 	public $alchemyApiKey;
+	public $useAlchemy;
 	public $audioUpload;
 	public $dateFormat;	//	TODO: set a default
 	public $imageUpload;
+	public $isImport;
 	public $postToTumblr;
 	public $status;
 	public $timezone;
 	public $tumblrPostEmail;
 	
-	function __construct( $id = null ) 
+	function __construct( $id = null, $db = null ) 
 	{
 		$this->fields = array('age','city','color','country','description','gender','latitude','longitude','occur_date','origin','region','title','user_id');
     	$this->table = self::TABLE;
-    	
-    	parent::__construct( $id );
+
+    	parent::__construct( $id, $db );
     }
     
 	protected function init()
@@ -59,8 +61,8 @@ class Dream extends DBObject
     	$this->feelings = array();
     	$this->tags = array();
     	$this->title = "";
-
 		$this->timezone = "America/New_York";
+		$this->useAlchemy = true;
     }
 
 	public function load()
@@ -69,12 +71,13 @@ class Dream extends DBObject
 
 		if( $success )
 		{
-			$user = new User($this->user_id);
+			$user = new User($this->user_id,$this->db);
 			$this->ip = $user->ip;
 			
 			//	load tags
 			$sql  = "SELECT tags.tag,tags.id FROM `dream_tags` LEFT JOIN tags ON dream_tags.tag_id=tags.id ";
 			$sql .= "WHERE dream_tags.dream_id='" . $this->id . "'";
+			
 			$result = $this->db->query( $sql );
 			
 			$this->tags = array();
@@ -94,25 +97,33 @@ class Dream extends DBObject
 			
 			while( $row = $result->fetch_assoc() ) 
 			{
-				$this->media[] = new Media( $row['id'] );
+				$this->media[] = new Media( $row['id'], $this->db );
 			}
 		}
 	}
 	
-  	public function save()
+  	public function save( $validate = true )
 	{
 		$this->logger->clear();
 		
 		//	validation
-		$valid = $this->validate();
-
+		$valid = !$validate || $this->validate();
+		
 		//	get a user_id, either by adding new user or fetching id of existing
 		if( $valid )
 		{
-			$user = new User();
+			$user = new User( null, $this->db );
 			$user->email = $this->email;
-			$user->loadFromEmail();
-
+			$user->name = $this->username;
+			
+			if( !is_null($user->email) && !empty($user->email) )
+				$user->loadFromEmail();
+			else if( !is_null($user->name) && !empty($user->name) )
+				$user->loadFromName();
+			
+			if( $this->isImport )
+				$user->implied = 1;
+				
 			if( $user->id )
 			{
 				$this->logger->log( "user found..." );
@@ -136,7 +147,7 @@ class Dream extends DBObject
 		{
 			$this->logger->log( "saving image..." );
 
-			$image = new Media();
+			$image = new Media(null,$this->db);
 			$image->name = time();
 			$image->mime_type = $this->imageUpload['type'];
 			$image->tempFile = $this->imageUpload;
@@ -169,7 +180,7 @@ class Dream extends DBObject
 		{
 			$this->logger->log( "saving audio..." );
 			
-			$audio = new Media();
+			$audio = new Media(null,$this->db);
 			$audio->name = time();
 			$audio->mime_type = $this->audioUpload['type'];
 			$audio->tempFile = $this->audioUpload;
@@ -217,7 +228,12 @@ class Dream extends DBObject
 				$this->latitude = $location->latitude;
 				$this->longitude = $location->longitude;
 			}
-
+			else
+			{
+				$this->latitude = "0";
+				$this->longitude = "0";
+			}
+			
 			$success = parent::save();
 			
 			if( $success )
@@ -226,7 +242,11 @@ class Dream extends DBObject
 			}
 			else
 			{
-				$this->status = isset($this->errorMessage)?$this->errorMessage:"Error updating dream";
+				if( isset($this->errorMessage) )
+					$this->status = $this->errorMessage;
+				else
+					$this->status = "Error updating dream";
+				
 				$valid = false;
 			}
 		}
@@ -267,53 +287,72 @@ class Dream extends DBObject
 
 		//	add dream tags
 		if( $valid 
-			&& !is_null($this->alchemyApiKey) )
+			&& $this->useAlchemy )
 		{
-			$alchemy = new AlchemyAPI();
-			$alchemy->setAPIKey( $this->alchemyApiKey );
+			$kb = strlen($this->description) / 1024;
 			
-			$params = new AlchemyAPI_KeywordParams();
-			$params->setMaxRetrieve( 20 );
-			$params->setKeywordExtractMode( 'strict' );
-			
-			$result = json_decode( $alchemy->TextGetRankedKeywords( $this->description, AlchemyAPI::JSON_OUTPUT_MODE, $params ) );
-			
-			if( $result->status == "OK" )
+			if( $kb <= 150 )
 			{
-				foreach($result->keywords as $key=>$val)
+				$alchemy = new AlchemyAPI($this->alchemyApiKey);
+				
+				$params = array();
+				$params['maxRetrieve'] = 20;
+				$params['keywordExtractMode'] = 'strict';
+				$params['sentiment'] = 1;
+				$params['showSourceText'] = 0;
+				
+				try
 				{
-					$tag = stripslashes( $val->text );
-					$tag = preg_replace( "/^\W|\W$|\./", "", $tag );
-
-					if( empty($tag) ) continue;
-					
-					$tag = strtolower( trim($tag) );
-					$tag = $this->db->real_escape_string( $tag );
-					
-					//	get tag_id
-					$sql = "SELECT id FROM `tags` WHERE tag='".$tag."'";
-					$result = $this->db->query( $sql );
-					
-					if( $this->db->affected_rows > 0 )	//	tag exists
-					{
-						$tag_row = $result->fetch_assoc();
-						$tag_id = $tag_row['id'];
-					}
-					else								//	tag does not exist
-					{
-						$sql = "INSERT INTO `tags` (tag,alchemy) VALUES ('".$tag."','1')";
-						$result = $this->db->query( $sql );
-						$tag_id = $this->db->insert_id;
-					}
-					
-					if( $tag_id )
-					{
-						$sql = "INSERT INTO `dream_tags` (dream_id,tag_id) VALUES ('".$this->id."','".$tag_id."')";
-						$result = $this->db->query( $sql );
-					}
-
-					$tags[] = $tag;
+					$result = $alchemy->keywords( 'text', $this->description, $params );
+					$this->logger->log( "alchemy " . $result['status'] . ", " . count($result['keywords']) . " keywords, " . $this->description );
 				}
+				catch(Exception $e)
+				{
+					$this->logger->log( "alchemy, " . $result['status'] . ", " . $result['statusInfo'] );
+				}
+				
+				if( isset($result)
+					&& $result['status'] == "OK" )
+				{
+					foreach($result['keywords'] as $keyword)
+					{
+						$tag = stripslashes( $keyword['text'] );
+						$tag = preg_replace( "/^\W|\W$|\./", "", $tag );
+
+						$tag = strtolower( trim($tag) );
+						$tag = $this->db->real_escape_string( $tag );
+						
+						//	get tag_id
+						$sql = "SELECT id FROM `tags` WHERE tag='".$tag."'";
+						$result2 = $this->db->query( $sql );
+						
+						if( $this->db->affected_rows > 0 )	//	tag exists
+						{
+							$tag_row = $result2->fetch_assoc();
+							$tag_id = $tag_row['id'];
+						}
+						else								//	tag does not exist
+						{
+							$sql = "INSERT INTO `tags` (tag,alchemy) VALUES ('".$tag."','1')";
+							$this->db->query( $sql );
+							$tag_id = $this->db->insert_id;
+						}
+						
+						if( $tag_id )
+						{
+							$sentiment = $keyword['sentiment'];
+							
+							$sql = "INSERT INTO `dream_tags` (dream_id,tag_id,sentiment_type,sentiment_score) VALUES ('".$this->id."','".$tag_id."','".$sentiment['type']."','".(isset($sentiment['score'])?$sentiment['score']:0)."')";
+							$this->db->query( $sql );
+						}
+	
+						$tags[] = $tag;
+					}
+				}
+			}
+			else
+			{
+				$this->logger->log( "Dream " . $this->id . " to big to process" . $kb );
 			}
 		}
 		

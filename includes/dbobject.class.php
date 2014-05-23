@@ -15,12 +15,18 @@ class DBObject
 	protected $table;
 	protected $logger;
 	
-	function __construct( $id = null )
+	protected $isNew;
+	protected $checkIfUnique;
+
+	function __construct( $id = null, $db )
 	{
-		$this->db = new Database();
+		$this->db = !is_null($db) ? $db : new Database();
 		$this->logger = new Logger();
 		
+		$this->checkIfUnique = false;
+
 		$this->init();
+		$this->isNew = true;
 
 		if( !is_null($id) )
 		{
@@ -47,10 +53,13 @@ class DBObject
 				{
 					$this->$field = $value;
 				}
+
+				$this->isNew = false;
 			}
 			else
 			{
 				$this->id = null;
+				$this->isNew = true;
 			}
 
 			return $this->id != null;
@@ -61,7 +70,7 @@ class DBObject
 	
 	public function save()
 	{
-		if( is_null($this->id) || empty($this->id) )
+		if( $this->isNew )
 		{
 			$fieldNames = array();
 			$fieldValues = array();
@@ -79,22 +88,27 @@ class DBObject
 				$where[] = $field . "='" . $value . "'";
 			}
 			
-			$sql = "SELECT id FROM " . $this->table . " WHERE " . implode(" AND ",$where);
-			$result = $this->db->query($sql);
-
-			if( $this->db->affected_rows > 0 )
+			if( $this->checkIfUnique )
 			{
-				$this->errorMessage = $this->getErrorMessage( self::ERROR_RECORD_EXISTS );
-				
-				return false;
+
+				$sql = "SELECT id FROM " . $this->table . " WHERE " . implode(" AND ",$where);
+				$result = $this->db->query($sql);
+
+				if( $this->db->affected_rows > 0 )
+				{
+					$this->errorMessage = $this->getErrorMessage( self::ERROR_RECORD_EXISTS );
+					
+					return false;
+				}
 			}
 
 			$sql = "INSERT INTO `" . $this->table . "` (" . implode(",",$fieldNames) . ") VALUES ('" . implode("','",$fieldValues) . "')";
 			$result = $this->db->query($sql);
-
+			
 			if( $result )
 			{
 				$this->id = $this->db->insert_id;
+				$this->isNew = false;
 			}
 			
 			return $result;
@@ -109,7 +123,7 @@ class DBObject
 			}
 			
 			$sql = "UPDATE `" . $this->table . "` SET " . implode(",",$updates) . " WHERE id='" . $this->id . "'";
-
+			
 			return $this->db->query($sql);
 		}
 
@@ -119,8 +133,11 @@ class DBObject
 	public function delete()
 	{
 		$sql = "DELETE FROM `" . $this->table . "` WHERE id='" . $this->id . "'";
+		$success = $this->db->query($sql);
 
-		return $this->db->query($sql);
+		$this->isNew = !is_null($success);
+
+		return $success;
 	}
 	
 	protected function getErrorMessage( $id )

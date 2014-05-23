@@ -46,6 +46,8 @@ button, input[type=button], input[type=submit]
 
 body#vis #background, body#vis #header { background-image: none; }
 
+#background,#foreground,#info,#intro,#date,#settings,#searchPane{ display: none; }
+
 #wrapper {
 	min-height: 100%;
 	height: auto !important;
@@ -95,22 +97,27 @@ body#vis #background, body#vis #header { background-image: none; }
 .framed { padding: 10px; }
 
 /*	index page	*/
-#info { display: inline-block; margin-left: 10px; font-size: .6em; padding: 3px; }
-#visualization{ width: 100%; height: 100%; } 
+#intro a { cursor: pointer; }
+#intro > div { width:300px; margin-left:auto; margin-right:auto; text-align:center; }
 
-.artwork_title { text-transform: uppercase; }
-.artwork_artist { font-weight: normal; }
+#info { display: inline-block; margin-left: 10px; font-size: .6em; padding: 3px; }
+
+#visualization{ width: 100%; height: 100%; } 
+#canvas {  width:0px; height: 0px }
+
+.artworkTitle { text-transform: uppercase; }
+.artworkArtist { font-weight: normal; }
 
 #settings { float:right; width: 25px; margin-right:15px; }
 .setting { vertical-align:middle;margin-bottom:1px;padding:2px; }
 
 #legend { clear: both; opacity: .75; }
-.legend_item{ display:inline-block; }
+.legendItem{ display:inline-block; }
 
-#search_overlay { position:absolute; z-index:1000; font-size: .6em; }
-#search_overlay .header, #search_overlay .content { padding: 5px; }
-#search_overlay .header { font-size: .5em; text-align: right; }
-#search_overlay input[type=text] { background:transparent; padding: 4px; }
+#searchPane { position:absolute; z-index:1000; font-size: .6em; }
+#searchPane .header, #searchPane .content { padding: 5px; }
+#searchPane .header { font-size: .5em; text-align: right; }
+#searchPane input[type=text] { background:transparent; padding: 4px; }
 
 #node_info { display:inline-block; position:absolute; }
 
@@ -185,7 +192,7 @@ body#vis #background, body#vis #header { background-image: none; }
 
 /*	icons	*/
 #icon_gear { width:20px; height:20px; border:0px; }
-#icon_help { width:20px; height:20px; border:0px; }
-#icon_save { height:15px; border:0px; }
-#icon_search { width:20px; height:20px; border:none; }
-#icon_theme { width:20px; height:28px; border:none; }
+#helpIcon { width:20px; height:20px; border:0px; }
+#saveIcon { height:15px; border:0px; }
+#searchIcon { width:20px; height:20px; border:none; }
+#themeIcon { width:20px; height:28px; border:none; }

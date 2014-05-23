@@ -23,16 +23,16 @@ h3 a:link, h3 a:visited, h3 a:hover { color: #fff }
 .module, .framed { background-color: rgba(255, 255, 255, 0.1); }
 
 /*	index page	*/
-#node_info { color: #fff; }
+#nodeInfo { color: #fff; }
 
-#search_overlay { background-color:#fff; color: #000; }
-#search_overlay .header { background-color:#ccc; }
-#search_overlay a, #search_overlay a:link, #search_overlay a:visited, #search_overlay a:hover { color: #000 }
-#search_overlay input[type=text] { color: #000; border:none; }
+#searchPane { background-color:#fff; color: #000; }
+#searchPane .header { background-color:#ccc; }
+#searchPane a, #searchPane a:link, #searchPane a:visited, #searchPane a:hover { color: #000 }
+#searchPane input[type=text] { color: #000; border:none; }
 
 #legend text { fill:#999; }
 #legend .node { fill:#999; }
-#legend .node_outline { stroke:#999; }
+#legend .nodeOutline { stroke:#999; }
 
 a.dream_link:link, a.dream_link:visited { color: #fff; background-color: none; }
 a.dream_link:hover { color: #000; background-color: #fff; }
@@ -48,7 +48,7 @@ a.dream_link:hover { color: #000; background-color: #fff; }
 .result a:hover {  color: #fff; }
 
 /*	icons	*/
-#icon_help { background: url("icons/help.png") no-repeat; }
-#icon_save { background: url("icons/save.png") no-repeat; }
-#icon_search { background: url("icons/calendar.png") no-repeat; }
-#icon_theme { background: url("icons/theme.png") no-repeat; }
+#helpIcon { background: url("icons/help.png") no-repeat; }
+#saveIcon { background: url("icons/save.png") no-repeat; }
+#searchIcon { background: url("icons/calendar.png") no-repeat; }
+#themeIcon { background: url("icons/theme.png") no-repeat; }

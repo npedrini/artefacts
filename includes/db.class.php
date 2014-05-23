@@ -3,14 +3,20 @@ include_once "config/config.php";
 
 class Database
 {
+	public $connection;
+
 	function Database()
 	{
-		$this->connection = new mysqli( DB_HOST, DB_USER, DB_PASS );
-		$this->connection->select_db( DB_NAME );
 	}
 	
 	function query( $string )
 	{
+		if( is_null($this->connection) ) 
+		{
+			$this->connection = new mysqli( DB_HOST, DB_USER, DB_PASS );
+			$this->connection->select_db( DB_NAME );
+		}
+
 		return $this->connection->query( $string );
 	}
 	

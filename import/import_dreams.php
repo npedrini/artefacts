@@ -1,8 +1,8 @@
 <?php
 set_include_path( "../" );
 
-include "config/config.php";
-include "includes/dream.class.php";
+include_once "config/config.php";
+include_once "includes/dream.class.php";
 
 $mysqli = new mysqli( DB_HOST, DB_USER, DB_PASS );
 $mysqli->select_db( DB_NAME );
@@ -11,6 +11,7 @@ $mysqli->query("TRUNCATE TABLE `users`");		//	empty users table
 $mysqli->query("TRUNCATE TABLE `tags`");		//	empty tags table
 $mysqli->query("TRUNCATE TABLE `dreams`");		//	empty dreams table
 $mysqli->query("TRUNCATE TABLE `dream_tags`");	//	empty dream_tags table
+$mysqli->query("TRUNCATE TABLE `media`");		//	empty media table
 
 echo "<pre>";
 
@@ -46,24 +47,12 @@ if ( ($handle = fopen("../dummy_data/dreams.csv", "r")) !== FALSE )
 		$dream->postToTumblr = POST_TO_TUMBLR;
 		$dream->timezone = TIME_ZONE;
 		$dream->tumblrPostEmail = TUMBLR_POST_EMAIL;
-
 		$dream->date = array_shift($data);
         $dream->description = array_shift($data);
         $dream->color = array_shift($data);
 		$dream->email = array_shift($data);
 		$dream->age = array_shift($data);
 		$dream->gender = array_shift($data);
-
-		$tags = array();
-
-		foreach($raw_tags as $tag)
-		{
-			if( empty($tag) ) continue;
-			
-			$tags[] = $tag;
-		}
-
-		$dream->tags = $tags;
 		
 		if( $dream->save() )
 			$successes++;

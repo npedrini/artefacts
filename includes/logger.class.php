@@ -18,6 +18,11 @@ class Logger
 	{
 		$this->log = array();
 	}
+	
+	function getLog()
+	{
+		return $this->log;
+	}
 }
 
 ?>

@@ -23,12 +23,12 @@ class Media extends DBObject
 	protected $validMimeTypes = array( self::TYPE_JPG, self::TYPE_PNG, self::TYPE_GIF, self::TYPE_MP3 );
 	protected $validExtensions = array('gif','jpg','jpeg','png');
 	
-	function __construct( $id = null ) 
+	function __construct( $id = null, $db = null ) 
 	{
 		$this->fields = array('dream_id','name','mime_type');
 		$this->table = self::TABLE;
 
-		parent::__construct( $id );
+		parent::__construct( $id, $db );
     }
 	
 	public function save()
@@ -98,8 +98,8 @@ class Media extends DBObject
 			
 			if( $this->isImage() )
 			{
-				unlink( getcwd() . $this->getPath('small') );
-				unlink( getcwd() . $this->getPath('med') );
+				unlink( $this->getPath('small', true) );
+				unlink( $this->getPath('med', true) );
 			}
 		}
 	}
@@ -149,7 +149,9 @@ class Media extends DBObject
 	
 	public function getPath( $size = null, $includeRoot = false )
 	{
-		$root = $includeRoot ? getcwd() . "/" : '';
+		$path = pathinfo(getcwd());
+		
+		$root = $includeRoot ? $path['dirname'] . "/" : '';
 		$extension = $this->getExtension();
 		
 		if( $this->isImage() 

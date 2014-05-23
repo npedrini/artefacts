@@ -4,8 +4,7 @@ set_include_path("../");
 include_once "includes/db.class.php";
 include_once "includes/dream.class.php";
 include_once "includes/logger.class.php";
-include_once "includes/alchemy/module/AlchemyAPI.php";
-include_once "includes/alchemy/module/AlchemyAPIParams.php";
+include_once "includes/alchemyapi_php/alchemyapi.php";
 
 class Graph
 {
@@ -23,6 +22,7 @@ class Graph
 	public $dateFrom;
 	public $dateTo;
 	public $maxKeywords = 20;
+	public $maxDreams = 100;
 	public $minTagValue;
 	
 	private $dreams;
@@ -68,9 +68,19 @@ class Graph
     	
 		//	GET ALL DREAMS FOR SPECIFIED DATE RANGE
 		$sql = "SELECT id FROM `dreams` ";
-		$sql .= "WHERE occur_date >= '" . $this->dateFrom . "' AND occur_date <= '" . $this->dateTo . "' ";
+		$sql .= "WHERE occur_date >= '" . $this->dateFrom . "' ";
+		if( isset($this->dateTo) )
+			$sql .= "AND occur_date <= '" . $this->dateTo . "' ";
+			
+		$sql .= "LIMIT 0," . $this->maxDreams;
 		
 		$result = $this->db->query( $sql );
+		
+		//	recalculate min and max dates, since requested
+		//	date range will likely be invalid if limit is 
+		//	imposed
+		$minDate = strtotime( $this->dateTo );
+		$maxDate = strtotime( $this->dateFrom );
 		
 		if( $this->db->affected_rows > 0 )
 		{
@@ -87,10 +97,14 @@ class Graph
 				$node->description = $dream->description;
 				$node->gender = $dream->gender;
 				$node->node_type = self::TYPE_DREAM;
+				$node->occur_date = $dream->occur_date;
 				$node->index = count($this->nodes);
 				$node->tags = array();			
 				$node->title = $dream->title;
 				$node->value = 0;
+				
+				$minDate = min( strtotime( $dream->occur_date ), $minDate );
+				$maxDate = max( strtotime( $dream->occur_date ), $maxDate );
 				
 				if( $dream->getImage() ) 
 				{
@@ -129,6 +143,9 @@ class Graph
 					&& isset($root_node) ) 
 					$root_node->value++;
 			}
+			
+			$this->dateFrom = date( "Y-m-d", $minDate );
+			$this->dateTo = date( "Y-m-d", $maxDate );
 		}
 		
 		//	add tag nodes and dream<>tag links
@@ -170,6 +187,8 @@ class Graph
     
     function render()
     {
+		$sounds = array("A","As","B","C","Cs","D","Ds","E","F","Fs","G","Gs");
+
     	$paragraphs = array();
 
 		//	build indexed array of dream values
@@ -182,6 +201,14 @@ class Graph
 				$index = array_search( $dream, $this->dreams );
 				$dreams_by_value[ $index ] = $dream->value;
 			}
+
+			if( $dream->value )
+			{
+				$sound_id = $sounds[ floor( count($sounds)/0xFFFFFF*hexdec($dream->color2)) ];
+				$sound_id .= min( $dream->value, 3 );
+
+				$dream->soundeffect_path = $sound_id;
+			}			
 		}
 		
 		//	sort array of values by value
@@ -204,13 +231,12 @@ class Graph
 			$sentences = preg_split( "/(\.+\s*)/", $dream->description );
 			
 			$influence = max(1,$dream->value) / $total_weight;
-			$excerpt_count = round( $influence * count($sentences) );
+			$excerpt_count = ceil( $influence * count($sentences) );
 			$start = round(count($sentences)*$cursor_position);
 			$length = min( count($sentences)-$start-1, $excerpt_count );
 
 			$excerpt = array_slice( $sentences, $start, $length );
 			$explanation = count($excerpt) . " sentences  taken from the " . $this->cardinalize($i+1) . " most influential dream";
-			//, starting at a relative text position of " . number_format( $cursor_position, 2 )  . ".";
 
 			for($j=0;$j<count($excerpt);$j++)
 			{
@@ -236,25 +262,28 @@ class Graph
 			$text = implode(". ", $sentences);
 
 			//	alchemy
-			$alchemy = new AlchemyAPI();
-			$alchemy->setAPIKey( $this->alchemyApiKey );
+			$alchemy = new AlchemyAPI($this->alchemyApiKey);
 			
-			$params = new AlchemyAPI_KeywordParams();
-			$params->setMaxRetrieve( $this->maxKeywords );
-			$params->setKeywordExtractMode( 'strict' );
+			$params = array();
+			$params['maxRetrieve'] = $this->maxKeywords;
+			$params['keywordExtractMode'] = 'strict';
+			$params['sentiment'] = 0;
+			$params['showSourceText'] = 0;
 			
-			//	parse response
-			$response =$alchemy->TextGetRankedKeywords( $text, AlchemyAPI::JSON_OUTPUT_MODE, $params );
-			
-			$result = json_decode( $response );
-			
-			if( $result->status == "OK" )
+			try {
+				
+				//	parse response
+				$result =$alchemy->keywords( 'text', $text, $params );				
+			} catch (Exception $e){}
+
+			if( isset($result)
+				&& $result['status'] == "OK" )
 			{
 				$root_node = $this->nodes[0];
 				
-				foreach($result->keywords as $key=>$val)
+				foreach($result['keywords'] as $keyword)
 				{
-					$tag = $val->text;
+					$tag = stripslashes( $keyword['text'] );
 					$tag = preg_replace( "/\./", "", $tag );
 					
 					if( isset($this->indexes['tags'][$tag]) )
@@ -265,14 +294,14 @@ class Graph
 					{
 						$this->indexes['tags'][$tag] = $this->tags[] = $tag_node = (object)array('color'=>'#000000','id'=>-1,'index'=>count($this->nodes),'node_type'=>'tag','tags'=>array(),'title'=>$tag,'value'=>0);
 					}
-					
+							
 					if( $tag_node->value >= $this->minTagValue )
 					{
 						if( !array_search($tag_node,$this->nodes) )
 						{
 							$this->nodes[] = $tag_node;
 						}
-					
+								
 						$this->addTag( $tag_node, $root_node );
 					}
 				}
@@ -292,12 +321,7 @@ class Graph
 		
 		$data = (object)array( 'nodes'=>$this->nodes, 'links'=>$this->links, 'dream_total'=>count($this->dreams), 'art_total'=>0 );
 		
-    	return $this->format( $data );
-    }
-    
-    function format( $data )
-    {
-    	return json_encode($data);
+    	return $data;
     }
     
     function addTag( $tag, $node )
