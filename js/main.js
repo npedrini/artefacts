@@ -349,7 +349,8 @@
 		var dateSpecified = availableDates.indexOf( hash[0] ) > -1;
 		
 		//	narrow search
-		if( graph.totalDreams < 10
+		if( window.expandRange
+			&& graph.totalDreams < 10
 			&& dataLoadAttempts < availableDates.length 
 			&& !dateSpecified )
 		{

@@ -5,6 +5,7 @@ include_once "includes/session.php";
 $date = new DateTime( 'now', new DateTimeZone(TIME_ZONE) );
 
 $showIntro = isset($_SESSION['introShown']) ? false : true;
+$expandRange = isset($_GET['expand']) ? $_GET['expand']==="true" : true;
 
 $_SESSION['introShown'] = true;
 
@@ -145,6 +146,7 @@ if( $showIntro )
 	<script type="text/javascript" src="js/main.js"></script>
 	<script type="text/javascript">
 	var showIntro = <?php echo $showIntro?'true':'false' ?>;
+	var expandRange = <?php echo $expandRange?'true':'false' ?>;
 	var status = "<?php echo isset($_GET['status'])?$_GET['status']:"";?>";
 	var isEmbedded = <?php echo EMBEDDED?'true':'false' ?>;
 	var defaultTheme = "<?php echo THEME; ?>";
