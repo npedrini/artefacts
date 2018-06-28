@@ -84,6 +84,10 @@ switch( $resource )
 			$graph->maxDreams = MAX_DISPLAYED_DREAMS;
 			$graph->maxKeywords = 30;
 			$graph->minTagValue = MIN_TAG_VALUE;
+			if( isset($_SESSION[origin]) ) 
+			{
+  				$graph->origin = $_SESSION[origin];
+			}
 			
 			if( isset($_GET['date_to']) )
 			{
