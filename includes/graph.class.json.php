@@ -71,10 +71,8 @@ class Graph
 		$sql .= "WHERE occur_date >= '" . $this->dateFrom . "' ";
 		if( isset($this->dateTo) )
 			$sql .= "AND occur_date <= '" . $this->dateTo . "' ";
-		if(isset($this->origin) 
-		{
+		if(isset($this->origin) )
         		$sql .= "AND origin = '" . $origin . "' ";
-		}
 			
 		$sql .= "LIMIT 0," . $this->maxDreams;
 		
