@@ -24,7 +24,7 @@ class Graph
 	public $maxKeywords = 20;
 	public $maxDreams = 100;
 	public $minTagValue;
-	
+	public $origin;	
 	private $dreams;
 	private $tags;
 	private $indexes;
