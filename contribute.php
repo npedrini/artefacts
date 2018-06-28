@@ -167,8 +167,8 @@ if( isset($formData['submit']) )
 <script type="text/javascript" src="js/lib/jquery.miniColors.js"></script>
 <script type="text/javascript" src="js/lib/jquery.tipsy.js"></script>
 <script type="text/javascript" src="js/lib/jquery.cookie.js"></script>
-<script type="text/javascript">
-<script src='https://www.google.com/recaptcha/api.js'></script>
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+
 $(document).ready
 (
 	function()
@@ -304,6 +304,7 @@ var tagTimer;
 									rel="tooltip" title="We won't share this with anybody, promise." />
 						</div>
 						<div class="g-recaptcha" data-sitekey="6LccMWEUAAAAAGKLMa1GoYLbF9nAXg9UZqNxlCnQ"></div>
+						<br>
 						<div class="row">
 							<input type="submit" name="submit" value="Contribute" />
 						</div>
