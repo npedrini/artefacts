@@ -1,5 +1,5 @@
 <?php
-session_start();
+include_once "includes/session.php";
 
 include_once "config/config.php";
 include_once "includes/db.class.php";
