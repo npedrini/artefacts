@@ -109,11 +109,12 @@ else
 		$sql .= "LEFT JOIN tags ON tags.id=dream_tags.tag_id ";
 		*/
 		
-		$sql  = "SELECT DISTINCT(dreams.id), dreams.occur_date, dreams.title, dreams.description, dreams.gender, dreams.age ";
-		$sql .= "FROM `dreams`,`tags`,`dream_tags` ";
+		$sql  = "SELECT DISTINCT(dreams.id), dreams.occur_date, dreams.title, dreams.description, dreams.gender, dreams.age, contexts.show_demographics ";
+		$sql .= "FROM `dreams`,`tags`,`dream_tags`,`contexts` ";
 		
 		$where[] = "dream_tags.dream_id=dreams.id";
 		$where[] = "tags.id=dream_tags.tag_id";
+		$where[] = "contexts.id=dreams.context_id";
 		
 		$or = array();
 		
@@ -122,7 +123,6 @@ else
 			$tag = strtolower(trim($tag));
 			
 			$or[] = "tags.tag = '".$mysqli->real_escape_string($tag)."'";
-			
 			$or[] = "dreams.title LIKE '%".$mysqli->real_escape_string($tag)."%'";
 			$or[] = "dreams.description LIKE '%".$mysqli->real_escape_string($tag)."%'";
 						
@@ -137,7 +137,9 @@ else
 	}
 	else
 	{
-		$sql  = "SELECT * FROM `dreams` ";
+		$sql  = "SELECT dreams.*, contexts.show_demographics FROM `dreams`,`contexts`";
+
+		$where[] = "dreams.context_id=contexts.id";
 	}
 	
 	if( isset($_GET['date']) 
@@ -409,7 +411,6 @@ form input[type=text], form textarea { padding: .5em; outline-width: 0; }
 			
 			if( count($dreams) )
 			{
-
 				foreach($dreams as $dream)
 				{
 					$date = new DateTime( $dream['occur_date'], new DateTimeZone('Australia/Melbourne') );
@@ -433,11 +434,19 @@ form input[type=text], form textarea { padding: .5em; outline-width: 0; }
 					$title_description = implode( ' ', array_splice( explode( ' ', $dream['description'] ), 0, 10 ) ) . '...';
 				
 					$title = isset($dream['title']) && !empty($dream['title']) ? $dream['title'] : $title_description;
-				
-					$tootlip = $dream['gender'].(!empty($dream['age'])?', age '.$dream['age']:'');
-				
+					
+					$tooltip = array();
+					
+					if( $dream['show_demographics']==1 )
+					{
+						if( !empty($dream['gender']) ) 
+							array_push($tooltip,$dream['gender']);
+						if( !empty($dream['age']) ) 
+							array_push($tooltip,'age '.$dream['age']);
+					}
+					
 					echo $nl."\t<div class='result'>";
-					echo $nl."\t\t<a rel='tooltip' title='".$tootlip."' href='browse.php?did=".$dream['id']."'>".$title."</a>";
+					echo $nl."\t\t<a rel='tooltip' title='".implode(", ",$tooltip)."' href='browse.php?did=".$dream['id']."'>".$title."</a>";
 					
 					echo $nl."\t</div>";
 				}
