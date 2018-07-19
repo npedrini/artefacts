@@ -39,7 +39,7 @@ switch( $resource )
 			$dream = new Dream($resourceId);
 			$dream->alchemyApiKey = ALCHEMY_API_KEY;
 			$dream->dateFormat = $date_format;
-			$dream->origin = isset($_POST['origin'])?$_POST['origin']:null;
+			$dream->origin = isset($_SESSION['origin'])?$_SESSION['origin']:null;
 			$dream->postToTumblr = POST_TO_TUMBLR;
 			$dream->timezone = TIME_ZONE;
 			$dream->tumblrPostEmail = TUMBLR_POST_EMAIL;
