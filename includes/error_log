@@ -1,0 +1,1 @@
+[18-Jul-2018 23:49:14 UTC] PHP Fatal error:  Class 'WatsonSDK\Common\WatsonService' not found in /home/artefact/public_html/staging/includes/vendor/cognitivebuild/watsonphpsdk/Source/Services/NaturalLanguageUnderstanding.php on line 32

@@ -1,8 +1,27 @@
 <?php
+namespace WatsonSDK\Services;
+
+use WatsonSDK\Common\WatsonCredential;
+use WatsonSDK\Services\NaturalLanguageUnderstanding\AnalyzeModel;
+
+require 'vendor/autoload.php';
+
+include 'vendor/cognitivebuild/watsonphpsdk/Source/Services/NaturalLanguageUnderstanding.php';
+
+
+$nlu = new NaturalLanguageUnderstanding( WatsonCredential::initWithCredentials('apikey','YNeZEVJ0S8wzUUVANNn9z9qc74O13xux5ZF-mpeHNkyc') );
+$model = new AnalyzeModel('Watson PHP SDK for IBM Watson Developer Cloud.', [ 'keywords' => [ 'limit' => 5 ] ]);
+$result = $nlu->analyze($model);
+echo $result->getContent();
+
+
+
 include_once "includes/dbobject.class.php";
 include_once "includes/media.class.php";
 include_once "includes/user.class.php";
 include_once "includes/alchemyapi_php/alchemyapi.php";
+
+
 
 class Dream extends DBObject
 {
@@ -23,14 +42,14 @@ class Dream extends DBObject
 	public $region;
 	public $title;
 	public $user_id;
-	
+
 	public $media;
 	public $feelings;
 	public $tags;
 
 	public $email;
 	public $username;
-	
+
 	public $alchemyApiKey;
 	public $useAlchemy;
 	public $audioUpload;
@@ -41,19 +60,19 @@ class Dream extends DBObject
 	public $status;
 	public $timezone;
 	public $tumblrPostEmail;
-	
-	function __construct( $id = null, $db = null ) 
+
+	function __construct( $id = null, $db = null )
 	{
 		$this->fields = array('age','city','color','country','description','gender','latitude','longitude','occur_date','origin','region','title','user_id');
     	$this->table = self::TABLE;
 
     	parent::__construct( $id, $db );
     }
-    
+
 	protected function init()
 	{
 		parent::init();
-		
+
 		$this->color = "#333333";
     	$this->description = "";
     	$this->email = "";
@@ -73,16 +92,16 @@ class Dream extends DBObject
 		{
 			$user = new User($this->user_id,$this->db);
 			$this->ip = $user->ip;
-			
+
 			//	load tags
 			$sql  = "SELECT tags.tag,tags.id FROM `dream_tags` LEFT JOIN tags ON dream_tags.tag_id=tags.id ";
 			$sql .= "WHERE dream_tags.dream_id='" . $this->id . "'";
-			
+
 			$result = $this->db->query( $sql );
-			
+
 			$this->tags = array();
-			
-			while( $row = $result->fetch_assoc() ) 
+
+			while( $row = $result->fetch_assoc() )
 			{
 				$this->tags[] = (object)$row;
 			}
@@ -90,40 +109,42 @@ class Dream extends DBObject
 			//	load media
 			$sql  = "SELECT * FROM `" . Media::TABLE . "` ";
 			$sql .= "WHERE dream_id='" . $this->id . "'";
-			
+
 			$result = $this->db->query( $sql );
-			
+
 			$this->media = array();
-			
-			while( $row = $result->fetch_assoc() ) 
+
+			while( $row = $result->fetch_assoc() )
 			{
 				$this->media[] = new Media( $row['id'], $this->db );
 			}
 		}
 	}
-	
+
   	public function save( $validate = true )
 	{
 		$this->logger->clear();
-		
+
+/*
+
 		//	validation
 		$valid = !$validate || $this->validate();
-		
+
 		//	get a user_id, either by adding new user or fetching id of existing
 		if( $valid )
 		{
 			$user = new User( null, $this->db );
 			$user->email = $this->email;
 			$user->name = $this->username;
-			
+
 			if( !is_null($user->email) && !empty($user->email) )
 				$user->loadFromEmail();
 			else if( !is_null($user->name) && !empty($user->name) )
 				$user->loadFromName();
-			
+
 			if( $this->isImport )
 				$user->implied = 1;
-				
+
 			if( $user->id )
 			{
 				$this->logger->log( "user found..." );
@@ -136,13 +157,13 @@ class Dream extends DBObject
 			$success = $user->save();
 
 			$this->user_id = $user->id;
-			
+
 			if( is_null($this->user_id) ) $valid = false;
 		}
-		
-		if( $valid 
+
+		if( $valid
 			&& isset($this->imageUpload)
-			&& !empty($this->imageUpload["name"]) 
+			&& !empty($this->imageUpload["name"])
 			&& $this->imageUpload["error"] == 0 )
 		{
 			$this->logger->log( "saving image..." );
@@ -151,7 +172,7 @@ class Dream extends DBObject
 			$image->name = time();
 			$image->mime_type = $this->imageUpload['type'];
 			$image->tempFile = $this->imageUpload;
-			
+
 			if( $image->validate() )
 			{
 				if( $image->save() )
@@ -164,7 +185,7 @@ class Dream extends DBObject
 					$valid = false;
 
 					$this->logger->log( "error saving image..." );
-				}				
+				}
 			}
 			else
 			{
@@ -173,18 +194,18 @@ class Dream extends DBObject
 			}
 		}
 
-		if( $valid 
+		if( $valid
 			&& isset($this->audioUpload)
-			&& !empty($this->audioUpload["name"]) 
+			&& !empty($this->audioUpload["name"])
 			&& $this->audioUpload["error"] == 0 )
 		{
 			$this->logger->log( "saving audio..." );
-			
+
 			$audio = new Media(null,$this->db);
 			$audio->name = time();
 			$audio->mime_type = $this->audioUpload['type'];
 			$audio->tempFile = $this->audioUpload;
-			
+
 			if( $audio->validate() )
 			{
 				if( $audio->save() )
@@ -195,9 +216,9 @@ class Dream extends DBObject
 				{
 					$this->status = $audio->errorMessage;
 					$valid = false;
-			
+
 					$this->logger->log( "error saving audio..." );
-				}				
+				}
 			}
 			else
 			{
@@ -207,7 +228,7 @@ class Dream extends DBObject
 				$this->logger->log( "error validating audio..." );
 			}
 		}
-		
+
 		$get_location = curl_init();
 		curl_setopt($get_location, CURLOPT_URL, "http://freegeoip.net/json/" . $_SERVER['REMOTE_ADDR'] );
 		curl_setopt($get_location, CURLOPT_RETURNTRANSFER, 1);
@@ -218,9 +239,9 @@ class Dream extends DBObject
 		//	import dream
 		if( $valid )
 		{
-			$date = DateTime::createFromFormat( $this->dateFormat, $this->date, new DateTimeZone($this->timezone) ); 
+			$date = DateTime::createFromFormat( $this->dateFormat, $this->date, new DateTimeZone($this->timezone) );
 			$this->occur_date = $date->format('Y-m-d');
-			
+
 			if( $location )
 			{
 				$this->city = $location->city;
@@ -233,9 +254,9 @@ class Dream extends DBObject
 				$this->latitude = "0";
 				$this->longitude = "0";
 			}
-			
+
 			$success = parent::save();
-			
+
 			if( $success )
 			{
 				$this->status = "Dream added!";
@@ -246,14 +267,14 @@ class Dream extends DBObject
 					$this->status = $this->errorMessage;
 				else
 					$this->status = "Error updating dream";
-				
+
 				$valid = false;
 			}
 		}
-		
+
 		if( isset($image) )
 		{
-			if( !is_null($this->id) 
+			if( !is_null($this->id)
 				&& !empty($this->id) )
 			{
 				$image->dream_id = $this->id;
@@ -269,7 +290,7 @@ class Dream extends DBObject
 
 		if( isset($audio) )
 		{
-			if( !is_null($this->id) 
+			if( !is_null($this->id)
 				&& !empty($this->id) )
 			{
 				$audio->dream_id = $this->id;
@@ -286,21 +307,21 @@ class Dream extends DBObject
 		$tags = array();
 
 		//	add dream tags
-		if( $valid 
+		if( $valid
 			&& $this->useAlchemy )
 		{
 			$kb = strlen($this->description) / 1024;
-			
+
 			if( $kb <= 150 )
 			{
 				$alchemy = new AlchemyAPI($this->alchemyApiKey);
-				
+
 				$params = array();
 				$params['maxRetrieve'] = 20;
 				$params['keywordExtractMode'] = 'strict';
 				$params['sentiment'] = 1;
 				$params['showSourceText'] = 0;
-				
+
 				try
 				{
 					$result = $alchemy->keywords( 'text', $this->description, $params );
@@ -310,7 +331,7 @@ class Dream extends DBObject
 				{
 					$this->logger->log( "alchemy, " . $result['status'] . ", " . $result['statusInfo'] );
 				}
-				
+
 				if( isset($result)
 					&& $result['status'] == "OK" )
 				{
@@ -321,11 +342,11 @@ class Dream extends DBObject
 
 						$tag = strtolower( trim($tag) );
 						$tag = $this->db->real_escape_string( $tag );
-						
+
 						//	get tag_id
 						$sql = "SELECT id FROM `tags` WHERE tag='".$tag."'";
 						$result2 = $this->db->query( $sql );
-						
+
 						if( $this->db->affected_rows > 0 )	//	tag exists
 						{
 							$tag_row = $result2->fetch_assoc();
@@ -337,15 +358,15 @@ class Dream extends DBObject
 							$this->db->query( $sql );
 							$tag_id = $this->db->insert_id;
 						}
-						
+
 						if( $tag_id )
 						{
 							$sentiment = $keyword['sentiment'];
-							
+
 							$sql = "INSERT INTO `dream_tags` (dream_id,tag_id,sentiment_type,sentiment_score) VALUES ('".$this->id."','".$tag_id."','".$sentiment['type']."','".(isset($sentiment['score'])?$sentiment['score']:0)."')";
 							$this->db->query( $sql );
 						}
-	
+
 						$tags[] = $tag;
 					}
 				}
@@ -355,49 +376,49 @@ class Dream extends DBObject
 				$this->logger->log( "Dream " . $this->id . " to big to process" . $kb );
 			}
 		}
-		
-		if( $valid 
-			&& $this->postToTumblr 
+
+		if( $valid
+			&& $this->postToTumblr
 			&& $this->tumblrPostEmail != null )
 		{
 			$to = $this->tumblrPostEmail;
 			$subject = isset($this->title)?$this->title:"untitled";
-			
+
 			$body = $this->description;
 			$body .= ("\n\nDreamt on " . $this->date . " by a " . $this->age . " year old " . ($this->gender == "male" ? "man" : "woman") . " in " . $location->city);
 			$body .= ("\n\nhttp://artefactsofthecollectiveunconscious.net/browse.php?did=" . $this->id);
-			
+
 			$tagline = '';
 			foreach($tags as $tag) $tagline .= ("#".$tag." ");
 			$body .= "\n\n".$tagline;
-			
-			mail( $to, $subject, $body );		
+
+			mail( $to, $subject, $body );
 		}
-	
+
 		if( $valid )
 		{
 			foreach($this->feelings as $feeling_id)
 			{
 				if( $feeling_id )
 				{
-					$sql = "INSERT INTO `dream_feelings` (dream_id,feeling_id) VALUES ('".$this->id."','".$feeling_id."')";					
+					$sql = "INSERT INTO `dream_feelings` (dream_id,feeling_id) VALUES ('".$this->id."','".$feeling_id."')";
 					$result = $this->db->query( $sql );
 				}
 			}
 		}
-		
+
 		if( $valid ) $this->init();
-		
+
 		return $valid;
 	}
-	
+
 	protected function validate()
 	{
 		$valid = true;
-		
+
 		//	validate required fields
 		$required = array('date','description','email');
-		
+
 		foreach($required as $field)
 			if( !isset($this->$field) || empty($this->$field) )
 				$valid = false;
@@ -406,22 +427,22 @@ class Dream extends DBObject
 		{
 			$this->status = "Please complete all the fields.";
 		}
-		
+
 		//  validate email separately
 		else if( !filter_var($this->email, FILTER_VALIDATE_EMAIL) )
 		{
 			$this->status = "Oops! This doesn't look like a valid email.";
 			$valid = false;
 		}
-		
+
 		return $valid;
 	}
-	
+
 	protected function getErrorMessage( $id )
 	{
 		if( $id == self::ERROR_RECORD_EXISTS )
 			return "Ooops! It looks like this dream already exists.";
-		
+
 		return parent::getErrorMessage($id);
 	}
 
@@ -445,7 +466,7 @@ class Dream extends DBObject
     	{
     		$this->$key = $val;
     	}
-    	
+
     	if( $imageUpload != null )
     		$this->imageUpload = $imageUpload;
 
@@ -453,5 +474,5 @@ class Dream extends DBObject
     		$this->audioUpload = $audioUpload;
     }
 }
-
+*/
 ?>
