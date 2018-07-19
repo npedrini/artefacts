@@ -168,7 +168,7 @@ if( isset($formData['submit']) )
 <script type="text/javascript" src="js/lib/jquery.tipsy.js"></script>
 <script type="text/javascript" src="js/lib/jquery.cookie.js"></script>
 <script src="https://www.google.com/recaptcha/api.js" async defer></script>
-<script type="text/javascript">
+
 $(document).ready
 (
 	function()
