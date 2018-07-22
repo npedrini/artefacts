@@ -1,5 +1,5 @@
 <?php
-session_start();
+include_once "includes/session.php";
 
 include_once "config/config.php";
 include_once "includes/db.class.php";
@@ -229,7 +229,7 @@ var tagTimer;
 			<form method="post" enctype="multipart/form-data" accept-charset="UTF-8">
 
 				<input type="hidden" name="id" value="<?php echo isset($dream->id)?$dream->id:''; ?>"  />
-
+				<input type="hidden" name="origin" value="<?php echo isset($dream->origin)?$dream->origin:''; ?>"  />
 				<div class="module" id="fields">
 
 					<div class='title'>Dream Information</div>
