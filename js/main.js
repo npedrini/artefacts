@@ -485,7 +485,7 @@
 			if( node == graph.rootNode )
 				nodeInfo += graph.currentDateFrom + " to " + graph.currentDateTo;
 			else
-				nodeInfo += "Dreamt on " + graph.currentDateFrom + " by a " + node.age + " year old " + (node.gender == "male" ? "man" : "woman") + " in <a href='" + map_url + "' target='_blank'>" + node.city + "</a>";
+				nodeInfo += "Dreamt on " + graph.currentDateFrom + " in <a href='" + map_url + "' target='_blank'>" + node.city + "</a>";
 			nodeInfo += "</div>";
 
 			if( node.audio_path != null )
