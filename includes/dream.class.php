@@ -9,7 +9,6 @@ require 'watson/autoload.php';
 include_once "includes/dbobject.class.php";
 include_once "includes/media.class.php";
 include_once "includes/user.class.php";
-include_once "includes/alchemyapi_php/alchemyapi.php";
 
 class Dream extends DBObject
 {
@@ -307,7 +306,7 @@ class Dream extends DBObject
 				try
 				{
 					$response = $nlu->analyze($model);
-					$result = $response->getContents();
+					$result = json_decode($response->getContent(), true);
 					$this->logger->log( "watson, " . (isset($result['keywords'])?count($result['keywords']):0) . " keywords, " . $this->description );
 				}
 				catch(Exception $e)
