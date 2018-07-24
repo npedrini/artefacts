@@ -1,2 +1,0 @@
-[19-Jul-2018 11:44:28 UTC] PHP Warning:  mysqli_query() expects parameter 1 to be mysqli, null given in /home/artefact/public_html/womenindesign2018/index.php on line 87
-[19-Jul-2018 11:44:28 UTC] PHP Warning:  mysqli_error() expects parameter 1 to be mysqli, null given in /home/artefact/public_html/womenindesign2018/index.php on line 87

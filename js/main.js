@@ -82,6 +82,9 @@
 
 			setTheme( isEmbedded ? 1 : ($.cookie("theme") != undefined ? $.cookie("theme") : 1) );
 
+			if( document.url.indexOf("dream-design") > -1 ) {
+			 setTheme(1);
+			}
 			updateInfo();
 		}
 	);
