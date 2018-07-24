@@ -243,7 +243,10 @@ if( isset($formData['submit']) )
     <main class="body-content">
       <section class="contribute-section">
         <form method="post" enctype="multipart/form-data" accept-charset="UTF-8">
-          <div class="module" id="fields">
+					<input type="hidden" name="id" value="<?php echo isset($dream->id)?$dream->id:''; ?>"  />
+					<input type="hidden" name="origin" value="womenindesign2018"  />
+					<input type="hidden" name="redirect_url" value="http://staging.artefactsofthecollectiveunconscious.net/dream-design/home.html" />"
+					<div class="module" id="fields">
             <div class="title">Dream Information</div>
             <div class="body">
               <div class="row">
@@ -275,10 +278,7 @@ if( isset($formData['submit']) )
                 <input id="email" type="hidden" name="email" value="michelleboyde69@gmail.com" >
               </div>
               <div class="g-recaptcha" data-sitekey="6LccMWEUAAAAAGKLMa1GoYLbF9nAXg9UZqNxlCnQ">
-                <div style="width: 304px; height: 78px;">
-                  <div><iframe src="https://www.google.com/recaptcha/api2/anchor?ar=1&amp;k=6LccMWEUAAAAAGKLMa1GoYLbF9nAXg9UZqNxlCnQ&amp;co=aHR0cDovL3d3dy5hcnRlZmFjdHNvZnRoZWNvbGxlY3RpdmV1bmNvbnNjaW91cy5uZXQ6ODA.&amp;hl=en&amp;v=v1531759913576&amp;size=normal&amp;cb=36coklf2z7m1" role="presentation" scrolling="no" sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-top-navigation allow-modals allow-popups-to-escape-sandbox" width="304" height="78" frameborder="0"></iframe></div>
-                  <textarea id="g-recaptcha-response" name="g-recaptcha-response" class="g-recaptcha-response" style="width: 250px; height: 40px; border: 1px solid #c1c1c1; margin: 10px 25px; padding: 0px; resize: none;  display: none; "></textarea>
-                </div>
+
               </div>
               <br>
               <div class="row">
