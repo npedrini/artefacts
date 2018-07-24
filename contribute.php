@@ -85,7 +85,7 @@ if( isset($formData['submit']) )
 
 		curl_close($curl);
 
-		$status = "Oops, something went wrong.";
+		$status = "Oops, something went wrong with curl.";
 	}
 	else
 	{
@@ -140,7 +140,7 @@ if( isset($formData['submit']) )
 		$dream->setValues( $formData );
 
 		if( !isset($status) )
-			$status = "Oops! Something went wrong.";
+			$status = "Oops! Something went wrong with data validation.";
 	}
 	else
 	{
@@ -229,7 +229,7 @@ var tagTimer;
 			<form method="post" enctype="multipart/form-data" accept-charset="UTF-8">
 
 				<input type="hidden" name="id" value="<?php echo isset($dream->id)?$dream->id:''; ?>"  />
-				<input type="hidden" name="origin" value="<?php echo isset($dream->origin)?$dream->origin:''; ?>"  />
+				<input type="hidden" name="origin" value="womenindesign2018"  />
 				<div class="module" id="fields">
 
 					<div class='title'>Dream Information</div>

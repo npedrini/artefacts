@@ -1,4 +1,11 @@
 <?php
+
+use WatsonSDK\Common\WatsonCredential;
+use WatsonSDK\Services\NaturalLanguageUnderstanding\AnalyzeModel;
+use WatsonSDK\Services\NaturalLanguageUnderstanding;
+
+require 'watson/autoload.php';
+
 include_once "includes/dbobject.class.php";
 include_once "includes/media.class.php";
 include_once "includes/user.class.php";
@@ -293,26 +300,24 @@ class Dream extends DBObject
 
 			if( $kb <= 150 )
 			{
-				$alchemy = new AlchemyAPI($this->alchemyApiKey);
-
-				$params = array();
-				$params['maxRetrieve'] = 20;
-				$params['keywordExtractMode'] = 'strict';
-				$params['sentiment'] = 1;
-				$params['showSourceText'] = 0;
+				$nlu = new NaturalLanguageUnderstanding( WatsonCredential::initWithCredentials('99b00872-a550-48b1-8546-fc565e213036','w3SKunEBDxZ2') );
+				//	look into whether the following call returns sentiment
+				$model = new AnalyzeModel($this->description, [ 'keywords' => [ 'sentiment' => true ] ]);
 
 				try
 				{
-					$result = $alchemy->keywords( 'text', $this->description, $params );
-					$this->logger->log( "alchemy " . $result['status'] . ", " . (isset($result['keywords'])?count($result['keywords']):0) . " keywords, " . $this->description );
+					$response = $nlu->analyze($model);
+					$result = $response->getContents();
+					$this->logger->log( "watson, " . (isset($result['keywords'])?count($result['keywords']):0) . " keywords, " . $this->description );
 				}
 				catch(Exception $e)
 				{
-					$this->logger->log( "alchemy, " . $result['status'] . ", " . $result['statusInfo'] );
+					$this->logger->log( "watson, no response" );
 				}
-
 				if( isset($result)
-					&& $result['status'] == "OK" )
+					//	alchemy returned a `status` property in the result which we checked here,
+					//	but watson does not
+					/*&& $result['status'] == "OK"*/ )
 				{
 					foreach($result['keywords'] as $keyword)
 					{
@@ -342,7 +347,7 @@ class Dream extends DBObject
 						{
 							$sentiment = $keyword['sentiment'];
 
-							$sql = "INSERT INTO `dream_tags` (dream_id,tag_id,sentiment_type,sentiment_score) VALUES ('".$this->id."','".$tag_id."','".$sentiment['type']."','".(isset($sentiment['score'])?$sentiment['score']:0)."')";
+							$sql = "INSERT INTO `dream_tags` (dream_id,tag_id,sentiment_type,sentiment_score) VALUES ('".$this->id."','".$tag_id."','".$sentiment['label']."','".(isset($sentiment['score'])?$sentiment['score']:0)."')";
 							$this->db->query( $sql );
 						}
 
@@ -356,7 +361,7 @@ class Dream extends DBObject
 			}
 		}
 
-		/*if( $valid
+		if( $valid
 			&& $this->postToTumblr
 			&& $this->tumblrPostEmail != null )
 		{
@@ -372,7 +377,7 @@ class Dream extends DBObject
 			$body .= "\n\n".$tagline;
 
 			mail( $to, $subject, $body );
-		}*/
+		}
 
 		if( $valid )
 		{
