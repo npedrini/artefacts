@@ -66,9 +66,13 @@ if( isset($formData['submit']) )
 
 	$url = "http://" . $_SERVER['HTTP_HOST'] . (isset($path['path']) ? substr($path['path'],0,strrpos($path['path'],'/')) : '') . "/api/dream/".(isset($formData['id'])?$formData['id']:'');
 
+print_r($_FILES); // debug
+
 	foreach($_FILES as $key=>$file)
 		if( $file['tmp_name'] )
 			$formData[$key] = '@' . $file['tmp_name'] . ';filename=' . $file['name'] . ';type=' . $file['type'];
+
+print_r($formData); //debug
 
 	$curl = curl_init();
 
@@ -229,7 +233,7 @@ var tagTimer;
 			<form method="post" enctype="multipart/form-data" accept-charset="UTF-8">
 
 				<input type="hidden" name="id" value="<?php echo isset($dream->id)?$dream->id:''; ?>"  />
-				
+
 				<div class="module" id="fields">
 
 					<div class='title'>Dream Information</div>
