@@ -68,7 +68,7 @@ if( isset($formData['submit']) )
 
 	foreach($_FILES as $key=>$file)
 		if( $file['tmp_name'] )
-			$formData[$key] = '@' . $file['tmp_name'] . ';filename=' . $file['name'] . ';type=' . $file['type'];
+			$formData[$key] = new CurlFile($file['tmp_name'], $file['type'], $file['name']);
 
 	$curl = curl_init();
 
@@ -122,6 +122,7 @@ if( isset($formData['submit']) )
 			if( isset($formData['redirect_url']) )
 			{
 				header("Location: " . urldecode($formData['redirect_url']) );
+
 			}
 			else
 			{
@@ -150,7 +151,7 @@ if( isset($formData['submit']) )
 		$date = DateTime::createFromFormat( $date_format, $dream->date, new DateTimeZone(TIME_ZONE) );
 		$status = "Your dream was submitted";
 
-		header("Location: index.php?status=".$status."#".$date->format('j/n/Y'));
+		header("Location: /dream-design/home.html");
 	}
 }
 ?>
@@ -245,7 +246,7 @@ if( isset($formData['submit']) )
         <form method="post" enctype="multipart/form-data" accept-charset="UTF-8">
 					<input type="hidden" name="id" value="<?php echo isset($dream->id)?$dream->id:''; ?>"  />
 					<input type="hidden" name="origin" value="womenindesign2018"  />
-					<input type="hidden" name="redirect_url" value="http://staging.artefactsofthecollectiveunconscious.net/dream-design/home.html" />"
+					<input type="hidden" name="redirect_url" value="http://staging.artefactsofthecollectiveunconscious.net/dream-design/home.html" />
 					<div class="module" id="fields">
             <div class="title">Dream Information</div>
             <div class="body">
