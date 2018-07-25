@@ -229,15 +229,20 @@ class Dream extends DBObject
 
 			if( $location )
 			{
+				/*geolocation service deprecated
 				$this->city = $location->city;
 				$this->country = $location->country_name;
 				$this->latitude = $location->latitude;
 				$this->longitude = $location->longitude;
+
 			}
 			else
 			{
+			*/
 				$this->latitude = "0";
 				$this->longitude = "0";
+				$this->city = "Hobart";
+				$this->country = "Australia";
 			}
 
 			$success = parent::save();
@@ -360,6 +365,8 @@ class Dream extends DBObject
 			}
 		}
 
+	/*Tumblr email posting deprecated
+
 		if( $valid
 			&& $this->postToTumblr
 			&& $this->tumblrPostEmail != null )
@@ -377,6 +384,7 @@ class Dream extends DBObject
 
 			mail( $to, $subject, $body );
 		}
+*/
 
 		if( $valid )
 		{

@@ -66,13 +66,9 @@ if( isset($formData['submit']) )
 
 	$url = "http://" . $_SERVER['HTTP_HOST'] . (isset($path['path']) ? substr($path['path'],0,strrpos($path['path'],'/')) : '') . "/api/dream/".(isset($formData['id'])?$formData['id']:'');
 
-print_r($_FILES); // debug
-
 	foreach($_FILES as $key=>$file)
 		if( $file['tmp_name'] )
-			$formData[$key] = '@' . $file['tmp_name'] . ';filename=' . $file['name'] . ';type=' . $file['type'];
-
-print_r($formData); //debug
+			$formData[$key] = new CurlFile($file['tmp_name'], $file['type'], $file['name']);
 
 	$curl = curl_init();
 
